@@ -1,0 +1,2210 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Penderie</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Penderie">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#E3E7EA; --paper:#F7F8F6; --paper-ink:#56637A; --surface:#FFFFFF; --ink:#1C2638; --muted:#5F6B7C;
+  --line:#CDD4DA; --seam:#8994A5; --dot:#BAC4CF; --accent:#C93A5B; --on-accent:#FFFFFF; --ok:#2E7D5B;
+  --shadow:rgba(28,38,56,.14); --shadow-lg:rgba(28,38,56,.22); --chip:#EEF1F3;
+  color-scheme:light;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#161B24; --paper:#DDE1E4; --paper-ink:#4E5A6E; --surface:#202734; --ink:#E7EBF1; --muted:#9AA5B5;
+    --line:#323B4A; --seam:#7F8A9B; --dot:#AEB8C3; --accent:#E45C7D; --on-accent:#FFFFFF; --ok:#5DBB8F;
+    --shadow:rgba(0,0,0,.35); --shadow-lg:rgba(0,0,0,.5); --chip:#2A3241;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#161B24; --paper:#DDE1E4; --paper-ink:#4E5A6E; --surface:#202734; --ink:#E7EBF1; --muted:#9AA5B5;
+  --line:#323B4A; --seam:#7F8A9B; --dot:#AEB8C3; --accent:#E45C7D; --on-accent:#FFFFFF; --ok:#5DBB8F;
+  --shadow:rgba(0,0,0,.35); --shadow-lg:rgba(0,0,0,.5); --chip:#2A3241;
+  color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none !important}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{
+  margin:0; min-height:100%; background:var(--bg); color:var(--ink);
+  font-family:'Archivo',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  -webkit-font-smoothing:antialiased; -webkit-tap-highlight-color:transparent;
+}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+img{max-width:100%}
+main{max-width:520px;margin:0 auto;padding:10px 16px calc(100px + env(safe-area-inset-bottom,0px))}
+
+/* Headers */
+.top{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;padding:10px 0 14px}
+h1{margin:0;font-size:40px;line-height:.9;font-weight:840;font-stretch:62%;letter-spacing:-.005em}
+.sub{margin:6px 0 0;font-size:14px;color:var(--muted);font-variant-numeric:tabular-nums}
+.acts{display:flex;gap:6px;align-items:center;flex-shrink:0}
+.icon{width:42px;height:42px;border-radius:12px;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center;cursor:pointer;transition:transform .12s}
+.icon:active{transform:scale(.94)}
+.icon.hot{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.icon:disabled,.pill:disabled{opacity:.4;cursor:default}
+.pill{height:42px;padding:0 14px;border-radius:12px;border:1.5px solid var(--accent);color:var(--accent);background:transparent;font-weight:660;font-size:15px;cursor:pointer}
+.h2{margin:22px 2px 10px;font-size:22px;font-weight:800;font-stretch:66%;line-height:1}
+
+/* Context switches */
+.ctx{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0 0 12px}
+.seg{display:grid;grid-template-columns:repeat(3,1fr);background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:3px;gap:2px}
+.seg button{min-height:34px;border:0;background:none;border-radius:9px;font-size:13.5px;font-weight:580;color:var(--muted);cursor:pointer;padding:0 2px}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--surface)}
+
+/* Pattern paper */
+.dots{background-color:var(--paper);background-image:radial-gradient(circle,var(--dot) 1px,transparent 1.6px);background-size:18px 18px;background-position:center}
+.paper{position:relative;display:flex;justify-content:center;padding:22px 0 24px;border-radius:12px;
+  box-shadow:0 1px 0 rgba(255,255,255,.6) inset,0 10px 30px -12px var(--shadow-lg),0 0 0 1px var(--line);
+  --u:calc((min(100vw, 520px) - 56px) / 420)}
+.reg{position:absolute;width:14px;height:14px;pointer-events:none;opacity:.75}
+.reg.a{top:10px;left:10px;border-top:1.5px solid var(--accent);border-left:1.5px solid var(--accent)}
+.reg.b{top:10px;right:10px;border-top:1.5px solid var(--accent);border-right:1.5px solid var(--accent)}
+.reg.c{bottom:10px;left:10px;border-bottom:1.5px solid var(--accent);border-left:1.5px solid var(--accent)}
+.reg.d{bottom:10px;right:10px;border-bottom:1.5px solid var(--accent);border-right:1.5px solid var(--accent)}
+
+/* Outfit layout (420u wide) */
+.outfit{display:grid;width:calc(420 * var(--u));
+  grid-template-columns:calc(90 * var(--u)) calc(240 * var(--u)) calc(90 * var(--u));
+  grid-template-rows:calc(72 * var(--u)) calc(42 * var(--u)) calc(214 * var(--u)) calc(214 * var(--u)) calc(56 * var(--u)) calc(84 * var(--u));
+  row-gap:calc(8 * var(--u));
+  grid-template-areas:". tete ." ". yeux ." "mg torse md" ". bas ." ". chaussettes ." ". pieds ."}
+.slot{position:relative;display:flex;align-items:center;justify-content:center;padding:0;border:0;background:none;
+  touch-action:pan-y;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.live .slot{cursor:pointer}
+.slot img{max-width:100%;max-height:100%;object-fit:contain;pointer-events:none;
+  filter:drop-shadow(0 calc(4 * var(--u)) calc(5 * var(--u)) rgba(28,38,56,.22))}
+img.opaque{mix-blend-mode:multiply;filter:none !important}
+.live .slot.empty{border:1.5px dashed var(--seam);border-radius:calc(14 * var(--u));background:var(--paper)}
+.ph{font-size:calc(15 * var(--u));line-height:1.1;font-weight:580;font-stretch:84%;color:var(--paper-ink);text-align:center;padding:0 4px}
+.lk{position:absolute;top:-4px;right:-4px;width:20px;height:20px;border-radius:50%;background:var(--ink);color:#fff;display:grid;place-items:center;z-index:4;box-shadow:0 2px 6px var(--shadow)}
+.s-tete{grid-area:tete;justify-self:center;width:62%;height:100%}
+.s-yeux{grid-area:yeux;justify-self:center;width:48%;height:100%}
+.torse{grid-area:torse;position:relative;display:block}
+.s-dessus{position:absolute;left:0;top:0;width:64%;height:100%}
+.s-haut{position:absolute;right:0;top:5%;width:64%;height:95%;z-index:2}
+.live .s-dessus.empty{justify-content:flex-start;align-items:flex-start;padding:calc(12 * var(--u)) 0 0 calc(10 * var(--u))}
+.live .s-dessus.empty .ph{max-width:50%;text-align:left;padding:0}
+.torse[data-s="dessus"] .s-dessus{left:18%}
+.torse[data-s="haut"] .s-haut{right:18%;top:0;height:100%}
+.live .torse[data-s="dessus"] .s-haut,
+.live .torse[data-s="haut"] .s-dessus{width:auto;height:calc(34 * var(--u));padding:0 calc(10 * var(--u));border-radius:999px;align-items:center}
+.live .torse[data-s="dessus"] .s-haut{right:0;top:auto;bottom:0}
+.live .torse[data-s="haut"] .s-dessus{left:0;top:0;z-index:3}
+.live .torse[data-s="haut"] .s-dessus .ph{max-width:none}
+.s-mg{grid-area:mg;align-self:end;justify-self:start;width:86%;height:calc(110 * var(--u))}
+.s-md{grid-area:md;align-self:end;justify-self:end;width:86%;height:calc(110 * var(--u))}
+.s-bas{grid-area:bas;width:100%;height:100%}
+.s-chaussettes{grid-area:chaussettes;justify-self:center;width:52%;height:100%}
+.s-pieds{grid-area:pieds;justify-self:center;width:76%;height:100%}
+
+@keyframes inR{from{transform:translateX(22%);opacity:0}to{transform:none;opacity:1}}
+@keyframes inL{from{transform:translateX(-22%);opacity:0}to{transform:none;opacity:1}}
+@keyframes drop{from{transform:translateY(-14%) scale(.94);opacity:0}to{transform:none;opacity:1}}
+.slot img.in-r{animation:inR .24s cubic-bezier(.2,.8,.2,1)}
+.slot img.in-l{animation:inL .24s cubic-bezier(.2,.8,.2,1)}
+.slot img.drop{animation:drop .42s cubic-bezier(.2,.8,.2,1) both}
+
+.under{display:flex;justify-content:center;gap:8px;margin-top:12px}
+.ghost{min-height:38px;padding:0 14px;border-radius:999px;border:1px solid var(--line);background:var(--surface);font-size:14px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.hint{font-size:13.5px;color:var(--muted);text-align:center;margin:12px 8px 0;line-height:1.45}
+
+/* Hang tag */
+.tag{position:relative;margin:16px auto 0;background:#FBFBF8;color:#1C2638;border-radius:12px;padding:14px 16px 14px 46px;
+  box-shadow:0 8px 24px -10px var(--shadow-lg),0 0 0 1px rgba(28,38,56,.08)}
+.tag::before{content:"";position:absolute;left:17px;top:22px;width:12px;height:12px;border-radius:50%;background:var(--bg);box-shadow:inset 0 1px 2px rgba(0,0,0,.25)}
+.tag::after{content:"";position:absolute;left:23px;top:34px;bottom:14px;border-left:1.5px dashed rgba(28,38,56,.22)}
+.tag .sc{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.tag .sc b{font-size:40px;font-weight:850;font-stretch:62%;line-height:.9;font-variant-numeric:tabular-nums}
+.tag .sc span{font-size:15px;font-weight:650}
+.tag ul{list-style:none;margin:10px 0 0;padding:0;display:flex;flex-direction:column;gap:6px}
+.tag li{font-size:13.5px;line-height:1.38;padding-left:16px;position:relative;color:#2A3547}
+.tag li::before{content:"";position:absolute;left:0;top:.42em;width:7px;height:7px;border-radius:50%;background:#2E7D5B}
+.tag li.bad::before{background:#C93A5B}
+.tag .rules{margin-top:10px;background:none;border:0;padding:0;color:#C93A5B;font-weight:650;font-size:13.5px;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+
+/* Wardrobe */
+.filters{display:flex;gap:8px;overflow-x:auto;margin:0 -16px 14px;padding:2px 16px;scrollbar-width:none}
+.filters::-webkit-scrollbar{display:none}
+.chip{min-height:36px;padding:0 12px;border-radius:999px;border:1px solid var(--line);background:var(--surface);
+  font-size:14px;font-weight:550;display:inline-flex;align-items:center;gap:6px;cursor:pointer;white-space:nowrap;flex-shrink:0}
+.chip.sm{min-height:32px;font-size:13.5px;padding:0 11px}
+.chip.on{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.chip .ct{font-size:12px;opacity:.6;font-variant-numeric:tabular-nums}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.tile{display:flex;flex-direction:column;gap:6px;padding:0;border:0;background:none;text-align:left;cursor:pointer;min-width:0;position:relative}
+.tile .ti{position:relative;display:flex;align-items:center;justify-content:center;aspect-ratio:3/4;width:100%;background:var(--paper);
+  border-radius:12px;padding:12%;overflow:hidden;color:var(--paper-ink);font-weight:600;font-size:14px;text-align:center;
+  box-shadow:0 0 0 1px var(--line),0 6px 16px -10px var(--shadow-lg);transition:transform .15s}
+.tile:active .ti{transform:scale(.97)}
+.tile .ti img{max-width:100%;max-height:100%;object-fit:contain;filter:drop-shadow(0 3px 4px rgba(28,38,56,.2))}
+.tile .tl{font-size:13px;line-height:1.25;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:0 2px}
+.tile.on .ti{box-shadow:0 0 0 2.5px var(--accent)}
+.tile.dash .ti{box-shadow:none;border:1.5px dashed var(--seam)}
+.dotc{position:absolute;left:8px;top:8px;width:11px;height:11px;border-radius:50%;background:var(--c);box-shadow:0 0 0 1.5px rgba(255,255,255,.9),0 0 0 2.5px rgba(28,38,56,.15)}
+.nolab{position:absolute;right:7px;top:7px;font-size:10.5px;font-weight:700;color:#C93A5B;background:#fff;border-radius:6px;padding:2px 5px;box-shadow:0 0 0 1px rgba(201,58,91,.35)}
+.check{position:absolute;right:8px;top:8px;width:22px;height:22px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center}
+
+/* Laundry */
+.basket{display:flex;gap:10px;overflow-x:auto;margin:0 -16px;padding:4px 16px 8px;scrollbar-width:none}
+.basket::-webkit-scrollbar{display:none}
+.bk{position:relative;width:70px;flex-shrink:0}
+.bk .ti{width:70px;height:84px;display:grid;place-items:center;background:var(--paper);border-radius:12px;padding:8px;box-shadow:0 0 0 1px var(--line);border:0;cursor:pointer}
+.bk .ti img{max-width:100%;max-height:100%;object-fit:contain}
+.bk .rm{position:absolute;right:-5px;top:-5px;width:24px;height:24px;border-radius:50%;border:0;background:var(--ink);color:var(--surface);display:grid;place-items:center;cursor:pointer}
+.load{background:var(--surface);border-radius:16px;padding:16px;margin-bottom:12px;box-shadow:0 0 0 1px var(--line),0 10px 24px -16px var(--shadow-lg)}
+.load-head{display:flex;gap:14px;align-items:center}
+.drum{--in:#F2F4F3;--tx:#1C2638;width:78px;height:78px;border-radius:50%;flex-shrink:0;display:grid;place-items:center;position:relative;
+  background:radial-gradient(circle,var(--in) 0 55%,#C9D0D7 56% 62%,#E9EDF0 63% 100%);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08)}
+.drum::after{content:"";position:absolute;inset:14px;border-radius:50%;border:1.5px dashed rgba(28,38,56,.25)}
+.drum b{font-size:25px;font-weight:850;font-stretch:62%;color:var(--tx);position:relative;z-index:1}
+.g-blanc .drum{--in:#FFFFFF}
+.g-clair .drum{--in:#EFE7D6}
+.g-couleur .drum{--in:#E7C3CB}
+.g-fonce .drum{--in:#2B3444;--tx:#F2F4F7}
+.g-apart .drum{--in:#F0C8B3}
+.g-main .drum{--in:#DCE6F0}
+.lh h3{margin:0;font-size:22px;font-weight:820;font-stretch:66%;line-height:1}
+.lh p{margin:5px 0 0;font-size:14px;color:var(--muted);line-height:1.35}
+.meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.meta span{font-size:12.5px;padding:5px 10px;border-radius:999px;background:var(--chip);font-weight:560}
+.thumbs{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}
+.thumbs button{width:50px;height:60px;background:var(--paper);border-radius:9px;display:grid;place-items:center;padding:5px;border:0;cursor:pointer;box-shadow:0 0 0 1px var(--line)}
+.thumbs img{max-width:100%;max-height:100%;object-fit:contain}
+.notes{margin:12px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px}
+.notes li{font-size:13.5px;line-height:1.4;padding-left:18px;position:relative}
+.notes li::before{content:"";position:absolute;left:2px;top:.55em;width:8px;border-top:1.5px dashed var(--seam)}
+.notes li.w::before{border-color:var(--accent)}
+.load .done{margin-top:14px}
+
+/* Care label (woven ribbon) */
+.ribbon{display:inline-flex;align-items:center;gap:12px;padding:11px 16px;background:#F4F2EC;color:#1E2A4A;border-radius:3px;position:relative;
+  box-shadow:0 1px 3px rgba(0,0,0,.14),inset 0 0 0 1px rgba(30,42,74,.06)}
+.ribbon::before,.ribbon::after{content:"";position:absolute;left:5px;right:5px;border-top:1px dashed rgba(30,42,74,.3)}
+.ribbon::before{top:4px}.ribbon::after{bottom:4px}
+.ribbon svg{width:27px;height:29px;display:block}
+.cbox{display:flex;flex-direction:column;gap:10px;align-items:flex-start}
+.ctext{font-size:13.5px;color:var(--muted);line-height:1.4;margin:0}
+
+/* Saved outfits */
+.og{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.ocard{display:flex;flex-direction:column;gap:8px;padding:0;border:0;background:none;text-align:left;cursor:pointer;min-width:0}
+.opaper{display:flex;justify-content:center;padding:12px 0;border-radius:12px;box-shadow:0 0 0 1px var(--line),0 8px 20px -14px var(--shadow-lg);
+  --u:calc(((min(100vw, 520px) - 44px) / 2 - 22px) / 420)}
+.oname{font-size:14px;font-weight:620;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:0 2px}
+.prev-mid{display:flex;justify-content:center;padding:14px 0;border-radius:12px;box-shadow:0 0 0 1px var(--line);--u:calc(170px / 420);margin-bottom:12px}
+.big{display:flex;justify-content:center;align-items:center;height:250px;border-radius:14px;box-shadow:0 0 0 1px var(--line);padding:18px}
+.big img{max-width:100%;max-height:100%;object-fit:contain;filter:drop-shadow(0 4px 6px rgba(28,38,56,.22))}
+
+/* Empty states */
+.empty{text-align:center;padding:26px 16px 10px;color:var(--muted)}
+.empty svg{color:var(--seam);margin-bottom:10px}
+.empty p{margin:0 auto 16px;line-height:1.45;max-width:30ch}
+.empty .row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.loading{padding-top:38vh;text-align:center;color:var(--muted)}
+
+/* Nav + FAB */
+.tabs{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--line);
+  padding:4px 8px calc(4px + env(safe-area-inset-bottom,0px));display:flex;justify-content:center;z-index:20}
+.tabs .in{display:flex;width:100%;max-width:520px}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:9px 0 5px;background:none;border:0;
+  color:var(--muted);font-size:11.5px;font-weight:580;position:relative;cursor:pointer}
+.tab[aria-current="page"]{color:var(--ink)}
+.tab[aria-current="page"]::before{content:"";position:absolute;top:0;width:30px;border-top:2px dashed var(--accent)}
+.tab .bdg{position:absolute;top:4px;left:calc(50% + 6px);min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--accent);color:#fff;font-size:11px;font-weight:700;display:grid;place-items:center}
+.fab{position:fixed;right:max(16px, calc(50vw - 244px));bottom:calc(76px + env(safe-area-inset-bottom,0px));
+  width:58px;height:58px;border-radius:50%;background:var(--accent);color:var(--on-accent);border:0;
+  box-shadow:0 8px 22px var(--shadow-lg);display:grid;place-items:center;z-index:15;cursor:pointer}
+
+/* Sheet */
+.sheet{position:fixed;inset:0;z-index:50;display:flex;align-items:flex-end;justify-content:center;background:rgba(16,22,32,0);transition:background .2s}
+.sheet.open{background:rgba(16,22,32,.45)}
+.sheet-card{width:100%;max-width:520px;max-height:calc(100% - 36px - env(safe-area-inset-top,0px));overflow-y:auto;overscroll-behavior:contain;
+  background:var(--surface);border-radius:20px 20px 0 0;padding:10px 16px calc(20px + env(safe-area-inset-bottom,0px));
+  transform:translateY(100%);transition:transform .26s cubic-bezier(.2,.8,.2,1)}
+.sheet-card::before{content:"";display:block;width:40px;height:4px;border-radius:2px;background:var(--line);margin:0 auto 12px}
+.sheet.open .sheet-card{transform:none}
+@media (prefers-reduced-motion: reduce){
+  .sheet-card,.sheet{transition:none}
+  .slot img.in-r,.slot img.in-l,.slot img.drop{animation:none}
+}
+.sh-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+.sh-head h2{margin:0;font-size:28px;font-weight:820;font-stretch:64%;line-height:1;min-width:0;overflow-wrap:anywhere}
+.x{width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:none;display:grid;place-items:center;cursor:pointer;flex-shrink:0}
+.foot{position:sticky;bottom:calc(-20px - env(safe-area-inset-bottom,0px));margin:16px -16px calc(-20px - env(safe-area-inset-bottom,0px));
+  padding:12px 16px calc(14px + env(safe-area-inset-bottom,0px));background:var(--surface);border-top:1px solid var(--line);z-index:5}
+
+.drop{position:relative;height:210px;border-radius:14px;border:1.5px dashed var(--seam);overflow:hidden;
+  background:conic-gradient(#E7EAED 25%,#F8F9FA 0 50%,#E7EAED 0 75%,#F8F9FA 0) 0 0/18px 18px}
+.drop.lab{height:140px}
+.drop.has{border-style:solid;border-color:var(--line)}
+.drop:focus-within{border-color:var(--accent)}
+.drop .pv{position:absolute;inset:12px;width:calc(100% - 24px);height:calc(100% - 24px);object-fit:contain}
+.paste{position:absolute;inset:0;outline:none;color:transparent;caret-color:transparent;overflow:hidden;
+  display:flex;align-items:center;justify-content:center;-webkit-user-select:text;user-select:text;cursor:text}
+.paste:empty::before{content:attr(data-ph);color:#56637A;font-size:15.5px;font-weight:580;pointer-events:none;padding:0 20px;text-align:center;line-height:1.35}
+.drop.has .paste::before{content:none}
+.drop.busy::after{content:"Préparation de l’image…";position:absolute;inset:0;display:grid;place-items:center;background:rgba(247,248,246,.86);color:#1C2638;font-weight:600}
+.how{font-size:14px;color:var(--muted);margin:10px 2px 4px;line-height:1.45}
+.how b{color:var(--ink);font-weight:660}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:46px;padding:0 14px;border-radius:12px;
+  border:1px solid var(--line);background:var(--surface);font-weight:630;font-size:15px;cursor:pointer;position:relative;text-align:center;line-height:1.2}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.btn:disabled{opacity:.45;cursor:default}
+.btn.danger{color:var(--accent);background:transparent;border-color:transparent}
+.btn.wide{width:100%}
+.btn.sm{min-height:38px;font-size:14px;border-radius:10px}
+.file input{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+.warn{font-size:13.5px;color:var(--accent);margin:0 2px 6px;line-height:1.4}
+.aist{font-size:13.5px;margin:10px 2px 0;line-height:1.4;color:var(--ok);font-weight:560;min-height:0}
+.aist.busy{color:var(--muted)}
+.aist.busy::after{content:"";display:inline-block;width:14px;animation:dots 1.2s steps(4) infinite;text-align:left}
+@keyframes dots{0%{content:""}25%{content:"."}50%{content:".."}75%{content:"..."}}
+.field{display:block;margin:16px 0}
+.field > span{display:block;font-size:13.5px;font-weight:650;color:var(--muted);margin-bottom:8px}
+.field em{font-style:normal;font-weight:400}
+.field input,.inp{width:100%;min-height:46px;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--ink);padding:0 14px;font:inherit;font-size:16px}
+.cats{display:flex;flex-direction:column;gap:10px}
+.cz,.drow{display:grid;grid-template-columns:84px 1fr;gap:8px;align-items:start}
+.cats.single .cz{grid-template-columns:1fr}
+.czl,.dl{font-size:13px;color:var(--muted);padding-top:9px}
+.czc{display:flex;flex-wrap:wrap;gap:6px}
+.dets{display:flex;flex-direction:column;gap:12px}
+.sw{display:flex;flex-wrap:wrap;gap:7px;padding-top:2px}
+.swc{width:28px;height:28px;border-radius:50%;border:0;background:var(--c);cursor:pointer;box-shadow:inset 0 0 0 1px rgba(0,0,0,.14)}
+.swc.on{box-shadow:0 0 0 2px var(--surface),0 0 0 4px var(--accent)}
+.dv{grid-column:2;font-size:13px;color:var(--muted);margin-top:-2px}
+details.sec{margin:16px 0 0;border-radius:14px;box-shadow:0 0 0 1px var(--line);padding:0 14px}
+details.sec summary{list-style:none;cursor:pointer;padding:14px 0;display:flex;justify-content:space-between;align-items:center;gap:10px}
+details.sec summary::-webkit-details-marker{display:none}
+details.sec summary b{font-size:15px;font-weight:660}
+details.sec summary span{font-size:13px;color:var(--muted);text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:55%}
+details.sec[open] summary{border-bottom:1px dashed var(--line);margin-bottom:12px}
+details.sec > .inner{padding-bottom:14px}
+.switch{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:14px 2px 0;font-size:14px;color:var(--muted)}
+.switch input{width:20px;height:20px;accent-color:var(--accent)}
+.rulelist{margin:0;padding:0 0 0 18px;display:flex;flex-direction:column;gap:8px}
+.rulelist li{font-size:14.5px;line-height:1.45}
+
+.torse.long{grid-area:auto;grid-row:3 / 5;grid-column:2}
+.torse.long .s-dessus{height:50%}
+.torse.long .s-haut{top:2%;height:98%}
+.torse.long[data-s="haut"] .s-haut{top:0;height:100%}
+.h3{margin:20px 2px 10px;font-size:15px;font-weight:660;color:var(--muted)}
+.bsec{margin:14px 0;padding:14px;border-radius:14px;box-shadow:0 0 0 1px var(--line);display:flex;flex-direction:column;gap:10px}
+.bsec h3{margin:0;font-size:22px;font-weight:820;font-stretch:66%;line-height:1}
+.bar{height:8px;border-radius:4px;background:var(--chip);overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--accent);transition:width .2s}
+.toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);
+  background:var(--ink);color:var(--surface);padding:11px 14px;border-radius:12px;font-size:14px;display:flex;gap:14px;align-items:center;
+  z-index:60;width:max-content;max-width:calc(100vw - 32px);box-shadow:0 6px 18px var(--shadow);line-height:1.35}
+.toast button{background:none;border:0;color:var(--accent);font-weight:700;padding:0;cursor:pointer;flex-shrink:0}
+</style>
+</head>
+<body>
+<main>
+  <section id="v-tenue"></section>
+  <section id="v-dressing" hidden></section>
+  <section id="v-lessive" hidden></section>
+  <section id="v-tenues" hidden></section>
+</main>
+
+<button class="fab" id="fab" data-act="add" aria-label="Ajouter une pièce" hidden>
+  <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+</button>
+
+<nav class="tabs" aria-label="Navigation"><div class="in">
+  <button class="tab" data-tab="tenue" aria-current="page">
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.6 6.4a2.4 2.4 0 1 1 3.2 2.3c-.5.2-.8.6-.8 1.1V11"/><path d="M12 11l8.1 6c.6.5.3 1.4-.5 1.4H4.4c-.8 0-1.1-.9-.5-1.4z"/></svg>
+    <span>Tenue</span>
+  </button>
+  <button class="tab" data-tab="dressing">
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></svg>
+    <span>Dressing</span>
+  </button>
+  <button class="tab" data-tab="lessive">
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" aria-hidden="true"><rect x="4.5" y="3" width="15" height="18" rx="2.5"/><circle cx="12" cy="13" r="4.6"/><path d="M7.5 6.2h2"/></svg>
+    <span>Lessive</span><span class="bdg" id="bdg" hidden></span>
+  </button>
+  <button class="tab" data-tab="tenues">
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" aria-hidden="true"><path d="M6.5 4h11v16l-5.5-3.8L6.5 20z"/></svg>
+    <span>Tenues</span>
+  </button>
+</div></nav>
+
+<div class="sheet" id="sheet" hidden></div>
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+<script>
+(function(){
+"use strict";
+
+/* =========================================================
+   DATA
+   ========================================================= */
+const ZONES = [
+  {id:'tete', label:'Tête', cats:['casquette','bonnet','chapeau']},
+  {id:'yeux', label:'Lunettes', cats:['lunettes']},
+  {id:'haut', label:'Hauts', cats:['tshirt','polo','chemise','pull','sweat']},
+  {id:'ensemble', label:'Une pièce', cats:['qamis','djellaba','robe','abaya','combinaison']},
+  {id:'dessus', label:'Par-dessus', cats:['veste','gilet','sansmanche','manteau']},
+  {id:'poignet', label:'Poignets', cats:['montre','bracelet','bague','bijou']},
+  {id:'bas', label:'Bas', cats:['pantalon','jean','short','pantacourt']},
+  {id:'chaussettes', label:'Chaussettes', cats:['chaussettes']},
+  {id:'pieds', label:'Chaussures', cats:['baskets','chaussures','sandales']}
+];
+const CAT_LABEL = {
+  casquette:'Casquette', bonnet:'Bonnet', chapeau:'Chapeau', lunettes:'Lunettes',
+  tshirt:'T-shirt', polo:'Polo', chemise:'Chemise', pull:'Pull', sweat:'Sweat',
+  qamis:'Qamis', djellaba:'Djellaba', robe:'Robe', abaya:'Abaya', combinaison:'Combinaison',
+  veste:'Veste', gilet:'Gilet', sansmanche:'Gilet sans manche', manteau:'Manteau',
+  montre:'Montre', bracelet:'Bracelet', bague:'Bague', bijou:'Bijou',
+  pantalon:'Pantalon', jean:'Jean', short:'Short', pantacourt:'Pantacourt',
+  chaussettes:'Chaussettes', baskets:'Baskets', chaussures:'Chaussures de ville', sandales:'Sandales'
+};
+/* f: style 1 sport … 4 habillé ; w: 0 été, 1 mi-saison, 2 hiver ; kg: poids sec approx ; tex: passe en machine/lavage */
+const CATDEF = {
+  casquette:{f:2,w:0,kg:.1,tex:true}, bonnet:{f:2,w:2,kg:.1,tex:true}, chapeau:{f:3,w:0,kg:.15,tex:false},
+  lunettes:{f:null,w:null,kg:0,tex:false},
+  tshirt:{f:2,w:0,kg:.18,tex:true}, polo:{f:3,w:0,kg:.22,tex:true}, chemise:{f:3,w:0,kg:.25,tex:true},
+  pull:{f:3,w:2,kg:.45,tex:true}, sweat:{f:2,w:1,kg:.6,tex:true},
+  qamis:{f:3,w:1,kg:.5,tex:true}, djellaba:{f:3,w:2,kg:.9,tex:true}, robe:{f:3,w:0,kg:.35,tex:true}, abaya:{f:3,w:1,kg:.5,tex:true}, combinaison:{f:2,w:0,kg:.45,tex:true},
+  veste:{f:3,w:1,kg:.9,tex:true}, gilet:{f:3,w:1,kg:.45,tex:true}, sansmanche:{f:2,w:1,kg:.5,tex:true}, manteau:{f:3,w:2,kg:1.4,tex:true},
+  montre:{f:null,w:null,kg:0,tex:false}, bracelet:{f:null,w:null,kg:0,tex:false}, bague:{f:null,w:null,kg:0,tex:false}, bijou:{f:null,w:null,kg:0,tex:false},
+  pantalon:{f:3,w:1,kg:.55,tex:true}, jean:{f:2,w:1,kg:.7,tex:true}, short:{f:2,w:0,kg:.3,tex:true}, pantacourt:{f:2,w:0,kg:.4,tex:true},
+  chaussettes:{f:null,w:null,kg:.06,tex:true},
+  baskets:{f:2,w:1,kg:.8,tex:false}, chaussures:{f:4,w:1,kg:.9,tex:false}, sandales:{f:2,w:0,kg:.4,tex:false}
+};
+const CAT_ZONE = {};
+ZONES.forEach(z => z.cats.forEach(c => { CAT_ZONE[c] = z.id; }));
+const ZONE = Object.fromEntries(ZONES.map(z => [z.id, z]));
+const SLOTS = {
+  tete:{zone:'tete', ph:'Tête', title:'Sur la tête'},
+  yeux:{zone:'yeux', ph:'Lunettes', title:'Lunettes'},
+  dessus:{zone:'dessus', ph:'Par-dessus', title:'Par-dessus'},
+  haut:{zone:'haut', ph:'Haut', title:'Haut'},
+  ensemble:{zone:'ensemble', ph:'Une pièce', title:'Une pièce (qamis, robe…)'},
+  mg:{zone:'poignet', ph:'Poignet', title:'Poignet gauche'},
+  md:{zone:'poignet', ph:'Poignet', title:'Poignet droit'},
+  bas:{zone:'bas', ph:'Bas', title:'Bas'},
+  chaussettes:{zone:'chaussettes', ph:'Chaussettes', title:'Chaussettes'},
+  pieds:{zone:'pieds', ph:'Chaussures', title:'Chaussures'}
+};
+const SLOT_KEYS = Object.keys(SLOTS);
+const ZONE_SLOT = {tete:'tete', yeux:'yeux', haut:'haut', ensemble:'ensemble', dessus:'dessus', bas:'bas', chaussettes:'chaussettes', pieds:'pieds'};
+/* lg = groupe de lavage */
+const PALETTE = [
+  {name:'noir',hex:'#1c1c1e',fam:'neutre',lg:'fonce'},
+  {name:'anthracite',hex:'#3b3f45',fam:'neutre',lg:'fonce'},
+  {name:'gris',hex:'#8b8e93',fam:'neutre',lg:'couleur'},
+  {name:'gris clair',hex:'#c8cacd',fam:'neutre',lg:'clair'},
+  {name:'blanc',hex:'#f3f3f1',fam:'neutre',lg:'blanc'},
+  {name:'écru',hex:'#ebe3d2',fam:'neutre',lg:'clair'},
+  {name:'beige',hex:'#d5c2a2',fam:'neutre',lg:'clair'},
+  {name:'camel',hex:'#b88953',fam:'neutre',lg:'couleur'},
+  {name:'marron',hex:'#6a4930',fam:'neutre',lg:'fonce'},
+  {name:'kaki',hex:'#6e6a44',fam:'neutre',lg:'fonce'},
+  {name:'marine',hex:'#1f2a45',fam:'neutre',lg:'fonce'},
+  {name:'denim',hex:'#4b6589',fam:'neutre',lg:'fonce'},
+  {name:'bleu clair',hex:'#9dc1e1',fam:'couleur',lg:'clair'},
+  {name:'bleu',hex:'#2e5fb4',fam:'couleur',lg:'couleur'},
+  {name:'turquoise',hex:'#2aa5a0',fam:'couleur',lg:'couleur'},
+  {name:'vert',hex:'#3e8a4f',fam:'couleur',lg:'couleur'},
+  {name:'vert sapin',hex:'#23463a',fam:'couleur',lg:'fonce'},
+  {name:'jaune',hex:'#e9c93b',fam:'couleur',lg:'clair'},
+  {name:'moutarde',hex:'#c39a2d',fam:'couleur',lg:'couleur'},
+  {name:'orange',hex:'#e07830',fam:'couleur',lg:'couleur'},
+  {name:'rouge',hex:'#c33235',fam:'couleur',lg:'couleur'},
+  {name:'bordeaux',hex:'#6d2234',fam:'couleur',lg:'fonce'},
+  {name:'rose',hex:'#e89bb5',fam:'couleur',lg:'clair'},
+  {name:'violet',hex:'#6c4a9b',fam:'couleur',lg:'fonce'},
+  {name:'doré',hex:'#c8a54a',fam:'metal',lg:'couleur'},
+  {name:'argenté',hex:'#b9bdc3',fam:'metal',lg:'clair'}
+];
+const PAL = Object.fromEntries(PALETTE.map(p => [p.name, p]));
+const TON_SUR_TON = new Set(['noir','blanc','gris','gris clair','anthracite','beige','écru','marine','camel','marron','kaki']);
+const STYLE_LBL = {1:'Sport',2:'Casual',3:'Chic décontracté',4:'Habillé'};
+const WARM_LBL = {0:'Été',1:'Mi-saison',2:'Hiver'};
+const OCC_LBL = {casual:'casual', chic:'chic', sport:'sport'};
+
+/* =========================================================
+   HELPERS
+   ========================================================= */
+const $ = (s, r) => (r || document).querySelector(s);
+const $$ = (s, r) => Array.from((r || document).querySelectorAll(s));
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid = () => (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2, 10);
+function lsGet(k){ try { return JSON.parse(localStorage.getItem(k)); } catch(e) { return null; } }
+function lsSet(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch(e) {} }
+const ICON = {
+  dice:'<rect x="4" y="4" width="16" height="16" rx="3.5"/><circle cx="9" cy="9" r="1.1" fill="currentColor"/><circle cx="15" cy="15" r="1.1" fill="currentColor"/><circle cx="15" cy="9" r="1.1" fill="currentColor"/><circle cx="9" cy="15" r="1.1" fill="currentColor"/><circle cx="12" cy="12" r="1.1" fill="currentColor"/>',
+  reset:'<path d="M4.5 12a7.5 7.5 0 1 0 2.2-5.3"/><path d="M4.5 4.5v4h4"/>',
+  x:'<path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/>',
+  lock:'<rect x="5.5" y="10.5" width="13" height="9" rx="2"/><path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5"/>',
+  check:'<path d="M5.5 12.5l4 4 9-9"/>',
+  basket:'<path d="M4 9h16l-1.6 9.2a2 2 0 0 1-2 1.8H7.6a2 2 0 0 1-2-1.8z"/><path d="M8.5 9l3.5-5 3.5 5"/>',
+  backup:'<path d="M12 4v10M8 10l4 4 4-4"/><path d="M5 15v3a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3"/>',
+  sparkle:'<path d="M12 4l1.6 4.4L18 10l-4.4 1.6L12 16l-1.6-4.4L6 10l4.4-1.6z"/>'
+};
+const ic = (n, s) => `<svg viewBox="0 0 24 24" width="${s || 22}" height="${s || 22}" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON[n]}</svg>`;
+const closeBtn = `<button type="button" class="x" data-close aria-label="Fermer">${ic('x')}</button>`;
+const hangerArt = '<svg viewBox="0 0 64 48" width="72" height="54" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M27 12a5 5 0 1 1 6.7 4.7c-1 .4-1.7 1.3-1.7 2.3v2"/><path d="M32 21L56 38c1.3 1 .7 3-1 3H9c-1.7 0-2.3-2-1-3z"/><path d="M14 45h36" stroke-dasharray="4 4"/></svg>';
+const pl = (n, one, many) => n === 1 ? `1 ${one}` : `${n} ${many}`;
+const listNames = arr => { const n = arr.map(itemLabel); return n.length > 4 ? n.slice(0, 4).join(', ') + '…' : n.join(', '); };
+const fmtKg = v => v.toFixed(1).replace('.', ',');
+
+/* =========================================================
+   STATE
+   ========================================================= */
+const S = {
+  store:null, mode:null, ready:false, ai:null,
+  items:[], outfits:[],
+  current: lsGet('penderie.current') || {},
+  locks: lsGet('penderie.locks') || {},
+  basket: lsGet('penderie.basket') || [],
+  ctx: Object.assign({meteo:'doux', occasion:'casual'}, lsGet('penderie.ctx') || {}),
+  autoAI: lsGet('penderie.autoai') !== false,
+  tab:'tenue', filter:'all', plan:null
+};
+const itemLabel = it => (it && (it.name || CAT_LABEL[it.cat])) || 'Pièce';
+const src = it => S.store ? S.store.src(it) : '';
+const labelSrc = it => S.store ? S.store.labelSrc(it) : '';
+const getItem = id => id ? S.items.find(i => i.id === id) : null;
+function itemsIn(zone){ return S.items.filter(i => CAT_ZONE[i.cat] === zone).sort((a,b) => (a.createdAt||0) - (b.createdAt||0)); }
+function persist(){ lsSet('penderie.current', S.current); lsSet('penderie.locks', S.locks); }
+function saveBasket(){ lsSet('penderie.basket', S.basket); }
+function filledCount(slots){ return SLOT_KEYS.filter(k => slots[k] && getItem(slots[k])).length; }
+const isTextile = it => !!(CATDEF[it.cat] && CATDEF[it.cat].tex);
+const styleOf = it => it.style != null ? it.style : (CATDEF[it.cat] ? CATDEF[it.cat].f : null);
+const warmthOf = it => it.warmth != null ? it.warmth : (CATDEF[it.cat] ? CATDEF[it.cat].w : null);
+const motifOf = it => it.motif || 'uni';
+
+let toastT;
+function toast(msg, label, fn){
+  const t = $('#toast');
+  t.innerHTML = `<span>${esc(msg)}</span>${label ? `<button type="button">${esc(label)}</button>` : ''}`;
+  t.hidden = false;
+  if (label) t.querySelector('button').onclick = () => { t.hidden = true; fn(); };
+  clearTimeout(toastT);
+  toastT = setTimeout(() => { t.hidden = true; }, label ? 5000 : 2800);
+}
+function errMsg(e){
+  const c = e && e.code;
+  if (c === 'quota_or_state' || c === 'quota_exceeded') return 'Stockage plein : supprime quelques pièces pour en ajouter.';
+  if (c === 'rate_limited' || c === 'resource_exhausted') return 'Trop de requêtes d’un coup. Réessaie dans un instant.';
+  if (c === 'too_large') return 'Image trop lourde.';
+  if (e && e.name === 'QuotaExceededError') return 'Plus de place sur cet appareil.';
+  return 'L’enregistrement a échoué. Réessaie.';
+}
+
+/* =========================================================
+   COLOUR SCIENCE
+   ========================================================= */
+function hexRgb(h){ h = String(h || '').replace('#',''); if (h.length === 3) h = h.split('').map(c => c + c).join(''); const n = parseInt(h, 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; }
+function rgbHex(r,g,b){ return '#' + [r,g,b].map(v => Math.max(0, Math.min(255, Math.round(v))).toString(16).padStart(2,'0')).join(''); }
+function rgbToLab(r,g,b){
+  const f = v => { v /= 255; return v <= 0.04045 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); };
+  const R = f(r), G = f(g), B = f(b);
+  let X = (R*0.4124 + G*0.3576 + B*0.1805) / 0.95047, Y = R*0.2126 + G*0.7152 + B*0.0722, Z = (R*0.0193 + G*0.1192 + B*0.9505) / 1.08883;
+  const t = v => v > 0.008856 ? Math.cbrt(v) : 7.787 * v + 16/116;
+  X = t(X); Y = t(Y); Z = t(Z);
+  return [116*Y - 16, 500*(X - Y), 200*(Y - Z)];
+}
+const labMemo = new Map();
+function hexLab(hex){ if (!labMemo.has(hex)) { const c = hexRgb(hex); labMemo.set(hex, rgbToLab(c[0], c[1], c[2])); } return labMemo.get(hex); }
+const dE = (a,b) => Math.sqrt((a[0]-b[0])**2 + (a[1]-b[1])**2 + (a[2]-b[2])**2);
+function hueOf(hex){
+  const [r,g,b] = hexRgb(hex).map(v => v/255); const mx = Math.max(r,g,b), mn = Math.min(r,g,b), d = mx - mn;
+  if (!d) return 0; let h;
+  if (mx === r) h = ((g - b) / d) % 6; else if (mx === g) h = (b - r) / d + 2; else h = (r - g) / d + 4;
+  return (h * 60 + 360) % 360;
+}
+const hueDiff = (a,b) => { const d = Math.abs(a - b) % 360; return d > 180 ? 360 - d : d; };
+function nearestNamed(lab){
+  let best = null, bd = Infinity;
+  for (const p of PALETTE) { if (p.fam === 'metal') continue; const d = dE(lab, hexLab(p.hex)); if (d < bd) { bd = d; best = p; } }
+  return best;
+}
+function dominantColor(img, W, H, transparent){
+  const N = 56;
+  const c = document.createElement('canvas'); c.width = N; c.height = N;
+  const x = c.getContext('2d', {willReadFrequently:true});
+  if (transparent) x.drawImage(img, 0, 0, W, H, 0, 0, N, N);
+  else x.drawImage(img, W*.25, H*.2, W*.5, H*.6, 0, 0, N, N);
+  const d = x.getImageData(0, 0, N, N).data;
+  const pts = [];
+  for (let i = 0; i < d.length; i += 4) { if (d[i+3] < 200) continue; pts.push({r:d[i], g:d[i+1], b:d[i+2], lab:rgbToLab(d[i], d[i+1], d[i+2])}); }
+  if (pts.length < 12) return null;
+  const K = 3;
+  let cent = [pts[0].lab, pts[Math.floor(pts.length/3)].lab, pts[Math.floor(2*pts.length/3)].lab].map(a => a.slice());
+  const asg = new Array(pts.length).fill(0);
+  for (let it = 0; it < 8; it++) {
+    for (let i = 0; i < pts.length; i++) {
+      let bi = 0, bd = Infinity;
+      for (let k = 0; k < K; k++) { const l = pts[i].lab, cc = cent[k]; const dd = (l[0]-cc[0])**2 + (l[1]-cc[1])**2 + (l[2]-cc[2])**2; if (dd < bd) { bd = dd; bi = k; } }
+      asg[i] = bi;
+    }
+    const sum = cent.map(() => [0,0,0,0]);
+    pts.forEach((p, i) => { const s = sum[asg[i]]; s[0] += p.lab[0]; s[1] += p.lab[1]; s[2] += p.lab[2]; s[3]++; });
+    cent = cent.map((c0, k) => sum[k][3] ? [sum[k][0]/sum[k][3], sum[k][1]/sum[k][3], sum[k][2]/sum[k][3]] : c0);
+  }
+  const counts = [0,0,0]; asg.forEach(a => counts[a]++);
+  let best = 0; for (let k = 1; k < K; k++) if (counts[k] > counts[best]) best = k;
+  let r = 0, g = 0, b = 0, n = 0;
+  pts.forEach((p, i) => { if (asg[i] === best) { r += p.r; g += p.g; b += p.b; n++; } });
+  const p = nearestNamed(cent[best]);
+  return {name:p.name, hex:rgbHex(r/n, g/n, b/n)};
+}
+const colorCache = new Map();
+function colorOf(it){
+  const c = it.color || colorCache.get(it.id);
+  if (!c) return null;
+  const p = PAL[c.name] || nearestNamed(hexLab(c.hex || '#888888'));
+  const hex = c.hex || p.hex;
+  const lab = hexLab(hex);
+  return {name:p.name, hex, lab, L:lab[0], h:hueOf(p.hex), fam:p.fam, lg:p.lg};
+}
+function metalOf(it){
+  const c = colorOf(it); if (!c) return null;
+  if (['doré','jaune','moutarde','camel','beige','orange'].includes(c.name)) return 'or';
+  if (['argenté','gris','gris clair','blanc','anthracite'].includes(c.name)) return 'argent';
+  return null;
+}
+const isDenim = it => it.cat === 'jean' || (colorOf(it) && colorOf(it).name === 'denim');
+
+/* =========================================================
+   STORES
+   ========================================================= */
+function localStore(){
+  let dbp = null;
+  const open = () => dbp || (dbp = new Promise((res, rej) => {
+    const r = indexedDB.open('penderie', 1);
+    r.onupgradeneeded = () => {
+      const d = r.result;
+      if (!d.objectStoreNames.contains('items')) d.createObjectStore('items', {keyPath:'id'});
+      if (!d.objectStoreNames.contains('outfits')) d.createObjectStore('outfits', {keyPath:'id'});
+    };
+    r.onsuccess = () => res(r.result);
+    r.onerror = () => rej(r.error);
+  }));
+  const tx = async (name, mode, fn) => {
+    const d = await open();
+    return new Promise((res, rej) => {
+      const t = d.transaction(name, mode);
+      const q = fn(t.objectStore(name));
+      t.oncomplete = () => res(q ? q.result : undefined);
+      t.onerror = () => rej(t.error);
+      t.onabort = () => rej(t.error);
+    });
+  };
+  const urls = new Map();
+  const url = (key, blob) => { if (!blob) return ''; if (!urls.has(key)) urls.set(key, URL.createObjectURL(blob)); return urls.get(key); };
+  const drop = key => { const u = urls.get(key); if (u) { URL.revokeObjectURL(u); urls.delete(key); } };
+  async function refresh(){
+    S.items = (await tx('items', 'readonly', s => s.getAll())) || [];
+    S.outfits = (await tx('outfits', 'readonly', s => s.getAll())) || [];
+    render();
+  }
+  return {
+    mode:'local',
+    start: refresh,
+    src: it => it ? url('F:' + it.id, it.blob) : '',
+    labelSrc: it => it ? url('L:' + it.id, it.labelBlob) : '',
+    reload: refresh,
+    async addItem(meta, blob, labelBlob, opt){
+      opt = opt || {};
+      const it = Object.assign({id:opt.id || uid(), createdAt:opt.createdAt || Date.now()}, meta, {blob, labelBlob: labelBlob || null});
+      await tx('items', 'readwrite', s => s.put(it));
+      if (!opt.bulk) await refresh();
+      return it.id;
+    },
+    async updateItem(id, patch, labelBlob){
+      const it = getItem(id); if (!it) return;
+      const rec = Object.assign({}, it, patch);
+      if (labelBlob) { rec.labelBlob = labelBlob; drop('L:' + id); }
+      await tx('items', 'readwrite', s => s.put(rec));
+      await refresh();
+    },
+    async deleteItem(id){
+      await tx('items', 'readwrite', s => s.delete(id));
+      drop('F:' + id); drop('L:' + id);
+      await refresh();
+    },
+    async addOutfit(o, opt){
+      opt = opt || {};
+      await tx('outfits', 'readwrite', s => s.put(Object.assign({id:opt.id || uid(), createdAt:opt.createdAt || Date.now()}, o)));
+      if (!opt.bulk) await refresh();
+    },
+    async deleteOutfit(id){
+      await tx('outfits', 'readwrite', s => s.delete(id));
+      await refresh();
+    }
+  };
+}
+
+function cloudStore(db, assets){
+  const items = db.collection('items');
+  const outfits = db.collection('outfits');
+  return {
+    mode:'cloud',
+    start(){
+      return new Promise(res => {
+        let a = false, b = false;
+        const done = () => { if (a && b) res(); };
+        setTimeout(res, 8000);
+        items.onSnapshot(sn => {
+          S.items = sn.docs.map(d => Object.assign({id:d.id}, d.data()));
+          a = true; done(); if (S.ready) render();
+        }, () => { a = true; done(); });
+        outfits.onSnapshot(sn => {
+          S.outfits = sn.docs.map(d => Object.assign({id:d.id}, d.data()));
+          b = true; done(); if (S.ready) render();
+        }, () => { b = true; done(); });
+      });
+    },
+    src: it => (it && it.asset) ? '/_blob/' + it.asset : '',
+    labelSrc: it => (it && it.label) ? '/_blob/' + it.label : '',
+    reload(){ return Promise.resolve(); },
+    async addItem(meta, blob, labelBlob, opt){
+      opt = opt || {};
+      const up = await assets.upload(blob, {type: blob.type || 'image/png'});
+      let lab = null;
+      if (labelBlob) lab = await assets.upload(labelBlob, {type: labelBlob.type || 'image/jpeg'});
+      const id = opt.id || uid();
+      await items.doc(id).set(Object.assign({}, meta, {asset:up.id, label: lab ? lab.id : null, createdAt:opt.createdAt || Date.now()}));
+      return id;
+    },
+    async updateItem(id, patch, labelBlob){
+      const p = Object.assign({}, patch);
+      let old = null;
+      if (labelBlob) {
+        const up = await assets.upload(labelBlob, {type: labelBlob.type || 'image/jpeg'});
+        const it = getItem(id); old = it && it.label; p.label = up.id;
+      }
+      await items.doc(id).update(p);
+      if (old) { try { await assets.delete(old); } catch(e) {} }
+    },
+    async deleteItem(id){
+      const it = getItem(id);
+      await items.doc(id).delete();
+      if (it && it.asset) { try { await assets.delete(it.asset); } catch(e) {} }
+      if (it && it.label) { try { await assets.delete(it.label); } catch(e) {} }
+    },
+    async addOutfit(o, opt){ opt = opt || {}; await outfits.doc(opt.id || uid()).set(Object.assign({}, o, {createdAt:opt.createdAt || Date.now()})); },
+    async deleteOutfit(id){ await outfits.doc(id).delete(); }
+  };
+}
+
+/* =========================================================
+   IMAGES
+   ========================================================= */
+function loadImg(blob){
+  return new Promise((res, rej) => {
+    const u = URL.createObjectURL(blob);
+    const im = new Image();
+    im.onload = () => { res(im); setTimeout(() => URL.revokeObjectURL(u), 1000); };
+    im.onerror = () => { URL.revokeObjectURL(u); rej(new Error('image')); };
+    im.src = u;
+  });
+}
+async function processImage(blob){
+  const im = await loadImg(blob);
+  const W = im.naturalWidth, H = im.naturalHeight;
+  const k = Math.min(1, 1600 / Math.max(W, H));
+  const w = Math.max(1, Math.round(W * k)), h = Math.max(1, Math.round(H * k));
+  const c = document.createElement('canvas'); c.width = w; c.height = h;
+  const x = c.getContext('2d', {willReadFrequently:true});
+  x.drawImage(im, 0, 0, w, h);
+  const d = x.getImageData(0, 0, w, h).data;
+  let minX = w, minY = h, maxX = -1, maxY = -1, clear = 0;
+  for (let yy = 0; yy < h; yy++) {
+    const row = yy * w;
+    for (let xx = 0; xx < w; xx++) {
+      if (d[(row + xx) * 4 + 3] > 16) {
+        if (xx < minX) minX = xx; if (xx > maxX) maxX = xx;
+        if (yy < minY) minY = yy; if (yy > maxY) maxY = yy;
+      } else clear++;
+    }
+  }
+  const transparent = clear > w * h * 0.02 && maxX >= 0;
+  let sx = 0, sy = 0, sw = w, sh = h;
+  if (transparent) {
+    const p = Math.round(Math.max(maxX - minX, maxY - minY) * 0.02);
+    sx = Math.max(0, minX - p); sy = Math.max(0, minY - p);
+    sw = Math.min(w, maxX + p + 1) - sx; sh = Math.min(h, maxY + p + 1) - sy;
+  }
+  const k2 = Math.min(1, 900 / Math.max(sw, sh));
+  const o = document.createElement('canvas');
+  o.width = Math.max(1, Math.round(sw * k2)); o.height = Math.max(1, Math.round(sh * k2));
+  const ox = o.getContext('2d');
+  ox.imageSmoothingQuality = 'high';
+  ox.drawImage(c, sx, sy, sw, sh, 0, 0, o.width, o.height);
+  const type = transparent ? 'image/png' : 'image/jpeg';
+  const out = await new Promise(r => o.toBlob(r, type, 0.86));
+  if (!out) throw new Error('encode');
+  let color = null;
+  try { color = dominantColor(o, o.width, o.height, transparent); } catch(e) {}
+  return {blob:out, w:o.width, h:o.height, transparent, color, preview:URL.createObjectURL(out)};
+}
+async function processLabel(blob){
+  const im = await loadImg(blob);
+  const W = im.naturalWidth, H = im.naturalHeight;
+  const k = Math.min(1, 1400 / Math.max(W, H));
+  const c = document.createElement('canvas'); c.width = Math.max(1, Math.round(W*k)); c.height = Math.max(1, Math.round(H*k));
+  const x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, c.width, c.height);
+  x.drawImage(im, 0, 0, c.width, c.height);
+  const out = await new Promise(r => c.toBlob(r, 'image/jpeg', 0.88));
+  if (!out) throw new Error('encode');
+  return {blob:out, preview:URL.createObjectURL(out)};
+}
+let colorJob = false, colorAgain = false;
+async function ensureColors(){
+  if (colorJob) { colorAgain = true; return; }
+  colorJob = true; let changed = false;
+  try {
+    for (const it of S.items.slice()) {
+      if (it.color || colorCache.has(it.id)) continue;
+      try {
+        let blob = it.blob;
+        if (!blob) { const u = src(it); if (!u) continue; const r = await fetch(u); if (!r.ok) continue; blob = await r.blob(); }
+        const im = await loadImg(blob);
+        const c = dominantColor(im, im.naturalWidth, im.naturalHeight, it.transparent !== false);
+        colorCache.set(it.id, c || {name:'gris', hex:'#8b8e93'}); changed = true;
+      } catch(e) { colorCache.set(it.id, {name:'gris', hex:'#8b8e93'}); }
+    }
+  } finally { colorJob = false; }
+  if (changed) { renderTenue(); renderLessive(); }
+  if (colorAgain) { colorAgain = false; ensureColors(); }
+}
+
+/* =========================================================
+   CLIPBOARD
+   ========================================================= */
+async function readClipboard(){
+  if (!navigator.clipboard || !navigator.clipboard.read) throw new Error('unsupported');
+  const list = await navigator.clipboard.read();
+  for (const it of list) { const t = it.types.find(t => t.indexOf('image/') === 0); if (t) return await it.getType(t); }
+  return null;
+}
+function bindPaste(zone, onBlob){
+  zone.addEventListener('paste', e => {
+    const cd = e.clipboardData;
+    const items = cd ? Array.from(cd.items || []) : [];
+    const f = items.find(i => i.kind === 'file' && i.type.indexOf('image/') === 0);
+    if (f) { e.preventDefault(); e.stopPropagation(); onBlob(f.getAsFile()); return; }
+    const file = cd ? Array.from(cd.files || []).find(f => f.type.indexOf('image/') === 0) : null;
+    if (file) { e.preventDefault(); e.stopPropagation(); onBlob(file); return; }
+    e.stopPropagation();
+    setTimeout(async () => {
+      const img = zone.querySelector('img');
+      zone.innerHTML = '';
+      if (img && img.src) {
+        try { onBlob(await (await fetch(img.src)).blob()); }
+        catch(err) { toast('Cette image ne passe pas au collage. Utilise « Importer ».'); }
+      } else toast('Rien à coller : copie d’abord une image dans Photos.');
+    }, 60);
+  });
+  zone.addEventListener('input', () => { if (!zone.querySelector('img')) zone.textContent = ''; });
+  zone.addEventListener('keydown', e => { if (!(e.metaKey || e.ctrlKey)) e.preventDefault(); });
+}
+
+/* =========================================================
+   CLAUDE (sample) — lit la pièce et l'étiquette sur l'usage de l'utilisateur
+   ========================================================= */
+const FRONT_PROMPT = `Tu analyses la photo détourée d'un vêtement ou accessoire pour une application de garde-robe.
+Réponds uniquement avec un objet JSON de cette forme :
+{"categorie":"...","couleur":"...","motif":"uni","style":2,"chaleur":1,"nom":"..."}
+- categorie : une valeur parmi ${Object.keys(CAT_LABEL).join(', ')} (tshirt = t-shirt, sansmanche = gilet sans manche ou doudoune sans manche, chaussures = chaussures de ville/cuir, baskets = sneakers, qamis = tunique longue homme type kamis/thobe, djellaba = djellaba ou gandoura, abaya = abaya, robe = robe, combinaison = combinaison ou salopette).
+- couleur : la couleur dominante, une valeur parmi ${PALETTE.map(p => p.name).join(', ')} (doré/argenté seulement pour montres et bijoux ; denim = jean bleu).
+- motif : "uni" ou "motif" (rayures, carreaux, imprimé, gros logo ou graphique = motif).
+- style : 1 = sport, 2 = casual, 3 = chic décontracté, 4 = habillé.
+- chaleur : 0 = été/léger, 1 = mi-saison, 2 = hiver/chaud.
+- nom : nom court en français, 2 à 5 mots, sans marque inventée (ex. "Veste en jean brut").`;
+const LABEL_PROMPT = `Photo d'une étiquette d'entretien de vêtement. Lis les symboles (norme GINETEX / ISO 3758) et le texte imprimé.
+Réponds uniquement avec un objet JSON de cette forme :
+{"lisible":true,"lavage":"machine","temperature":30,"programme":"normal","blanchiment":"non","sechage":"non","repassage":2,"nettoyage_sec":false,"a_part":false,"composition":"100% coton"}
+Règles de lecture :
+- Bac avec un chiffre = lavage machine à cette température max (points : 1 = 30, 2 = 40, 3 = 50, 4 = 60). Main dans le bac = "main". Bac barré = "non".
+- Aucune barre sous le bac = "normal", une barre = "delicat", deux barres = "tres_delicat".
+- Triangle vide = "oui", triangle avec deux traits obliques = "oxygene", triangle barré = "non".
+- Carré avec cercle : deux points = "normal", un point = "doux", barré = "non". Carré sans cercle (séchage naturel) = "non".
+- Fer : nombre de points (1 à 3), barré = 0.
+- nettoyage_sec : true si un cercle (P, F ou W) non barré est présent.
+- a_part : true si le texte dit de laver séparément, à l'envers avant premier lavage, ou que la couleur peut déteindre.
+- composition : les matières lues, telles quelles, en français si possible.
+Si un symbole est illisible, choisis l'option la plus prudente. Si l'étiquette entière est illisible, mets "lisible":false.`;
+function aiFail(e){
+  const c = e && e.code;
+  if (['not_granted','sampling_disabled','not_declared','capability_disabled','capability_removed','images_unavailable'].includes(c)) { S.ai = null; return 'Analyse Claude indisponible ici : remplis à la main.'; }
+  if (c === 'rate_limited') return 'Limite d’utilisation Claude atteinte. Réessaie plus tard ou remplis à la main.';
+  if (c === 'session_expired') return 'Reconnecte-toi à Claude pour utiliser l’analyse.';
+  if (c === 'invalid_json' || c === 'empty_completion') return 'Lecture ratée. Réessaie.';
+  if (c === 'image_rejected') return 'Photo refusée : essaie une autre image.';
+  if (c === 'cancelled') return '';
+  return 'Analyse interrompue. Réessaie.';
+}
+function normFront(r){
+  const out = {};
+  if (!r || typeof r !== 'object') return out;
+  const cat = String(r.categorie || '').toLowerCase().trim();
+  const ck = Object.keys(CAT_LABEL).find(k => k === cat || CAT_LABEL[k].toLowerCase() === cat);
+  if (ck) out.cat = ck;
+  const cn = String((r.couleur && r.couleur.nom) || r.couleur || '').toLowerCase().trim();
+  const p = PAL[cn] || PALETTE.find(x => cn && cn.includes(x.name));
+  if (p) out.color = {name:p.name, hex:p.hex};
+  if (r.motif === 'uni' || r.motif === 'motif') out.motif = r.motif;
+  const st = Math.round(Number(r.style)); if (st >= 1 && st <= 4) out.style = st;
+  const w = Math.round(Number(r.chaleur)); if (w >= 0 && w <= 2 && r.chaleur !== null && r.chaleur !== '') out.warmth = w;
+  if (r.nom) out.name = String(r.nom).slice(0, 40);
+  return out;
+}
+function normCare(r){
+  if (!r || typeof r !== 'object') return null;
+  const c = {};
+  const lv = String(r.lavage || '').toLowerCase();
+  c.wash = lv === 'main' ? 'main' : lv === 'non' ? 'non' : 'machine';
+  const t = Number(r.temperature);
+  c.temp = !t ? (c.wash === 'main' ? 30 : 30) : t >= 95 ? 95 : t >= 60 ? 60 : t >= 40 ? 40 : t >= 30 ? 30 : 20;
+  const pr = String(r.programme || '');
+  c.cycle = ['normal','delicat','tres_delicat'].includes(pr) ? pr : 'normal';
+  const bl = String(r.blanchiment || '');
+  c.bleach = ['oui','oxygene','non'].includes(bl) ? bl : 'non';
+  const se = String(r.sechage || '');
+  c.dry = ['normal','doux','non'].includes(se) ? se : 'non';
+  const re = Math.round(Number(r.repassage));
+  c.iron = re >= 0 && re <= 3 ? re : 1;
+  c.dryclean = !!r.nettoyage_sec;
+  c.bleeds = !!r.a_part;
+  c.compo = String(r.composition || '').slice(0, 80);
+  return c;
+}
+async function aiFront(blob){ return normFront(await S.ai.sample.json(FRONT_PROMPT, {images:[blob], modelTier:'quick'})); }
+async function aiLabel(blob){
+  const r = await S.ai.sample.json(LABEL_PROMPT, {images:[blob]});
+  if (r && r.lisible === false) { const e = new Error('illisible'); e.code = 'illisible'; throw e; }
+  return normCare(r);
+}
+
+/* =========================================================
+   STYLE ENGINE — codes généraux de l'habillement
+   ========================================================= */
+const RULES = [
+  'Maximum 3 teintes par tenue, dont une seule couleur vive. Les neutres (noir, blanc, gris, marine, beige, camel, marron, kaki, denim) vont avec tout.',
+  'Deux couleurs vives ne passent que si elles sont voisines sur le cercle chromatique ; sinon, une seule.',
+  'Un contraste clair/foncé entre le haut et le bas structure la silhouette. Même couleur vive en haut et en bas : à éviter.',
+  'Un seul motif (rayures, carreaux, imprimé) par tenue, le reste uni.',
+  'Toutes les pièces au même niveau de style (sport, casual, chic décontracté, habillé), un cran d’écart maximum.',
+  'Jean sur jean seulement si les deux délavages sont nettement différents.',
+  'En chic : chaussures plus foncées que le pantalon, chaussettes assorties au pantalon ou aux chaussures, jamais blanches. Pas de casquette.',
+  'Une pièce (qamis, djellaba, robe, abaya, combinaison) remplace le haut et le bas ; une veste ou un gilet peut aller par-dessus.',
+  'Jamais de chaussettes avec des sandales. Pas de short avec des chaussures de ville.',
+  'Ne mélange pas doré et argenté, et une seule montre.',
+  'Météo : chaud = léger et sans veste chaude, doux = une couche légère, froid = une vraie couche chaude par-dessus, pas de short ni de sandales.'
+];
+function evaluate(slots, ctx){
+  const P = k => slots[k] ? getItem(slots[k]) : null;
+  const main = ['dessus','haut','bas','ensemble','pieds'].map(P).filter(Boolean);
+  if (main.length < 2) return null;
+  const visible = ['tete','dessus','haut','bas','ensemble','pieds'].map(P).filter(Boolean);
+  const good = [], bad = [];
+  let s = 62;
+  const add = (v, msg) => { s += v; if (msg) (v >= 0 ? good : bad).push({v, msg}); };
+  const ens = P('ensemble');
+  const haut = ens ? null : P('haut'), dessus = P('dessus'), bas = ens ? null : P('bas'), pieds = P('pieds'), tete = P('tete'), so = P('chaussettes');
+
+  /* Couleurs */
+  const cols = visible.map(colorOf).filter(Boolean);
+  const vivid = [];
+  cols.forEach(c => { if (c.fam === 'couleur' && !vivid.some(v => v.name === c.name)) vivid.push(c); });
+  if (vivid.length === 0) add(4, 'Palette neutre, facile à porter');
+  else if (vivid.length === 1) add(10, `Une seule couleur forte (${vivid[0].name}) : équilibre réussi`);
+  else if (vivid.length === 2) {
+    const d = hueDiff(vivid[0].h, vivid[1].h);
+    if (d <= 40) add(3, 'Deux couleurs voisines, ça reste harmonieux');
+    else add(-16, `${vivid[0].name} et ${vivid[1].name} se concurrencent : garde une seule couleur vive`);
+  } else add(-28, 'Trop de couleurs vives : une seule, deux voisines maximum');
+  const names = new Set(cols.map(c => c.name));
+  if (names.size > 3) add(-8, 'Plus de 3 teintes : simplifie');
+
+  if (haut && bas) {
+    const a = colorOf(haut), b = colorOf(bas);
+    if (a && b) {
+      const dl = Math.abs(a.L - b.L);
+      if (isDenim(haut) && isDenim(bas)) add(dl > 25 ? -4 : -14, dl > 25 ? 'Jean sur jean : passe car les teintes sont bien différentes' : 'Jean sur jean dans la même teinte : à éviter');
+      else if (a.name === b.name) { if (TON_SUR_TON.has(a.name)) add(3, 'Ton sur ton maîtrisé'); else add(-8, 'Même couleur vive en haut et en bas : ça écrase la silhouette'); }
+      else if (dl >= 22) add(6, 'Bon contraste entre le haut et le bas');
+      const nn = [a.name, b.name];
+      if (nn.includes('marine') && nn.includes('noir')) add(-3, 'Marine et noir collés : peut sembler dépareillé');
+    }
+  }
+
+  /* Motifs */
+  const pat = visible.filter(it => motifOf(it) === 'motif').length;
+  if (pat >= 2) add(-18, 'Plusieurs motifs : garde un seul imprimé');
+  else if (pat === 1) add(2, 'Un motif mis en valeur par des pièces unies');
+
+  /* Niveau de style */
+  const fs = visible.map(styleOf).filter(v => v != null);
+  if (fs.length) {
+    const spread = Math.max.apply(null, fs) - Math.min.apply(null, fs);
+    if (spread <= 1) add(8, 'Toutes les pièces au même niveau de style');
+    else if (spread === 2) add(-10, 'Styles un peu éloignés entre les pièces');
+    else add(-24, 'Styles incompatibles (sport et habillé)');
+    const target = ctx.occasion === 'sport' ? 1.3 : ctx.occasion === 'chic' ? 3.4 : 2.2;
+    const avg = fs.reduce((a,b) => a + b, 0) / fs.length;
+    const off = Math.abs(avg - target);
+    if (off <= .7) add(5, `Dans le ton pour une tenue ${OCC_LBL[ctx.occasion]}`);
+    else if (off > 1.2) add(-12, `Pas vraiment ${OCC_LBL[ctx.occasion]} comme tenue`);
+  }
+
+  /* Météo */
+  const w = it => { const v = warmthOf(it); return v == null ? 1 : v; };
+  const hasDessusInWardrobe = itemsIn('dessus').length > 0;
+  const shortish = bas && (bas.cat === 'short' || bas.cat === 'pantacourt');
+  if (ctx.meteo === 'chaud') {
+    if (haut && w(haut) === 2) add(-15, 'Haut trop chaud pour la météo');
+    if (ens && w(ens) === 2) add(-15, `${itemLabel(ens)} trop chaud pour la météo`);
+    if (dessus) { if (w(dessus) >= 2) add(-25, 'Couche trop chaude pour la chaleur'); else if (w(dessus) === 1) add(-6, 'Tu peux te passer de la couche du dessus'); }
+    if (shortish) add(6, 'Short ou pantacourt, idéal quand il fait chaud');
+    if (pieds && pieds.cat === 'sandales') add(3, 'Sandales de saison');
+    if (tete && tete.cat === 'bonnet') add(-30, 'Bonnet par temps chaud : non');
+    if (P('yeux')) add(3, 'Lunettes de soleil bienvenues');
+  } else if (ctx.meteo === 'doux') {
+    if (shortish) add(-6, 'Un peu léger pour un temps doux');
+    if (pieds && pieds.cat === 'sandales') add(-6, 'Sandales un peu justes pour la mi-saison');
+    if (tete && tete.cat === 'bonnet') add(-12, 'Bonnet superflu par temps doux');
+    if (dessus) { if (w(dessus) === 1) add(5, 'Une couche légère, parfait pour la mi-saison'); else if (w(dessus) === 2) add(-6, 'Couche un peu chaude pour un temps doux'); }
+  } else {
+    if (shortish) add(-30, 'Trop léger pour le froid');
+    if (ens && w(ens) === 2) add(4, `${itemLabel(ens)} bien chaud, de saison`);
+    if (pieds && pieds.cat === 'sandales') add(-30, 'Sandales par temps froid : non');
+    if (!dessus) add(hasDessusInWardrobe ? -20 : -6, hasDessusInWardrobe ? 'Il manque une couche chaude par-dessus' : 'Ajoute une veste ou un manteau au dressing pour le froid');
+    else if (w(dessus) === 2) add(8, 'Bien couvert pour le froid'); else add(2, 'Couche du dessus un peu légère pour le froid');
+    if (tete && tete.cat === 'bonnet') add(4, 'Bonnet de saison');
+  }
+
+  /* Codes précis */
+  if (pieds && pieds.cat === 'sandales' && so) add(-30, 'Pas de chaussettes avec des sandales');
+  if (shortish && pieds && pieds.cat === 'chaussures') add(-18, 'Short et chaussures de ville ne vont pas ensemble');
+  if (tete && tete.cat === 'casquette' && ctx.occasion === 'chic') add(-18, 'Casquette et tenue chic ne vont pas ensemble');
+  if (ctx.occasion === 'chic' && pieds && bas && pieds.cat !== 'sandales') {
+    const a = colorOf(pieds), b = colorOf(bas);
+    if (a && b) { if (a.L <= b.L + 5) add(5, 'Chaussures plus foncées que le pantalon : règle classique respectée'); else add(-6, 'En chic, préfère des chaussures plus foncées que le pantalon'); }
+  }
+  if (so && pieds && pieds.cat !== 'sandales') {
+    const c = colorOf(so), b = bas && colorOf(bas), f = colorOf(pieds);
+    if (c && ctx.occasion === 'chic') {
+      if (c.L > 85 && c.fam !== 'couleur') add(-12, 'Chaussettes blanches avec une tenue chic : à éviter');
+      else if ((b && dE(c.lab, b.lab) < 28) || (f && dE(c.lab, f.lab) < 28)) add(5, 'Chaussettes assorties au pantalon ou aux chaussures');
+    }
+  }
+  const wrists = ['mg','md'].map(P).filter(Boolean);
+  const metals = new Set(wrists.map(metalOf).filter(Boolean));
+  if (metals.size > 1) add(-10, 'Évite de mélanger doré et argenté');
+  if (wrists.filter(it => it.cat === 'montre').length > 1) add(-25, 'Une seule montre à la fois');
+
+  s = Math.max(0, Math.min(100, Math.round(s)));
+  const label = s >= 85 ? 'Très bon accord' : s >= 70 ? 'Bon accord' : s >= 55 ? 'Correct' : 'À revoir';
+  good.sort((a,b) => b.v - a.v); bad.sort((a,b) => a.v - b.v);
+  return {score:s, label, good, bad};
+}
+const PROB = {chaud:{dessus:.12, tete:.35, yeux:.65}, doux:{dessus:.65, tete:.2, yeux:.3}, froid:{dessus:1, tete:.55, yeux:.05}};
+function poolFor(slot, ctx){
+  const zone = SLOTS[slot].zone;
+  const all = itemsIn(zone);
+  const ok = it => {
+    const c = it.cat, w = warmthOf(it), f = styleOf(it);
+    if (ctx.meteo === 'chaud' && (c === 'bonnet' || c === 'manteau' || (w === 2 && (zone === 'haut' || zone === 'dessus' || zone === 'ensemble')))) return false;
+    if (ctx.meteo === 'froid' && (c === 'short' || c === 'pantacourt' || c === 'sandales')) return false;
+    if (ctx.occasion === 'chic' && (f === 1 || c === 'casquette' || c === 'sandales' || c === 'sweat')) return false;
+    if (ctx.occasion === 'sport' && f != null && f >= 4) return false;
+    return true;
+  };
+  const f = all.filter(ok);
+  return f.length ? f : all;
+}
+function generate(){
+  const ctx = S.ctx, pools = {};
+  SLOT_KEYS.forEach(s => { pools[s] = poolFor(s, ctx); });
+  const rnd = a => a[Math.floor(Math.random() * a.length)];
+  const pr = PROB[ctx.meteo] || PROB.doux;
+  const cands = [];
+  const locked = s => !!(S.locks[s] && S.current[s] && getItem(S.current[s]));
+  const nE = pools.ensemble.length, nSep = Math.min(pools.haut.length, pools.bas.length);
+  const pEns = nE ? (nSep ? Math.min(.5, nE / (nE + nSep) + .1) : 1) : 0;
+  for (let n = 0; n < 700; n++) {
+    const c = {};
+    const useEns = locked('ensemble') ? true : (locked('haut') || locked('bas')) ? false : Math.random() < pEns;
+    for (const s of SLOT_KEYS) {
+      if (useEns && (s === 'haut' || s === 'bas')) continue;
+      if (!useEns && s === 'ensemble') continue;
+      if (locked(s)) { c[s] = S.current[s]; continue; }
+      const P = pools[s]; if (!P.length) continue;
+      let p = 1;
+      if (s === 'dessus') p = pr.dessus; else if (s === 'tete') p = pr.tete; else if (s === 'yeux') p = pr.yeux;
+      else if (s === 'mg') p = .55; else if (s === 'md') p = .3;
+      if (s === 'tete' && ctx.occasion === 'chic') p *= .3;
+      if (Math.random() < p) c[s] = rnd(P).id;
+    }
+    const pi = getItem(c.pieds);
+    if (pi && pi.cat === 'sandales' && !S.locks.chaussettes) delete c.chaussettes;
+    if (c.mg && c.md === c.mg) delete c.md;
+    const e = evaluate(c, ctx);
+    if (e) cands.push({c, s:e.score, k:JSON.stringify(c)});
+  }
+  if (!cands.length) return null;
+  cands.sort((a,b) => b.s - a.s);
+  const top = [];
+  for (const x of cands) { if (!top.some(t => t.k === x.k)) top.push(x); if (top.length >= 6) break; }
+  const floor = top[top.length - 1].s;
+  const weights = top.map(t => Math.pow(t.s - floor + 6, 1.5));
+  let r = Math.random() * weights.reduce((a,b) => a + b, 0);
+  for (let i = 0; i < top.length; i++) { r -= weights[i]; if (r <= 0) return top[i].c; }
+  return top[0].c;
+}
+
+/* =========================================================
+   LAUNDRY ENGINE
+   ========================================================= */
+const CAP = {normal:6, delicat:3.5, laine:2};
+const GROUP_ORDER = ['blanc','clair','couleur','fonce','apart'];
+const PROG_RANK = {normal:0, delicat:1, laine:2};
+const PROG_LBL = {normal:'Programme coton', delicat:'Programme synthétique / délicat', laine:'Programme laine / très délicat'};
+const SPIN = {normal:1000, delicat:800, laine:600};
+const isWool = it => !!(it.care && (it.care.cycle === 'tres_delicat' || /laine|cachemire|mohair|alpaga|angora|soie|wool|cashmere|silk/i.test(it.care.compo || '')));
+const kgOf = arr => arr.reduce((a, it) => a + ((CATDEF[it.cat] && CATDEF[it.cat].kg) || .3), 0);
+function groupLabel(gs){
+  const k = gs.slice().sort((a,b) => GROUP_ORDER.indexOf(a) - GROUP_ORDER.indexOf(b)).join('+');
+  return ({blanc:'Blancs', clair:'Clairs', couleur:'Couleurs', fonce:'Foncés', apart:'À part', 'blanc+clair':'Blancs et clairs', 'couleur+fonce':'Couleurs et foncés'})[k] || 'Mélange';
+}
+function buildLoads(ids){
+  const out = {loads:[], hand:[], nowash:[], missing:[]};
+  const mach = [];
+  ids.map(getItem).filter(Boolean).forEach(it => {
+    const c = it.care;
+    if (!c) out.missing.push(it);
+    else if (c.wash === 'non') out.nowash.push(it);
+    else if (c.wash === 'main') out.hand.push(it);
+    else mach.push(it);
+  });
+  const progOf = it => isWool(it) ? 'laine' : it.care.cycle === 'delicat' ? 'delicat' : 'normal';
+  const grpOf = it => {
+    const c = colorOf(it); let g = c ? c.lg : 'couleur';
+    if (it.cat === 'jean') g = 'fonce';
+    if (it.care.bleeds && g !== 'fonce') g = 'apart';
+    return g;
+  };
+  const buckets = new Map();
+  const key = (g, p) => g + '|' + p;
+  mach.forEach(it => {
+    const g = grpOf(it), p = progOf(it), k = key(g, p);
+    if (!buckets.has(k)) buckets.set(k, {groups:[g], prog:p, items:[]});
+    buckets.get(k).items.push(it);
+  });
+  const merge = (ka, kb) => {
+    const a = buckets.get(ka), b = buckets.get(kb);
+    if (!a || !b) return;
+    b.items = b.items.concat(a.items);
+    b.groups = Array.from(new Set(a.groups.concat(b.groups)));
+    if (PROG_RANK[a.prog] > PROG_RANK[b.prog]) b.prog = a.prog;
+    buckets.delete(ka);
+  };
+  for (const g of GROUP_ORDER) {
+    const kn = key(g, 'normal'), kd = key(g, 'delicat');
+    if (buckets.has(kn) && buckets.has(kd) && kgOf(buckets.get(kn).items) + kgOf(buckets.get(kd).items) <= CAP.delicat) merge(kn, kd);
+  }
+  const FAMILY = g => (g === 'blanc' || g === 'clair') ? 'light' : (g === 'couleur' || g === 'fonce') ? 'dark' : g;
+  let merged = true;
+  while (merged) {
+    merged = false;
+    const keys = Array.from(buckets.keys());
+    outer: for (let i = 0; i < keys.length; i++) for (let j = i + 1; j < keys.length; j++) {
+      const A = buckets.get(keys[i]), B = buckets.get(keys[j]);
+      const fam = new Set(A.groups.concat(B.groups).map(FAMILY));
+      if (fam.size !== 1 || fam.has('apart')) continue;
+      const gentle = PROG_RANK[A.prog] >= PROG_RANK[B.prog] ? A.prog : B.prog;
+      const ka = kgOf(A.items), kb = kgOf(B.items);
+      if ((ka < 1.5 || kb < 1.5) && ka + kb <= CAP[gentle]) { merge(keys[i], keys[j]); merged = true; break outer; }
+    }
+  }
+  const split = (items, cap) => {
+    const sorted = items.slice().sort((a,b) => kgOf([b]) - kgOf([a]));
+    const bins = [];
+    sorted.forEach(it => {
+      const w = kgOf([it]);
+      const bin = bins.find(b => b.kg + w <= cap);
+      if (bin) { bin.items.push(it); bin.kg += w; } else bins.push({items:[it], kg:w});
+    });
+    return bins.map(b => b.items);
+  };
+  for (const B of buckets.values()) split(B.items, CAP[B.prog]).forEach(items => out.loads.push(makeLoad(B, items)));
+  out.loads.sort((a,b) => GROUP_ORDER.indexOf(a.tint) - GROUP_ORDER.indexOf(b.tint) || PROG_RANK[a.prog] - PROG_RANK[b.prog]);
+  return out;
+}
+function makeLoad(B, items){
+  const temps = items.map(it => it.care.temp || 30);
+  let temp = Math.min.apply(null, temps);
+  if (B.prog === 'laine') temp = Math.min(temp, 30);
+  const lim0 = items.filter(it => (it.care.temp || 30) === temp);
+  const limiter = temps.some(t => t !== temp) && lim0.length <= items.length / 2 ? lim0 : [];
+  const gs = B.groups.slice().sort((a,b) => GROUP_ORDER.indexOf(a) - GROUP_ORDER.indexOf(b));
+  const tint = gs[gs.length - 1];
+  const notes = [];
+  if (limiter.length && B.prog !== 'laine') notes.push({t:`Limité à ${temp}° par : ${listNames(limiter)}`});
+  if (gs.includes('apart')) notes.push({t:'Peut dégorger : à laver seul ou avec des foncés pour les premiers lavages', w:true});
+  const inside = items.filter(it => it.cat !== 'chaussettes' && (isDenim(it) || motifOf(it) === 'motif' || (colorOf(it) && colorOf(it).lg === 'fonce')));
+  if (B.prog === 'laine') notes.push({t:'Programme laine : essorage doux, pas d’adoucissant'});
+  if (inside.length) notes.push({t:`À retourner à l’envers : ${listNames(inside)}`});
+  if (items.some(it => ['jean','veste','sweat','gilet','sansmanche','manteau','pantalon'].includes(it.cat))) notes.push({t:'Ferme les zips et les boutons avant de lancer'});
+  if (items.some(it => it.cat === 'chaussettes')) notes.push({t:'Chaussettes dans un filet pour ne pas les perdre'});
+  if (gs.includes('blanc') && !gs.includes('apart')) {
+    if (items.every(it => it.care.bleach === 'oui')) notes.push({t:'Javel possible en cas de taches'});
+    else if (items.every(it => it.care.bleach !== 'non')) notes.push({t:'Détachant à l’oxygène possible, pas de javel'});
+  }
+  const dry = {tambour:[], bas:[], air:[], plat:[]};
+  items.forEach(it => {
+    if (isWool(it)) dry.plat.push(it);
+    else if (it.care.dry === 'normal') dry.tambour.push(it);
+    else if (it.care.dry === 'doux') dry.bas.push(it);
+    else dry.air.push(it);
+  });
+  const drying = [];
+  if (dry.tambour.length) drying.push(`Sèche-linge : ${listNames(dry.tambour)}`);
+  if (dry.bas.length) drying.push(`Sèche-linge basse température : ${listNames(dry.bas)}`);
+  if (dry.air.length) drying.push(`À l’air libre : ${listNames(dry.air)}`);
+  if (dry.plat.length) drying.push(`À plat, sans sèche-linge : ${listNames(dry.plat)}`);
+  let detergent = 'Lessive couleurs';
+  if (B.prog === 'laine') detergent = 'Lessive laine et délicats';
+  else if (gs.every(g => g === 'blanc')) detergent = 'Lessive universelle';
+  else if (gs.includes('fonce')) detergent = 'Lessive couleurs ou spéciale noir';
+  return {items, groups:gs, tint, prog:B.prog, temp, spin:SPIN[B.prog], detergent, kg:kgOf(items), notes, drying};
+}
+
+/* =========================================================
+   CARE LABEL (pictogrammes)
+   ========================================================= */
+const DEFAULT_CARE = () => ({wash:'machine', temp:30, cycle:'normal', bleach:'non', dry:'non', iron:1, dryclean:false, bleeds:false, compo:''});
+function careText(c){
+  const w = c.wash === 'non' ? 'Ne pas laver' : c.wash === 'main' ? 'Lavage à la main' : `Lavage ${c.temp}°` + (c.cycle === 'delicat' ? ', délicat' : c.cycle === 'tres_delicat' ? ', très délicat' : '');
+  const b = c.bleach === 'oui' ? 'javel autorisée' : c.bleach === 'oxygene' ? 'oxygène seulement' : 'pas de javel';
+  const d = c.dry === 'normal' ? 'sèche-linge' : c.dry === 'doux' ? 'sèche-linge doux' : 'pas de sèche-linge';
+  const i = c.iron === 0 ? 'pas de repassage' : ['','repassage doux','repassage moyen','repassage fort'][c.iron] || '';
+  return `${w}, ${b}, ${d}, ${i}${c.compo ? '. ' + c.compo : ''}`;
+}
+function careStrip(c){
+  if (!c) return '';
+  const X = '<path d="M4 5L24 25M24 5L4 25" stroke-width="1.6"/>';
+  const svg = inner => `<svg viewBox="0 0 28 30" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true">${inner}</svg>`;
+  let wash = '<path d="M3.5 9L6.3 23H21.7L24.5 9"/><path d="M3.5 9q1.75-2 3.5 0t3.5 0t3.5 0t3.5 0t3.5 0t3.5 0"/>';
+  if (c.wash === 'non') wash += X;
+  else if (c.wash === 'main') wash += '<path d="M10.5 19.5v-5M12.8 19.5v-6.5M15.1 19.5v-6.5M17.4 19.5v-5M10.2 19.4q3.6 2.6 7.6 0"/>';
+  else wash += `<text x="14" y="19.8" text-anchor="middle" font-size="7.6" font-weight="700" fill="currentColor" stroke="none" font-family="Archivo,system-ui,sans-serif">${c.temp}</text>`;
+  if (c.wash !== 'non') { if (c.cycle === 'delicat') wash += '<path d="M5 26.5H23"/>'; if (c.cycle === 'tres_delicat') wash += '<path d="M5 26H23M5 28.6H23"/>'; }
+  let tri = '<path d="M14 5L25 24H3Z"/>';
+  if (c.bleach === 'oxygene') tri += '<path d="M11 21.5L15.2 12.5M14.4 21.5L18.6 12.5"/>';
+  if (c.bleach === 'non') tri += X;
+  let dry = '<rect x="4" y="5" width="20" height="20" rx="1"/><circle cx="14" cy="15" r="7.5"/>';
+  if (c.dry === 'normal') dry += '<circle cx="11.8" cy="15" r="1.15" fill="currentColor"/><circle cx="16.2" cy="15" r="1.15" fill="currentColor"/>';
+  else if (c.dry === 'doux') dry += '<circle cx="14" cy="15" r="1.15" fill="currentColor"/>';
+  else dry += X;
+  let iron = '<path d="M4 22L7.6 13.6Q8.3 12 10 12H22.5Q24 12 24 13.5V22Z"/><path d="M11.5 12V9.5H20V12"/>';
+  const dots = {1:[15], 2:[12.6,17.4], 3:[11,15,19]}[c.iron];
+  if (c.iron === 0) iron += X; else if (dots) dots.forEach(x => { iron += `<circle cx="${x}" cy="17.6" r="1.1" fill="currentColor"/>`; });
+  return `<div class="ribbon" role="img" aria-label="${esc(careText(c))}">${svg(wash)}${svg(tri)}${svg(dry)}${svg(iron)}</div>`;
+}
+const CARE_ROWS = [
+  {k:'wash', label:'Lavage', opts:[['m20','20°'],['m30','30°'],['m40','40°'],['m60','60°'],['m95','95°'],['main','À la main'],['non','Ne pas laver']]},
+  {k:'cycle', label:'Programme', opts:[['normal','Normal'],['delicat','Délicat'],['tres_delicat','Laine / très délicat']]},
+  {k:'bleach', label:'Javel', opts:[['oui','Autorisée'],['oxygene','Oxygène seul'],['non','Interdite']]},
+  {k:'dry', label:'Sèche-linge', opts:[['normal','Oui'],['doux','Basse temp.'],['non','Non']]},
+  {k:'iron', label:'Repassage', opts:[['3','Fort'],['2','Moyen'],['1','Doux'],['0','Non']]}
+];
+function careVal(c, k){ if (k === 'wash') return c.wash === 'machine' ? 'm' + c.temp : c.wash; return String(c[k]); }
+function careEditorHTML(c){
+  return `<div class="dets">${CARE_ROWS.map(r => `<div class="drow"><span class="dl">${r.label}</span><div class="czc">${r.opts.map(o => `<button type="button" class="chip sm ${careVal(c, r.k) === o[0] ? 'on' : ''}" data-ck="${r.k}" data-cv="${o[0]}">${o[1]}</button>`).join('')}</div></div>`).join('')}
+    <div class="drow"><span class="dl">Couleur</span><div class="czc"><button type="button" class="chip sm ${c.bleeds ? 'on' : ''}" data-ck="bleeds" data-cv="toggle">Peut dégorger</button></div></div>
+    <div class="drow"><span class="dl">Matière</span><input class="inp" data-compo value="${esc(c.compo || '')}" placeholder="Ex. 100% coton" maxlength="80" autocomplete="off"></div></div>`;
+}
+function bindCareEditor(box, c, onChange){
+  box.addEventListener('click', e => {
+    const b = e.target.closest('[data-ck]'); if (!b) return;
+    const k = b.dataset.ck, v = b.dataset.cv;
+    if (k === 'wash') { if (v[0] === 'm') { c.wash = 'machine'; c.temp = Number(v.slice(1)); } else c.wash = v; }
+    else if (k === 'iron') c.iron = Number(v);
+    else if (k === 'bleeds') c.bleeds = !c.bleeds;
+    else c[k] = v;
+    $$('[data-ck="' + k + '"]', box).forEach(x => x.classList.toggle('on', k === 'bleeds' ? c.bleeds : x.dataset.cv === careVal(c, k)));
+    onChange();
+  });
+  const inp = $('[data-compo]', box);
+  if (inp) inp.addEventListener('input', () => { c.compo = inp.value.trim(); onChange(); });
+}
+
+/* =========================================================
+   OUTFIT RENDERING
+   ========================================================= */
+function outfitHTML(slots, live){
+  const tag = live ? 'button' : 'span';
+  const cell = id => {
+    const sl = SLOTS[id];
+    const it = slots[id] ? getItem(slots[id]) : null;
+    const inner = it
+      ? `<img src="${esc(src(it))}" alt="" class="${it.transparent === false ? 'opaque' : ''}" draggable="false">${live && S.locks[id] ? `<span class="lk">${ic('lock', 12)}</span>` : ''}`
+      : (live ? `<span class="ph">+ ${esc(sl.ph)}</span>` : '');
+    const aria = live ? ` type="button" aria-label="${esc(sl.title)}${it ? ' : ' + esc(itemLabel(it)) : ', vide'}"` : '';
+    return `<${tag} class="slot s-${id}${id === 'ensemble' ? ' s-haut' : ''} ${it ? 'full' : 'empty'}" data-slot="${id}"${aria}>${inner}</${tag}>`;
+  };
+  const ens = getItem(slots.ensemble);
+  const hasD = !!getItem(slots.dessus), hasH = ens ? true : !!getItem(slots.haut);
+  const ts = hasD && hasH ? 'both' : hasD ? 'dessus' : hasH ? 'haut' : 'none';
+  const wrap = live ? 'div' : 'span';
+  return `<${wrap} class="outfit ${live ? 'live' : 'mini'}">`
+    + cell('tete') + cell('yeux')
+    + `<${wrap} class="torse${ens ? ' long' : ''}" data-s="${ts}">${cell('dessus')}${ens ? cell('ensemble') : cell('haut')}</${wrap}>`
+    + cell('mg') + cell('md') + (ens ? '' : cell('bas')) + cell('chaussettes') + cell('pieds')
+    + `</${wrap}>`;
+}
+function tileHTML(it, attr, on, extra){
+  const c = colorOf(it);
+  return `<button type="button" class="tile ${on ? 'on' : ''}" ${attr}="${esc(it.id)}"><span class="ti">${c ? `<span class="dotc" style="--c:${esc(c.hex)}"></span>` : ''}${extra || ''}<img src="${esc(src(it))}" alt="" loading="lazy" class="${it.transparent === false ? 'opaque' : ''}"></span><span class="tl">${esc(itemLabel(it))}</span></button>`;
+}
+
+/* =========================================================
+   VIEWS
+   ========================================================= */
+function renderNav(){
+  ['tenue','dressing','lessive','tenues'].forEach(t => { $('#v-' + t).hidden = S.tab !== t; });
+  $$('[data-tab]').forEach(b => { if (b.dataset.tab === S.tab) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); });
+  $('#fab').hidden = !S.ready || S.tab !== 'dressing';
+  const n = S.basket.filter(id => getItem(id)).length;
+  const bdg = $('#bdg'); bdg.hidden = !n; bdg.textContent = n;
+}
+
+function renderTenue(){
+  const v = $('#v-tenue');
+  if (!S.ready) { v.innerHTML = '<div class="loading">Ouverture du dressing…</div>'; return; }
+  const n = filledCount(S.current);
+  const has = S.items.length > 0;
+  const seg = (k, opts) => `<div class="seg" role="group" aria-label="${k === 'meteo' ? 'Météo' : 'Occasion'}">${opts.map(o => `<button type="button" data-ctxk="${k}" data-ctxv="${o[0]}" aria-pressed="${S.ctx[k] === o[0]}">${o[1]}</button>`).join('')}</div>`;
+  const ev = evaluate(S.current, S.ctx);
+  const tag = ev ? `<div class="tag" aria-live="polite"><div class="sc"><b>${ev.score}</b><span>${ev.label}</span></div><ul>${ev.good.slice(0, 3).map(g => `<li>${esc(g.msg)}</li>`).join('')}${ev.bad.slice(0, 3).map(g => `<li class="bad">${esc(g.msg)}</li>`).join('')}</ul><button type="button" class="rules" data-act="rules">Les règles utilisées</button></div>` : '';
+  const textileCount = SLOT_KEYS.map(k => getItem(S.current[k])).filter(it => it && isTextile(it)).length;
+  v.innerHTML = `
+    <header class="top">
+      <div><h1>Tenue</h1><p class="sub">${n === 0 ? 'Touche une zone pour t’habiller' : pl(n, 'pièce portée', 'pièces portées')}</p></div>
+      <div class="acts">
+        <button type="button" class="icon hot" data-act="random" aria-label="Générer une tenue" ${has ? '' : 'disabled'}>${ic('dice')}</button>
+        <button type="button" class="icon" data-act="clear" aria-label="Tout retirer" ${n ? '' : 'disabled'}>${ic('reset')}</button>
+        <button type="button" class="pill" data-act="save" ${n ? '' : 'disabled'}>Enregistrer</button>
+      </div>
+    </header>
+    <div class="ctx">${seg('meteo', [['chaud','Chaud'],['doux','Doux'],['froid','Froid']])}${seg('occasion', [['casual','Casual'],['chic','Chic'],['sport','Sport']])}</div>
+    <div class="paper dots" id="composer"><span class="reg a"></span><span class="reg b"></span><span class="reg c"></span><span class="reg d"></span>${outfitHTML(S.current, true)}</div>
+    ${has
+      ? `<div class="under">${textileCount ? `<button type="button" class="ghost" data-act="outfit-basket">${ic('basket', 18)}Mettre au panier</button>` : ''}</div>
+         ${tag}
+         <p class="hint">Le dé compose une tenue selon la météo, l’occasion et les codes de style. Glisse une pièce pour en changer, touche-la pour choisir ou la garder au prochain tirage.</p>`
+      : `<div class="empty"><p>Ton dressing est vide. Commence par coller la photo d’une pièce.</p><div class="row"><button type="button" class="btn primary" data-act="add">Ajouter une pièce</button></div></div>`}`;
+}
+
+function renderDressing(){
+  const v = $('#v-dressing');
+  if (!S.ready) { v.innerHTML = ''; return; }
+  const counts = {};
+  S.items.forEach(i => { const z = CAT_ZONE[i.cat]; counts[z] = (counts[z] || 0) + 1; });
+  const noLab = S.items.filter(i => isTextile(i) && !i.care);
+  const n = S.items.length;
+  let list = S.filter === 'all' ? S.items : S.filter === 'nolabel' ? noLab : S.items.filter(i => CAT_ZONE[i.cat] === S.filter);
+  list = list.slice().sort((a,b) => (b.createdAt||0) - (a.createdAt||0));
+  const chips = [['all','Tout',n]].concat(ZONES.map(z => [z.id, z.label, counts[z.id] || 0]));
+  if (noLab.length) chips.push(['nolabel','Sans étiquette', noLab.length]);
+  const inBasket = new Set(S.basket);
+  v.innerHTML = `
+    <header class="top"><div><h1>Dressing</h1>
+      <p class="sub">${n === 0 ? 'Aucune pièce' : pl(n, 'pièce', 'pièces')}, ${S.mode === 'cloud' ? 'sauvegardées en ligne' : 'stockées sur cet appareil'}</p></div>
+      <div class="acts"><button type="button" class="icon" data-act="backup" aria-label="Sauvegarde : exporter ou importer">${ic('backup')}</button></div></header>
+    <div class="filters">${chips.map(c => `<button type="button" class="chip ${S.filter === c[0] ? 'on' : ''}" data-filter="${c[0]}">${esc(c[1])}<span class="ct">${c[2]}</span></button>`).join('')}</div>
+    ${list.length
+      ? `<div class="grid">${list.map(it => tileHTML(it, 'data-item', false, isTextile(it) && !it.care ? '<span class="nolab">étiquette ?</span>' : (inBasket.has(it.id) ? `<span class="check">${ic('basket', 13)}</span>` : ''))).join('')}</div>`
+      : `<div class="empty">${hangerArt}<p>${S.filter === 'all' ? 'Rien ici pour l’instant. Colle la photo d’un vêtement pour commencer.' : 'Aucune pièce dans cette catégorie.'}</p><div class="row"><button type="button" class="btn primary" data-act="add">Ajouter une pièce</button>${S.filter === 'all' && !n ? '<button type="button" class="btn" data-act="backup">Importer une sauvegarde</button>' : ''}</div></div>`}`;
+}
+
+function renderLessive(){
+  const v = $('#v-lessive');
+  if (!S.ready) { v.innerHTML = ''; return; }
+  const ids = S.basket.filter(id => getItem(id));
+  if (ids.length !== S.basket.length) { S.basket = ids; saveBasket(); }
+  const n = ids.length;
+  const plan = S.plan = buildLoads(ids);
+  const thumbs = arr => `<div class="thumbs">${arr.map(it => `<button type="button" data-item="${esc(it.id)}" aria-label="${esc(itemLabel(it))}"><img src="${esc(src(it))}" alt="" class="${it.transparent === false ? 'opaque' : ''}"></button>`).join('')}</div>`;
+  const loadCard = (L, i) => `
+    <article class="load g-${L.tint}">
+      <div class="load-head"><div class="drum"><b>${L.temp}°</b></div>
+        <div class="lh"><h3>Machine ${i + 1}</h3><p>${groupLabel(L.groups)}, ${PROG_LBL[L.prog].toLowerCase()}</p></div></div>
+      <div class="meta"><span>Essorage ${L.spin} tr/min</span><span>${L.detergent}</span><span>≈ ${fmtKg(L.kg)} kg</span></div>
+      ${thumbs(L.items)}
+      <ul class="notes">${L.notes.map(x => `<li class="${x.w ? 'w' : ''}">${esc(x.t)}</li>`).join('')}${L.drying.map(d => `<li>${esc(d)}</li>`).join('')}</ul>
+      <button type="button" class="btn sm wide done" data-act="load-done" data-load="${i}">${ic('check', 18)}C’est lavé</button>
+    </article>`;
+  let cards = plan.loads.map(loadCard).join('');
+  if (plan.hand.length) cards += `
+    <article class="load g-main"><div class="load-head"><div class="drum"><b>30°</b></div><div class="lh"><h3>À la main</h3><p>${pl(plan.hand.length, 'pièce', 'pièces')}</p></div></div>
+      ${thumbs(plan.hand)}<ul class="notes"><li>Eau tiède (30° max), lessive délicate, ne pas frotter ni tordre</li><li>Rincer, presser dans une serviette, sécher à plat</li></ul>
+      <button type="button" class="btn sm wide done" data-act="hand-done">${ic('check', 18)}C’est lavé</button></article>`;
+  if (plan.nowash.length) cards += `
+    <article class="load"><div class="lh"><h3>Pressing ou entretien à sec</h3><p>Ces pièces ne passent pas à l’eau</p></div>
+      ${thumbs(plan.nowash)}<ul class="notes">${plan.nowash.map(it => `<li>${esc(itemLabel(it))} : ${it.care.dryclean ? 'nettoyage à sec (pressing)' : 'aérer, brosser, détacher localement'}</li>`).join('')}</ul></article>`;
+  if (plan.missing.length) cards += `
+    <article class="load"><div class="lh"><h3>Étiquette à renseigner</h3><p>Touche une pièce pour ajouter la photo de son étiquette ou remplir l’entretien.</p></div>${thumbs(plan.missing)}</article>`;
+  v.innerHTML = `
+    <header class="top"><div><h1>Lessive</h1><p class="sub">${n ? pl(n, 'pièce dans le panier', 'pièces dans le panier') : 'Panier vide'}</p></div>
+      <div class="acts">${n ? '<button type="button" class="icon" data-act="basket-clear" aria-label="Vider le panier">' + ic('reset') + '</button>' : ''}<button type="button" class="pill" data-act="basket-add">Ajouter</button></div></header>
+    ${n
+      ? `<div class="basket">${ids.map(id => { const it = getItem(id); return `<div class="bk"><button type="button" class="ti" data-item="${esc(id)}" aria-label="${esc(itemLabel(it))}"><img src="${esc(src(it))}" alt="" class="${it.transparent === false ? 'opaque' : ''}"></button><button type="button" class="rm" data-act="basket-rm" data-id="${esc(id)}" aria-label="Retirer du panier">${ic('x', 14)}</button></div>`; }).join('')}</div>
+         <h2 class="h2">${plan.loads.length ? pl(plan.loads.length, 'machine à lancer', 'machines à lancer') : 'Tri du panier'}</h2>${cards}`
+      : `<div class="empty"><svg viewBox="0 0 64 64" width="64" height="64" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="12" y="6" width="40" height="52" rx="6"/><circle cx="32" cy="36" r="13"/><circle cx="32" cy="36" r="8" stroke-dasharray="3 3"/><path d="M19 15h6"/></svg>
+         <p>Mets tes vêtements sales dans le panier : les machines sont triées selon leurs étiquettes, couleurs et matières.</p>
+         <div class="row"><button type="button" class="btn primary" data-act="basket-add">Choisir dans le dressing</button>${filledCount(S.current) ? '<button type="button" class="btn" data-act="outfit-basket">Tenue du jour</button>' : ''}</div></div>`}`;
+}
+
+function renderTenues(){
+  const v = $('#v-tenues');
+  if (!S.ready) { v.innerHTML = ''; return; }
+  const list = S.outfits.slice().sort((a,b) => (b.createdAt||0) - (a.createdAt||0));
+  v.innerHTML = `
+    <header class="top"><div><h1>Mes tenues</h1>
+      <p class="sub">${list.length === 0 ? 'Aucune tenue enregistrée' : pl(list.length, 'tenue enregistrée', 'tenues enregistrées')}</p></div></header>
+    ${list.length
+      ? `<div class="og">${list.map(o => `<button type="button" class="ocard" data-outfit="${esc(o.id)}"><span class="opaper dots">${outfitHTML(o.slots || {}, false)}</span><span class="oname">${esc(o.name || 'Tenue')}</span></button>`).join('')}</div>`
+      : `<div class="empty">${hangerArt}<p>Compose une tenue puis touche « Enregistrer » pour la retrouver ici.</p></div>`}`;
+}
+
+function render(){
+  renderNav(); renderTenue(); renderDressing(); renderLessive(); renderTenues();
+  if (S.ready && S.items.some(it => !it.color && !colorCache.has(it.id))) setTimeout(ensureColors, 60);
+}
+
+/* =========================================================
+   OUTFIT ACTIONS
+   ========================================================= */
+function setSlot(slot, id, dir){
+  if (id) {
+    S.current[slot] = id;
+    if (slot === 'ensemble') ['haut','bas'].forEach(k => { delete S.current[k]; delete S.locks[k]; });
+    else if (slot === 'haut' || slot === 'bas') { delete S.current.ensemble; delete S.locks.ensemble; }
+  } else { delete S.current[slot]; delete S.locks[slot]; }
+  persist(); renderTenue();
+  if (dir) { const img = document.querySelector(`#composer .s-${slot} img`); if (img) img.classList.add(dir > 0 ? 'in-r' : 'in-l'); }
+}
+function cycle(slot, dir){
+  const list = itemsIn(SLOTS[slot].zone);
+  if (!list.length) { openPicker(slot); return; }
+  let i = list.findIndex(x => x.id === S.current[slot]);
+  i = i < 0 ? (dir > 0 ? 0 : list.length - 1) : (i + dir + list.length) % list.length;
+  setSlot(slot, list[i].id, dir);
+}
+function randomize(){
+  const c = generate();
+  if (!c) { toast('Ajoute au moins un haut et un bas pour générer une tenue.'); return; }
+  S.current = c; persist(); renderTenue();
+  $$('#composer .slot img').forEach((im, i) => { im.style.animationDelay = (i * 45) + 'ms'; im.classList.add('drop'); });
+}
+function clearAll(){
+  const prev = Object.assign({}, S.current), pl0 = Object.assign({}, S.locks);
+  S.current = {}; S.locks = {}; persist(); renderTenue();
+  toast('Tenue vidée', 'Annuler', () => { S.current = prev; S.locks = pl0; persist(); renderTenue(); });
+}
+function addToBasket(ids){
+  const set = new Set(S.basket); let added = 0;
+  ids.forEach(id => { const it = getItem(id); if (it && isTextile(it) && !set.has(id)) { set.add(id); added++; } });
+  S.basket = Array.from(set); saveBasket(); renderNav(); renderLessive(); renderDressing();
+  return added;
+}
+function removeFromBasket(ids){
+  const rm = new Set(ids); const prev = S.basket.slice();
+  S.basket = S.basket.filter(id => !rm.has(id)); saveBasket(); renderNav(); renderLessive(); renderDressing();
+  return prev;
+}
+
+/* =========================================================
+   SHEETS
+   ========================================================= */
+let sheetState = null;
+function openSheet(html, bind){
+  const sh = $('#sheet');
+  sh.innerHTML = `<div class="sheet-card" role="dialog" aria-modal="true">${html}</div>`;
+  sh.hidden = false;
+  requestAnimationFrame(() => requestAnimationFrame(() => sh.classList.add('open')));
+  sh.onclick = e => { if (e.target === sh || e.target.closest('[data-close]')) closeSheet(); };
+  if (bind) bind(sh.firstElementChild);
+}
+function closeSheet(){
+  const sh = $('#sheet');
+  sh.classList.remove('open');
+  if (sheetState) {
+    [sheetState.img, sheetState.labelImg].forEach(x => { if (x && x.preview) URL.revokeObjectURL(x.preview); });
+    if (sheetState.ctl) try { sheetState.ctl.abort(); } catch(e) {}
+  }
+  sheetState = null;
+  setTimeout(() => { if (!sh.classList.contains('open')) { sh.hidden = true; sh.innerHTML = ''; } }, 260);
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('#sheet').hidden) closeSheet(); });
+
+function catsHTML(onlyZone, sel){
+  const zs = onlyZone ? [ZONE[onlyZone]] : ZONES;
+  return `<div class="cats ${onlyZone ? 'single' : ''}">${zs.map(z => `<div class="cz">${onlyZone ? '' : `<span class="czl">${esc(z.label)}</span>`}<div class="czc">${z.cats.map(c => `<button type="button" class="chip sm ${sel === c ? 'on' : ''}" data-cat="${c}">${esc(CAT_LABEL[c])}</button>`).join('')}</div></div>`).join('')}</div>`;
+}
+function detailsSummary(st){
+  const parts = [];
+  if (st.color) parts.push(st.color.name);
+  const def = st.cat && CATDEF[st.cat];
+  if (def && def.f != null) parts.push(STYLE_LBL[st.style != null ? st.style : def.f].toLowerCase());
+  if (def && def.w != null) parts.push(WARM_LBL[st.warmth != null ? st.warmth : def.w].toLowerCase());
+  if (st.motif === 'motif') parts.push('motif');
+  return parts.join(', ') || 'À compléter';
+}
+function detailsHTML(st){
+  const z = st.cat ? CAT_ZONE[st.cat] : null;
+  const def = st.cat ? CATDEF[st.cat] : null;
+  const pal = PALETTE.filter(p => p.fam !== 'metal' || z === 'poignet');
+  const row = (label, key, opts, cur) => `<div class="drow"><span class="dl">${label}</span><div class="czc">${opts.map(o => `<button type="button" class="chip sm ${String(cur) === String(o[0]) ? 'on' : ''}" data-dk="${key}" data-dv="${o[0]}">${o[1]}</button>`).join('')}</div></div>`;
+  let h = `<div class="drow"><span class="dl">Couleur</span><div class="sw">${pal.map(p => `<button type="button" class="swc ${st.color && st.color.name === p.name ? 'on' : ''}" data-col="${esc(p.name)}" style="--c:${p.hex}" aria-label="${esc(p.name)}" title="${esc(p.name)}"></button>`).join('')}</div><span class="dv">${st.color ? esc(st.color.name) : 'Choisis la couleur dominante'}</span></div>`;
+  if (def && def.f != null) h += row('Style', 'style', [[1,'Sport'],[2,'Casual'],[3,'Chic décontracté'],[4,'Habillé']], st.style != null ? st.style : def.f);
+  if (def && def.w != null) h += row('Saison', 'warmth', [[0,'Été'],[1,'Mi-saison'],[2,'Hiver']], st.warmth != null ? st.warmth : def.w);
+  h += row('Aspect', 'motif', [['uni','Uni'],['motif','Motif / imprimé']], st.motif || 'uni');
+  return `<div class="dets">${h}</div>`;
+}
+function mountDetails(root, st){
+  const box = $('[data-details]', root), sum = $('[data-dsum]', root);
+  const paint = () => { box.innerHTML = detailsHTML(st); if (sum) sum.textContent = detailsSummary(st); };
+  paint();
+  box.addEventListener('click', e => {
+    const c = e.target.closest('[data-col]');
+    if (c) { const p = PAL[c.dataset.col]; st.color = {name:p.name, hex:p.hex}; st.touched.add('color'); paint(); return; }
+    const d = e.target.closest('[data-dk]');
+    if (d) { const k = d.dataset.dk; st[k] = k === 'motif' ? d.dataset.dv : Number(d.dataset.dv); st.touched.add(k); paint(); }
+  });
+  return paint;
+}
+function setAiStatus(root, msg, busy){
+  const el = $('[data-aist]', root); if (!el) return;
+  el.textContent = msg || ''; el.hidden = !msg; el.classList.toggle('busy', !!busy);
+}
+function careBlockHTML(){
+  return `<div class="cbox" data-cbox></div>
+    <div class="drop lab" data-ldrop style="margin-top:12px"><img class="pv" data-lprev alt="Aperçu de l’étiquette" hidden>
+      <div class="paste" data-lpaste contenteditable="true" inputmode="none" role="textbox" aria-label="Zone de collage de l’étiquette" data-ph="Photo de l’étiquette : appui long ici, puis « Coller »"></div></div>
+    <div class="row2"><button type="button" class="btn sm" data-lclip>Coller</button><label class="btn sm file">Photographier<input type="file" accept="image/*" data-lfile></label></div>
+    <div class="row2" style="margin-top:-2px"><button type="button" class="btn sm" data-lread ${S.ai ? '' : 'hidden'}>${ic('sparkle', 16)}Lire avec Claude</button><button type="button" class="btn sm" data-lmanual>Remplir à la main</button></div>
+    <div data-ceditor hidden></div>`;
+}
+function mountCare(root, st, opts){
+  const cbox = $('[data-cbox]', root), sum = $('[data-csum]', root), ed = $('[data-ceditor]', root);
+  const ldrop = $('[data-ldrop]', root), lprev = $('[data-lprev]', root), lpaste = $('[data-lpaste]', root);
+  const readBtn = $('[data-lread]', root);
+  const paint = () => {
+    cbox.innerHTML = st.care ? careStrip(st.care) + `<p class="ctext">${esc(careText(st.care))}</p>` : '<p class="ctext">Pas encore d’entretien : ajoute la photo de l’étiquette ou remplis à la main.</p>';
+    if (sum) sum.textContent = st.care ? (st.care.wash === 'machine' ? `${st.care.temp}°` + (st.care.cycle !== 'normal' ? ' délicat' : '') : st.care.wash === 'main' ? 'à la main' : 'pressing') : (st.labelImg || st.hasLabel ? 'à lire' : 'facultatif');
+    readBtn.hidden = !(S.ai && (st.labelImg || st.hasLabel));
+  };
+  if (opts.existingLabel) { lprev.src = opts.existingLabel; lprev.hidden = false; ldrop.classList.add('has'); }
+  const openEditor = () => {
+    if (!st.care) st.care = DEFAULT_CARE();
+    ed.hidden = false; ed.innerHTML = careEditorHTML(st.care);
+    bindCareEditor(ed, st.care, paint); paint();
+  };
+  const read = async () => {
+    if (!S.ai) return;
+    let blob = st.labelImg && st.labelImg.blob;
+    if (!blob && opts.existingLabel) { try { blob = await (await fetch(opts.existingLabel)).blob(); } catch(e) {} }
+    if (!blob) return;
+    const tok = st.labTok = (st.labTok || 0) + 1;
+    setAiStatus(root, 'Claude lit l’étiquette', true);
+    try {
+      const care = await aiLabel(blob);
+      if (tok !== st.labTok || sheetState !== st) return;
+      st.care = care; paint();
+      if (!ed.hidden) { ed.innerHTML = careEditorHTML(st.care); bindCareEditor(ed, st.care, paint); }
+      setAiStatus(root, 'Étiquette lue par Claude : vérifie les symboles.');
+      const det = $('[data-csec]', root); if (det) det.open = true;
+    } catch(e) {
+      if (tok !== st.labTok) return;
+      setAiStatus(root, e && e.code === 'illisible' ? 'Étiquette illisible : reprends la photo de plus près, bien à plat.' : aiFail(e));
+      paint();
+    }
+  };
+  const takeLabel = async blob => {
+    if (!blob) return;
+    ldrop.classList.add('busy');
+    try {
+      const r = await processLabel(blob);
+      if (st.labelImg && st.labelImg.preview) URL.revokeObjectURL(st.labelImg.preview);
+      st.labelImg = r; lprev.src = r.preview; lprev.hidden = false; ldrop.classList.add('has');
+      paint();
+      if (S.ai && S.autoAI) read();
+    } catch(e) { toast('Image illisible. Essaie une autre photo.'); }
+    finally { ldrop.classList.remove('busy'); lpaste.innerHTML = ''; lpaste.blur(); }
+  };
+  st.takeLabel = takeLabel;
+  bindPaste(lpaste, takeLabel);
+  $('[data-lclip]', root).onclick = async () => {
+    try { const b = await readClipboard(); if (b) takeLabel(b); else toast('Aucune image dans le presse-papier.'); }
+    catch(e) { lpaste.focus(); toast('Collage direct bloqué ici : appui long dans le cadre, puis « Coller ».'); }
+  };
+  $('[data-lfile]', root).onchange = e => { const f = e.target.files && e.target.files[0]; if (f) takeLabel(f); e.target.value = ''; };
+  readBtn.onclick = read;
+  $('[data-lmanual]', root).onclick = openEditor;
+  paint();
+}
+
+function openPicker(slot){
+  if (!S.ready) return;
+  const sl = SLOTS[slot];
+  const list = itemsIn(sl.zone);
+  const cur = S.current[slot];
+  const locked = !!S.locks[slot];
+  const ens = (slot === 'haut' || slot === 'bas') ? itemsIn('ensemble') : [];
+  openSheet(`
+    <div class="sh-head"><h2>${esc(sl.title)}</h2>${closeBtn}</div>
+    ${cur && getItem(cur) ? `<button type="button" class="btn sm wide" data-lock aria-pressed="${locked}" style="margin-bottom:14px">${ic('lock', 16)}${locked ? 'Gardée au prochain tirage (toucher pour libérer)' : 'Garder cette pièce au prochain tirage'}</button>` : ''}
+    <div class="grid">
+      <button type="button" class="tile dash ${!cur ? 'on' : ''}" data-pick=""><span class="ti">Aucun</span><span class="tl">${slot === 'ensemble' ? 'Revenir à haut + bas' : 'Retirer'}</span></button>
+      ${list.map(it => tileHTML(it, 'data-pick', cur === it.id)).join('')}
+      <button type="button" class="tile dash" data-addfor="${slot}"><span class="ti">+ Ajouter</span><span class="tl">Nouvelle pièce</span></button>
+    </div>
+    ${ens.length ? `<h3 class="h3">Ou une pièce entière (remplace haut et bas)</h3><div class="grid">${ens.map(it => tileHTML(it, 'data-pickens')).join('')}</div>` : ''}`, root => {
+    root.addEventListener('click', e => {
+      const pe = e.target.closest('[data-pickens]');
+      if (pe) { setSlot('ensemble', pe.dataset.pickens, 1); closeSheet(); return; }
+      if (e.target.closest('[data-lock]')) { if (S.locks[slot]) delete S.locks[slot]; else S.locks[slot] = true; persist(); renderTenue(); closeSheet(); toast(S.locks[slot] ? 'Pièce gardée au prochain tirage' : 'Pièce libérée'); return; }
+      const p = e.target.closest('[data-pick]');
+      if (p) { setSlot(slot, p.dataset.pick || null, p.dataset.pick ? 1 : 0); closeSheet(); return; }
+      if (e.target.closest('[data-addfor]')) openAdd({slot});
+    });
+  });
+}
+
+function openAdd(opts){
+  opts = opts || {};
+  const slot = opts.slot || null;
+  const only = slot ? SLOTS[slot].zone : null;
+  const z = only ? ZONE[only] : (ZONE[S.filter] || null);
+  const st = sheetState = {kind:'add', slot, onlyZone:only, cat: z && z.cats.length === 1 ? z.cats[0] : null, color:null, style:null, warmth:null, motif:'uni', care:null, img:null, labelImg:null, touched:new Set()};
+  openSheet(`
+    <div class="sh-head"><h2>${slot ? 'Ajouter : ' + esc(SLOTS[slot].title.toLowerCase()) : 'Ajouter une pièce'}</h2>${closeBtn}</div>
+    <div class="drop" data-drop><img class="pv" data-prev alt="Aperçu de la pièce" hidden>
+      <div class="paste" data-paste contenteditable="true" inputmode="none" role="textbox" aria-label="Zone de collage de la photo" data-ph="Appui long ici, puis « Coller »"></div></div>
+    <p class="how">Dans Photos : appui long sur le vêtement, puis <b>Copier</b>. Reviens ici et colle-le dans le cadre.</p>
+    <div class="row2"><button type="button" class="btn" data-clip>Coller</button><label class="btn file">Importer une photo<input type="file" accept="image/*" data-file></label></div>
+    <p class="warn" data-warn hidden>Photo non détourée : son fond restera visible. Pour un rendu propre, copie le sujet depuis Photos.</p>
+    <p class="aist" data-aist hidden></p>
+    <div class="field"><span>Catégorie</span>${catsHTML(only, st.cat)}</div>
+    <details class="sec"><summary><b>Couleur, style, saison</b><span data-dsum></span></summary><div class="inner" data-details></div></details>
+    <details class="sec" data-csec><summary><b>Étiquette d’entretien</b><span data-csum></span></summary><div class="inner">${careBlockHTML()}</div></details>
+    <label class="field"><span>Nom <em>(facultatif)</em></span><input data-name placeholder="Ex. veste en jean brut" maxlength="60" autocomplete="off"></label>
+    ${S.ai ? `<label class="switch">Analyse automatique par Claude (sur ton usage) <input type="checkbox" data-auto ${S.autoAI ? 'checked' : ''}></label>` : ''}
+    <div class="foot"><button type="button" class="btn primary wide" data-save disabled>${slot ? 'Ajouter à la tenue' : 'Ajouter au dressing'}</button></div>`, root => bindAdd(root, st));
+}
+
+function bindAdd(root, st){
+  const paste = $('[data-paste]', root), prev = $('[data-prev]', root), warn = $('[data-warn]', root), save = $('[data-save]', root), drop = $('[data-drop]', root), nameIn = $('[data-name]', root);
+  const upd = () => { save.disabled = !(st.img && st.cat); };
+  const repaintDetails = mountDetails(root, st);
+  mountCare(root, st, {});
+  nameIn.addEventListener('input', () => st.touched.add('name'));
+  const auto = $('[data-auto]', root);
+  if (auto) auto.onchange = () => { S.autoAI = auto.checked; lsSet('penderie.autoai', S.autoAI); };
+  const markCats = () => $$('[data-cat]', root).forEach(b => b.classList.toggle('on', b.dataset.cat === st.cat));
+  $('.cats', root).addEventListener('click', e => {
+    const c = e.target.closest('[data-cat]'); if (!c) return;
+    st.cat = c.dataset.cat; st.touched.add('cat'); markCats(); repaintDetails(); upd();
+  });
+  const analyze = async () => {
+    if (!S.ai || !S.autoAI || !st.img) return;
+    const tok = st.frontTok = (st.frontTok || 0) + 1;
+    setAiStatus(root, 'Claude regarde la pièce', true);
+    try {
+      const r = await aiFront(st.img.blob);
+      if (tok !== st.frontTok || sheetState !== st) return;
+      if (r.cat && !st.touched.has('cat') && (!st.onlyZone || CAT_ZONE[r.cat] === st.onlyZone)) st.cat = r.cat;
+      ['color','style','warmth','motif'].forEach(k => { if (r[k] != null && !st.touched.has(k)) st[k] = r[k]; });
+      if (r.name && !st.touched.has('name') && !nameIn.value) nameIn.value = r.name;
+      markCats(); repaintDetails(); upd();
+      setAiStatus(root, 'Rempli par Claude : vérifie et ajuste si besoin.');
+    } catch(e) { if (tok === st.frontTok) setAiStatus(root, aiFail(e)); }
+  };
+  const take = async blob => {
+    if (!blob) return;
+    drop.classList.add('busy');
+    try {
+      const r = await processImage(blob);
+      if (st.img && st.img.preview) URL.revokeObjectURL(st.img.preview);
+      st.img = r; prev.src = r.preview; prev.hidden = false;
+      drop.classList.add('has'); warn.hidden = r.transparent;
+      if (r.color && !st.touched.has('color')) st.color = r.color;
+      repaintDetails();
+      analyze();
+    } catch(e) { toast('Image illisible. Essaie une autre photo.'); }
+    finally { drop.classList.remove('busy'); paste.innerHTML = ''; paste.blur(); upd(); }
+  };
+  st.take = take;
+  bindPaste(paste, take);
+  $('[data-clip]', root).onclick = async () => {
+    try { const b = await readClipboard(); if (b) take(b); else toast('Aucune image dans le presse-papier. Copie d’abord un vêtement dans Photos.'); }
+    catch(e) { paste.focus(); toast('Collage direct bloqué ici : appui long dans le cadre, puis « Coller ».'); }
+  };
+  $('[data-file]', root).onchange = e => { const f = e.target.files && e.target.files[0]; if (f) take(f); e.target.value = ''; };
+  const resetForNext = () => {
+    [st.img, st.labelImg].forEach(x => { if (x && x.preview) URL.revokeObjectURL(x.preview); });
+    st.img = null; st.labelImg = null; st.care = null; st.color = null; st.style = null; st.warmth = null; st.motif = 'uni';
+    st.touched = new Set(['cat']);
+    prev.hidden = true; prev.removeAttribute('src'); drop.classList.remove('has'); warn.hidden = true;
+    const lp = $('[data-lprev]', root); lp.hidden = true; lp.removeAttribute('src'); $('[data-ldrop]', root).classList.remove('has');
+    const ed = $('[data-ceditor]', root); ed.hidden = true; ed.innerHTML = '';
+    nameIn.value = ''; setAiStatus(root, '');
+    repaintDetails(); mountCareRepaint(root, st); upd();
+  };
+  save.onclick = async () => {
+    if (!st.img || !st.cat) return;
+    const label = save.textContent;
+    save.disabled = true; save.textContent = 'Ajout…';
+    try {
+      const meta = {cat:st.cat, name:nameIn.value.trim(), w:st.img.w, h:st.img.h, transparent:st.img.transparent,
+        color:st.color || null, style:st.style, warmth:st.warmth, motif:st.motif || 'uni', care:st.care || null};
+      const id = await S.store.addItem(meta, st.img.blob, st.labelImg ? st.labelImg.blob : null);
+      if (st.slot) { setSlot(st.slot, id, 1); closeSheet(); toast('Ajouté à la tenue'); }
+      else { save.textContent = label; resetForNext(); toast('Pièce ajoutée. Colle la suivante.'); }
+    } catch(err) { save.textContent = label; upd(); toast(errMsg(err)); }
+  };
+}
+function mountCareRepaint(root, st){
+  const cbox = $('[data-cbox]', root), sum = $('[data-csum]', root), readBtn = $('[data-lread]', root);
+  cbox.innerHTML = '<p class="ctext">Pas encore d’entretien : ajoute la photo de l’étiquette ou remplis à la main.</p>';
+  if (sum) sum.textContent = 'facultatif';
+  if (readBtn) readBtn.hidden = true;
+}
+
+document.addEventListener('paste', e => {
+  const st = sheetState;
+  if (!st || !st.take) return;
+  const t = e.target;
+  if (t && t.closest && t.closest('.paste')) return;
+  if (t && t.matches && t.matches('input,textarea')) return;
+  const items = e.clipboardData ? Array.from(e.clipboardData.items || []) : [];
+  const f = items.find(i => i.kind === 'file' && i.type.indexOf('image/') === 0);
+  if (!f) return;
+  e.preventDefault();
+  if (!st.img || !st.takeLabel) st.take(f.getAsFile()); else st.takeLabel(f.getAsFile());
+});
+
+function openItem(id){
+  const it = getItem(id); if (!it) return;
+  const st = sheetState = {kind:'item', id, cat:it.cat, color: it.color || colorCache.get(it.id) || null, style:it.style != null ? it.style : null, warmth:it.warmth != null ? it.warmth : null,
+    motif:it.motif || 'uni', care: it.care ? Object.assign({}, it.care) : null, labelImg:null, hasLabel: !!labelSrc(it), touched:new Set()};
+  const inB = S.basket.includes(id);
+  openSheet(`
+    <div class="sh-head"><h2>${esc(itemLabel(it))}</h2>${closeBtn}</div>
+    <div class="big dots"><img src="${esc(src(it))}" alt="" class="${it.transparent === false ? 'opaque' : ''}"></div>
+    <div class="row2">
+      <button type="button" class="btn primary" data-wear>Mettre dans la tenue</button>
+      ${isTextile(it) ? `<button type="button" class="btn" data-bask>${ic('basket', 18)}${inB ? 'Retirer du panier' : 'Au panier'}</button>` : '<span></span>'}
+    </div>
+    <p class="aist" data-aist hidden></p>
+    <label class="field"><span>Nom</span><input data-name value="${esc(it.name || '')}" placeholder="${esc(CAT_LABEL[it.cat] || '')}" maxlength="60" autocomplete="off"></label>
+    <div class="field"><span>Catégorie</span>${catsHTML(null, it.cat)}</div>
+    <details class="sec" open><summary><b>Couleur, style, saison</b><span data-dsum></span></summary><div class="inner" data-details></div></details>
+    ${isTextile(it) ? `<details class="sec" data-csec ${it.care ? '' : 'open'}><summary><b>Étiquette d’entretien</b><span data-csum></span></summary><div class="inner">${careBlockHTML()}</div></details>` : ''}
+    <button type="button" class="btn danger wide" data-del style="margin-top:14px">Supprimer cette pièce</button>
+    <div class="foot"><button type="button" class="btn primary wide" data-save>Enregistrer les modifications</button></div>`, root => {
+    mountDetails(root, st);
+    if (isTextile(it)) mountCare(root, st, {existingLabel: labelSrc(it) || null});
+    $('.cats', root).addEventListener('click', e => {
+      const c = e.target.closest('[data-cat]'); if (!c) return;
+      st.cat = c.dataset.cat; $$('[data-cat]', root).forEach(b => b.classList.toggle('on', b === c));
+      const box = $('[data-details]', root); box.innerHTML = detailsHTML(st); $('[data-dsum]', root).textContent = detailsSummary(st);
+    });
+    $('[data-save]', root).onclick = async ev => {
+      const b = ev.currentTarget; b.disabled = true;
+      const patch = {cat:st.cat, name:$('[data-name]', root).value.trim(), color:st.color || null, style:st.style, warmth:st.warmth, motif:st.motif || 'uni'};
+      if (isTextile(it)) patch.care = st.care || null;
+      try { await S.store.updateItem(id, patch, st.labelImg ? st.labelImg.blob : null); closeSheet(); toast('Modifications enregistrées'); }
+      catch(err) { b.disabled = false; toast(errMsg(err)); }
+    };
+    $('[data-wear]', root).onclick = () => {
+      const z = CAT_ZONE[it.cat];
+      const slot = z === 'poignet' ? (!S.current.mg ? 'mg' : !S.current.md ? 'md' : 'mg') : ZONE_SLOT[z];
+      S.tab = 'tenue'; closeSheet(); renderNav(); setSlot(slot, it.id, 1); window.scrollTo(0, 0);
+    };
+    const bk = $('[data-bask]', root);
+    if (bk) bk.onclick = () => {
+      if (S.basket.includes(id)) { removeFromBasket([id]); toast('Retiré du panier'); } else { addToBasket([id]); toast('Ajouté au panier'); }
+      closeSheet();
+    };
+    let armed = false;
+    $('[data-del]', root).onclick = async ev => {
+      const b = ev.currentTarget;
+      if (!armed) { armed = true; b.textContent = 'Toucher encore pour confirmer'; return; }
+      b.disabled = true;
+      try {
+        await S.store.deleteItem(id);
+        SLOT_KEYS.forEach(k => { if (S.current[k] === id) { delete S.current[k]; delete S.locks[k]; } });
+        S.basket = S.basket.filter(x => x !== id); saveBasket();
+        persist(); closeSheet(); render(); toast('Pièce supprimée');
+      } catch(err) { b.disabled = false; toast(errMsg(err)); }
+    };
+  });
+}
+
+function openBasketPicker(){
+  const tex = S.items.filter(isTextile).sort((a,b) => (b.createdAt||0) - (a.createdAt||0));
+  const sel = new Set();
+  const inB = new Set(S.basket);
+  openSheet(`
+    <div class="sh-head"><h2>Au panier</h2>${closeBtn}</div>
+    ${tex.length ? `<p class="how" style="margin-top:0">Touche les pièces sales. Les accessoires et chaussures n’apparaissent pas ici.</p>
+      <div class="grid">${tex.filter(it => !inB.has(it.id)).map(it => tileHTML(it, 'data-sel')).join('') || '<p class="how">Tout ton linge est déjà dans le panier.</p>'}</div>` : '<p class="how">Aucun vêtement lavable dans le dressing pour l’instant.</p>'}
+    <div class="foot"><button type="button" class="btn primary wide" data-ok disabled>Ajouter au panier</button></div>`, root => {
+    const ok = $('[data-ok]', root);
+    root.addEventListener('click', e => {
+      const t = e.target.closest('[data-sel]'); if (!t) return;
+      const id = t.dataset.sel;
+      if (sel.has(id)) sel.delete(id); else sel.add(id);
+      t.classList.toggle('on', sel.has(id));
+      ok.disabled = !sel.size; ok.textContent = sel.size ? `Ajouter ${pl(sel.size, 'pièce', 'pièces')} au panier` : 'Ajouter au panier';
+    });
+    ok.onclick = () => { const n = addToBasket(Array.from(sel)); closeSheet(); if (n) toast(`${pl(n, 'pièce ajoutée', 'pièces ajoutées')} au panier`); };
+  });
+}
+
+function openRules(){
+  openSheet(`<div class="sh-head"><h2>Codes de style</h2>${closeBtn}</div>
+    <p class="how" style="margin-top:0">Le générateur teste des centaines de combinaisons et garde les mieux notées selon ces règles, puis en tire une au hasard parmi les meilleures.</p>
+    <ol class="rulelist">${RULES.map(r => `<li>${esc(r)}</li>`).join('')}</ol>
+    <p class="how">La note se base sur la couleur, le style et la saison de chaque pièce. Si une note te paraît fausse, corrige ces infos dans la fiche de la pièce.</p>`);
+}
+
+function openSaveOutfit(){
+  const n = S.outfits.length + 1;
+  openSheet(`
+    <div class="sh-head"><h2>Enregistrer la tenue</h2>${closeBtn}</div>
+    <div class="prev-mid dots">${outfitHTML(S.current, false)}</div>
+    <label class="field"><span>Nom</span><input data-onm value="Tenue ${n}" maxlength="60" autocomplete="off"></label>
+    <button type="button" class="btn primary wide" data-osave>Enregistrer la tenue</button>`, root => {
+    $('[data-osave]', root).onclick = async ev => {
+      const b = ev.currentTarget; b.disabled = true;
+      const slots = {};
+      SLOT_KEYS.forEach(k => { if (S.current[k] && getItem(S.current[k])) slots[k] = S.current[k]; });
+      try { await S.store.addOutfit({name: $('[data-onm]', root).value.trim() || 'Tenue ' + n, slots}); closeSheet(); toast('Tenue enregistrée'); }
+      catch(err) { b.disabled = false; toast(errMsg(err)); }
+    };
+  });
+}
+
+function openOutfit(id){
+  const o = S.outfits.find(x => x.id === id); if (!o) return;
+  const ev = evaluate(o.slots || {}, S.ctx);
+  openSheet(`
+    <div class="sh-head"><h2>${esc(o.name || 'Tenue')}</h2>${closeBtn}</div>
+    <div class="prev-mid dots">${outfitHTML(o.slots || {}, false)}</div>
+    ${ev ? `<p class="how" style="text-align:center;margin:0 0 6px">${ev.score}/100 selon la météo et l’occasion choisies</p>` : ''}
+    <div class="row2">
+      <button type="button" class="btn primary" data-owear>Porter cette tenue</button>
+      <button type="button" class="btn danger" data-odel>Supprimer</button>
+    </div>`, root => {
+    $('[data-owear]', root).onclick = () => { S.current = Object.assign({}, o.slots || {}); S.locks = {}; persist(); S.tab = 'tenue'; closeSheet(); render(); window.scrollTo(0, 0); };
+    let armed = false;
+    $('[data-odel]', root).onclick = async ev2 => {
+      const b = ev2.currentTarget;
+      if (!armed) { armed = true; b.textContent = 'Confirmer'; return; }
+      b.disabled = true;
+      try { await S.store.deleteOutfit(id); closeSheet(); toast('Tenue supprimée'); }
+      catch(err) { b.disabled = false; toast(errMsg(err)); }
+    };
+  });
+}
+
+
+/* =========================================================
+   SAUVEGARDE : export / import (.zip)
+   ========================================================= */
+const CRC_T = (() => { const t = new Uint32Array(256); for (let n = 0; n < 256; n++) { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; } return t; })();
+function crc32(u8){ let c = 0xFFFFFFFF; for (let i = 0; i < u8.length; i++) c = CRC_T[(c ^ u8[i]) & 0xFF] ^ (c >>> 8); return (c ^ 0xFFFFFFFF) >>> 0; }
+function makeZip(files){
+  const enc = new TextEncoder(), parts = [], central = [];
+  const d = new Date();
+  const dosT = (d.getHours() << 11) | (d.getMinutes() << 5) | (d.getSeconds() >> 1);
+  const dosD = ((d.getFullYear() - 1980) << 9) | ((d.getMonth() + 1) << 5) | d.getDate();
+  let offset = 0;
+  for (const f of files) {
+    const name = enc.encode(f.name), crc = crc32(f.data), size = f.data.length;
+    const lh = new DataView(new ArrayBuffer(30));
+    lh.setUint32(0, 0x04034b50, true); lh.setUint16(4, 20, true); lh.setUint16(6, 0x0800, true); lh.setUint16(8, 0, true);
+    lh.setUint16(10, dosT, true); lh.setUint16(12, dosD, true); lh.setUint32(14, crc, true);
+    lh.setUint32(18, size, true); lh.setUint32(22, size, true); lh.setUint16(26, name.length, true); lh.setUint16(28, 0, true);
+    parts.push(new Uint8Array(lh.buffer), name, f.data);
+    const ch = new DataView(new ArrayBuffer(46));
+    ch.setUint32(0, 0x02014b50, true); ch.setUint16(4, 20, true); ch.setUint16(6, 20, true); ch.setUint16(8, 0x0800, true); ch.setUint16(10, 0, true);
+    ch.setUint16(12, dosT, true); ch.setUint16(14, dosD, true); ch.setUint32(16, crc, true); ch.setUint32(20, size, true); ch.setUint32(24, size, true);
+    ch.setUint16(28, name.length, true); ch.setUint32(42, offset, true);
+    central.push(new Uint8Array(ch.buffer), name);
+    offset += 30 + name.length + size;
+  }
+  const cdSize = central.reduce((a, b) => a + b.length, 0);
+  const end = new DataView(new ArrayBuffer(22));
+  end.setUint32(0, 0x06054b50, true); end.setUint16(8, files.length, true); end.setUint16(10, files.length, true);
+  end.setUint32(12, cdSize, true); end.setUint32(16, offset, true);
+  return new Blob(parts.concat(central, [new Uint8Array(end.buffer)]), {type:'application/zip'});
+}
+async function readZip(blob){
+  const buf = new Uint8Array(await blob.arrayBuffer());
+  const dv = new DataView(buf.buffer, buf.byteOffset, buf.byteLength);
+  let e = -1;
+  for (let i = buf.length - 22; i >= Math.max(0, buf.length - 65557); i--) { if (dv.getUint32(i, true) === 0x06054b50) { e = i; break; } }
+  if (e < 0) throw new Error('zip');
+  const count = dv.getUint16(e + 10, true);
+  let p = dv.getUint32(e + 16, true);
+  const dec = new TextDecoder(), entries = new Map();
+  for (let n = 0; n < count; n++) {
+    if (dv.getUint32(p, true) !== 0x02014b50) throw new Error('zip');
+    const method = dv.getUint16(p + 10, true), csize = dv.getUint32(p + 20, true);
+    const nlen = dv.getUint16(p + 28, true), xlen = dv.getUint16(p + 30, true), clen = dv.getUint16(p + 32, true), lho = dv.getUint32(p + 42, true);
+    const name = dec.decode(buf.subarray(p + 46, p + 46 + nlen));
+    p += 46 + nlen + xlen + clen;
+    const start = lho + 30 + dv.getUint16(lho + 26, true) + dv.getUint16(lho + 28, true);
+    entries.set(name, {method, raw: buf.subarray(start, start + csize)});
+  }
+  return {
+    has: n => entries.has(n),
+    async get(n){
+      const f = entries.get(n); if (!f) return null;
+      if (f.method === 0) return f.raw;
+      if (f.method === 8 && typeof DecompressionStream !== 'undefined') {
+        const st = new Blob([f.raw]).stream().pipeThrough(new DecompressionStream('deflate-raw'));
+        return new Uint8Array(await new Response(st).arrayBuffer());
+      }
+      throw new Error('zip-method');
+    }
+  };
+}
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const fmtMo = b => (b / 1048576).toFixed(1).replace('.', ',') + ' Mo';
+function extOf(u8){
+  if (u8[0] === 0x89 && u8[1] === 0x50) return 'png';
+  if (u8[0] === 0xFF && u8[1] === 0xD8) return 'jpg';
+  if (u8[0] === 0x52 && u8[1] === 0x49 && u8[8] === 0x57) return 'webp';
+  if (u8[0] === 0x47 && u8[1] === 0x49) return 'gif';
+  return 'png';
+}
+const MIME = {png:'image/png', jpg:'image/jpeg', jpeg:'image/jpeg', webp:'image/webp', gif:'image/gif'};
+const mimeOf = n => MIME[String(n).split('.').pop().toLowerCase()] || 'image/png';
+const safeId = id => String(id).replace(/[^A-Za-z0-9_\-.~:@+]/g, '_');
+async function itemBlob(it, kind){
+  if (S.mode === 'local') return (kind === 'front' ? it.blob : it.labelBlob) || null;
+  const u = kind === 'front' ? src(it) : labelSrc(it);
+  if (!u) return null;
+  try { const r = await fetch(u); return r.ok ? await r.blob() : null; } catch(e) { return null; }
+}
+async function saveFile(blob, filename){
+  if (S.downloads) {
+    try { await S.downloads.save({filename, data:blob}); return 'saved'; }
+    catch(e) {
+      if (e && e.code === 'declined') return 'declined';
+      if (e && ['unavailable','not_granted','capability_disabled','capability_removed'].includes(e.code)) S.downloads = null;
+      else throw e;
+    }
+  }
+  try {
+    const file = new File([blob], filename, {type:'application/zip'});
+    if (navigator.canShare && navigator.canShare({files:[file]})) {
+      try { await navigator.share({files:[file], title:'Sauvegarde Penderie'}); return 'saved'; }
+      catch(e) { if (e && e.name === 'AbortError') return 'declined'; }
+    }
+  } catch(e) {}
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = filename;
+  document.body.appendChild(a); a.click();
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 5000);
+  return 'saved';
+}
+function cleanMeta(r){
+  const m = {cat: CAT_LABEL[r.cat] ? r.cat : 'tshirt', name:String(r.name || '').slice(0, 60), w:Number(r.w) || 0, h:Number(r.h) || 0,
+    transparent: r.transparent !== false, color:null, style:null, warmth:null, motif: r.motif === 'motif' ? 'motif' : 'uni', care:null};
+  if (r.color && PAL[r.color.name]) m.color = {name:r.color.name, hex: /^#[0-9a-f]{6}$/i.test(r.color.hex || '') ? r.color.hex : PAL[r.color.name].hex};
+  const st = Number(r.style); if (r.style != null && st >= 1 && st <= 4) m.style = Math.round(st);
+  const wa = Number(r.warmth); if (r.warmth != null && wa >= 0 && wa <= 2) m.warmth = Math.round(wa);
+  if (r.care && typeof r.care === 'object') m.care = normCare({lavage:r.care.wash, temperature:r.care.temp, programme:r.care.cycle, blanchiment:r.care.bleach,
+    sechage:r.care.dry, repassage:r.care.iron, nettoyage_sec:r.care.dryclean, a_part:r.care.bleeds, composition:r.care.compo});
+  return m;
+}
+async function buildBackup(onProgress, alive){
+  const files = [], items = [];
+  let i = 0, missing = 0;
+  const list = S.items.slice();
+  for (const it of list) {
+    if (!alive()) return null;
+    const rec = {id:it.id, cat:it.cat, name:it.name || '', w:it.w || 0, h:it.h || 0, transparent:it.transparent !== false, color:it.color || colorCache.get(it.id) || null,
+      style:it.style != null ? it.style : null, warmth:it.warmth != null ? it.warmth : null, motif:it.motif || 'uni', care:it.care || null, createdAt:it.createdAt || 0, image:null, label:null};
+    const img = await itemBlob(it, 'front');
+    if (img) { const u8 = new Uint8Array(await img.arrayBuffer()); rec.image = `images/${safeId(it.id)}.${extOf(u8)}`; files.push({name:rec.image, data:u8}); } else missing++;
+    const lab = await itemBlob(it, 'label');
+    if (lab) { const u8 = new Uint8Array(await lab.arrayBuffer()); rec.label = `etiquettes/${safeId(it.id)}.${extOf(u8)}`; files.push({name:rec.label, data:u8}); }
+    items.push(rec); i++;
+    onProgress(i / Math.max(1, list.length), `Photos : ${i}/${list.length}`);
+  }
+  const data = {app:'penderie', version:1, exportedAt:new Date().toISOString(), items,
+    outfits:S.outfits.map(o => ({id:o.id, name:o.name || '', slots:o.slots || {}, createdAt:o.createdAt || 0})),
+    basket:S.basket, current:S.current, locks:S.locks, ctx:S.ctx};
+  files.unshift({name:'penderie.json', data:new TextEncoder().encode(JSON.stringify(data))});
+  return {blob:makeZip(files), missing, count:list.length};
+}
+async function runImport(z, data, ui){
+  const list = data.items, map = {};
+  const validId = id => typeof id === 'string' && /^[A-Za-z0-9_\-.~:@+]{1,120}$/.test(id);
+  const retry = async fn => {
+    for (let a = 0; ; a++) {
+      try { return await fn(); }
+      catch(e) { if (a < 3 && e && ['rate_limited','resource_exhausted','store_unavailable','unavailable'].includes(e.code)) { await sleep(2500 * (a + 1)); continue; } throw e; }
+    }
+  };
+  let done = 0, added = 0, skipped = 0, oAdded = 0;
+  try {
+    for (const r of list) {
+      if (!ui.alive()) break;
+      const id = validId(r.id) ? r.id : uid();
+      map[r.id] = id;
+      if (getItem(id)) skipped++;
+      else {
+        const raw = r.image ? await z.get(r.image) : null;
+        if (!raw) skipped++;
+        else {
+          const img = new Blob([raw], {type:mimeOf(r.image)});
+          const lraw = r.label ? await z.get(r.label) : null;
+          const lab = lraw ? new Blob([lraw], {type:mimeOf(r.label)}) : null;
+          await retry(() => S.store.addItem(cleanMeta(r), img, lab, {id, createdAt:Number(r.createdAt) || Date.now(), bulk:true}));
+          added++;
+          if (S.mode === 'cloud') await sleep(120);
+        }
+      }
+      done++;
+      ui.progress(done / Math.max(1, list.length), `Import : ${done}/${list.length}`);
+    }
+    if (ui.alive()) {
+      for (const o of (data.outfits || [])) {
+        const oid = validId(o.id) ? o.id : uid();
+        if (S.outfits.some(x => x.id === oid)) continue;
+        const slots = {};
+        Object.keys(o.slots || {}).forEach(k => { if (SLOTS[k] && o.slots[k]) slots[k] = map[o.slots[k]] || o.slots[k]; });
+        await retry(() => S.store.addOutfit({name:String(o.name || 'Tenue').slice(0, 60), slots}, {id:oid, createdAt:Number(o.createdAt) || Date.now(), bulk:true}));
+        oAdded++;
+      }
+      if (Array.isArray(data.basket)) { const set = new Set(S.basket); data.basket.forEach(x => { if (map[x]) set.add(map[x]); }); S.basket = Array.from(set); saveBasket(); }
+      if (!filledCount(S.current) && data.current && typeof data.current === 'object') {
+        const c = {}; Object.keys(data.current).forEach(k => { if (SLOTS[k] && map[data.current[k]]) c[k] = map[data.current[k]]; }); S.current = c; persist();
+      }
+    }
+    await S.store.reload(); render();
+    const stopped = done < list.length;
+    return stopped
+      ? `Import arrêté à ${done}/${list.length}. Relance-le : les pièces déjà importées seront ignorées.`
+      : `Terminé : ${pl(added, 'pièce importée', 'pièces importées')}, ${pl(oAdded, 'tenue', 'tenues')}${skipped ? `, ${skipped} déjà présente(s) ou sans photo` : ''}.`;
+  } catch(e) {
+    try { await S.store.reload(); } catch(e2) {}
+    render();
+    return `Import interrompu à ${done}/${list.length} : ${errMsg(e)} Relance l’import, les pièces déjà importées seront ignorées.`;
+  }
+}
+function openBackup(){
+  const nLab = S.items.filter(it => it.label || it.labelBlob).length;
+  const st = sheetState = {kind:'backup'};
+  openSheet(`
+    <div class="sh-head"><h2>Sauvegarde</h2>${closeBtn}</div>
+    <p class="how" style="margin-top:0">Un seul fichier .zip avec les photos, les étiquettes, toutes les infos, les tenues et le panier. Pour changer de téléphone, ou passer de la version claude.ai à la version GitHub et inversement.</p>
+    <section class="bsec"><h3>Exporter</h3>
+      <p class="ctext">${pl(S.items.length, 'pièce', 'pièces')}, ${pl(nLab, 'photo d’étiquette', 'photos d’étiquettes')}, ${pl(S.outfits.length, 'tenue', 'tenues')}.</p>
+      <div class="bar" data-xbar hidden><i></i></div><p class="ctext" data-xmsg hidden></p>
+      <button type="button" class="btn primary wide" data-xprep ${S.items.length || S.outfits.length ? '' : 'disabled'}>Préparer la sauvegarde</button>
+      <button type="button" class="btn primary wide" data-xsave hidden>${ic('backup', 18)}Enregistrer le fichier</button></section>
+    <section class="bsec"><h3>Importer</h3>
+      <p class="ctext">Ajoute le contenu d’une sauvegarde à ce dressing. Les pièces déjà présentes sont ignorées, donc un import interrompu peut être relancé sans doublons.</p>
+      <label class="btn wide file">Choisir un fichier .zip<input type="file" accept=".zip,application/zip,application/x-zip-compressed" data-ifile></label>
+      <div class="bar" data-ibar hidden><i></i></div><p class="ctext" data-imsg hidden></p>
+      <button type="button" class="btn primary wide" data-igo hidden>Importer</button></section>
+    <p class="how">Sur iPhone, enregistre le fichier dans Fichiers ou iCloud Drive. Sur le nouveau téléphone, ouvre Penderie, Dressing, puis Sauvegarde et Importer.</p>`, root => {
+    const alive = () => sheetState === st;
+    const bar = (el, v) => { el.hidden = false; el.firstElementChild.style.width = Math.round(v * 100) + '%'; };
+    const say = (el, t) => { el.hidden = !t; el.textContent = t || ''; };
+    const xbar = $('[data-xbar]', root), xmsg = $('[data-xmsg]', root), xprep = $('[data-xprep]', root), xsave = $('[data-xsave]', root);
+    const ibar = $('[data-ibar]', root), imsg = $('[data-imsg]', root), igo = $('[data-igo]', root), ifile = $('[data-ifile]', root);
+    let zipBlob = null;
+    const fname = `penderie-sauvegarde-${new Date().toISOString().slice(0, 10)}.zip`;
+    xprep.onclick = async () => {
+      xprep.disabled = true; say(xmsg, 'Préparation…');
+      try {
+        const r = await buildBackup((v, t) => { bar(xbar, v * .95); say(xmsg, t); }, alive);
+        if (!r || !alive()) return;
+        zipBlob = r.blob; bar(xbar, 1);
+        say(xmsg, `Prêt : ${fmtMo(zipBlob.size)}${r.missing ? `, ${r.missing} photo(s) introuvable(s)` : ''}.`);
+        xprep.hidden = true; xsave.hidden = false;
+      } catch(e) { say(xmsg, 'La préparation a échoué. Réessaie.'); xprep.disabled = false; }
+    };
+    xsave.onclick = async () => {
+      if (!zipBlob) return;
+      try {
+        const r = await saveFile(zipBlob, fname);
+        if (r === 'saved') { say(xmsg, 'Sauvegarde enregistrée. Garde ce fichier en lieu sûr.'); toast('Sauvegarde enregistrée'); }
+        else say(xmsg, 'Enregistrement annulé. Tu peux réessayer.');
+      } catch(e) { say(xmsg, e && e.code === 'rate_limited' ? 'Une fenêtre d’enregistrement est déjà ouverte.' : 'Impossible d’enregistrer le fichier ici.'); }
+    };
+    let parsed = null;
+    ifile.onchange = async e => {
+      const f = e.target.files && e.target.files[0]; e.target.value = '';
+      if (!f) return;
+      igo.hidden = true; parsed = null; say(imsg, 'Lecture du fichier…');
+      try {
+        const z = await readZip(f);
+        const raw = await z.get('penderie.json');
+        if (!raw) throw new Error('json');
+        const data = JSON.parse(new TextDecoder().decode(raw));
+        if (!data || data.app !== 'penderie' || !Array.isArray(data.items)) throw new Error('json');
+        parsed = {z, data};
+        const already = data.items.filter(it => getItem(it.id)).length;
+        say(imsg, `${pl(data.items.length, 'pièce', 'pièces')} et ${pl((data.outfits || []).length, 'tenue', 'tenues')} dans cette sauvegarde${already ? `, dont ${already} déjà présente(s)` : ''}.`);
+        igo.hidden = false; igo.disabled = false;
+      } catch(err) { say(imsg, 'Ce fichier n’est pas une sauvegarde Penderie valide.'); }
+    };
+    igo.onclick = async () => {
+      if (!parsed) return;
+      igo.disabled = true; ifile.disabled = true;
+      const msg = await runImport(parsed.z, parsed.data, {alive, progress:(v, t) => { bar(ibar, v); say(imsg, t); }});
+      if (alive()) { say(imsg, msg); igo.hidden = true; ifile.disabled = false; }
+      toast(msg.indexOf('Terminé') === 0 ? 'Import terminé' : 'Import incomplet');
+    };
+  });
+}
+
+/* =========================================================
+   GLOBAL EVENTS
+   ========================================================= */
+document.addEventListener('click', e => {
+  const t = e.target;
+  if (t.closest('#sheet')) return;
+  const tab = t.closest('[data-tab]');
+  if (tab) { S.tab = tab.dataset.tab; renderNav(); window.scrollTo(0, 0); return; }
+  const cx = t.closest('[data-ctxk]');
+  if (cx) { S.ctx[cx.dataset.ctxk] = cx.dataset.ctxv; lsSet('penderie.ctx', S.ctx); renderTenue(); return; }
+  const act = t.closest('[data-act]');
+  if (act) {
+    const a = act.dataset.act;
+    if (a === 'add') openAdd();
+    else if (a === 'random') randomize();
+    else if (a === 'clear') clearAll();
+    else if (a === 'save') openSaveOutfit();
+    else if (a === 'rules') openRules();
+    else if (a === 'backup') openBackup();
+    else if (a === 'basket-add') openBasketPicker();
+    else if (a === 'outfit-basket') {
+      const n = addToBasket(SLOT_KEYS.map(k => S.current[k]).filter(Boolean));
+      toast(n ? `${pl(n, 'pièce ajoutée', 'pièces ajoutées')} au panier` : 'Déjà dans le panier');
+    }
+    else if (a === 'basket-rm') { const prev = removeFromBasket([act.dataset.id]); toast('Retiré du panier', 'Annuler', () => { S.basket = prev; saveBasket(); render(); }); }
+    else if (a === 'basket-clear') { const prev = removeFromBasket(S.basket.slice()); toast('Panier vidé', 'Annuler', () => { S.basket = prev; saveBasket(); render(); }); }
+    else if (a === 'load-done' && S.plan) {
+      const L = S.plan.loads[Number(act.dataset.load)];
+      if (L) { const prev = removeFromBasket(L.items.map(i => i.id)); toast('Machine terminée', 'Annuler', () => { S.basket = prev; saveBasket(); render(); }); }
+    }
+    else if (a === 'hand-done' && S.plan) { const prev = removeFromBasket(S.plan.hand.map(i => i.id)); toast('Lavage à la main terminé', 'Annuler', () => { S.basket = prev; saveBasket(); render(); }); }
+    return;
+  }
+  const f = t.closest('[data-filter]');
+  if (f) { S.filter = f.dataset.filter; renderDressing(); return; }
+  const it = t.closest('[data-item]');
+  if (it) { openItem(it.dataset.item); return; }
+  const o = t.closest('[data-outfit]');
+  if (o) openOutfit(o.dataset.outfit);
+});
+
+(function bindComposer(){
+  const vt = $('#v-tenue');
+  let drag = null, suppress = false;
+  vt.addEventListener('pointerdown', e => { const s = e.target.closest('#composer .slot'); drag = s ? {slot:s.dataset.slot, x:e.clientX, y:e.clientY} : null; });
+  vt.addEventListener('pointercancel', () => { drag = null; });
+  vt.addEventListener('pointerup', e => {
+    if (!drag) return;
+    const dx = e.clientX - drag.x, dy = e.clientY - drag.y, slot = drag.slot;
+    drag = null;
+    if (Math.abs(dx) > 34 && Math.abs(dx) > Math.abs(dy) * 1.2) { suppress = true; setTimeout(() => { suppress = false; }, 400); cycle(slot, dx < 0 ? 1 : -1); }
+  });
+  vt.addEventListener('click', e => {
+    const s = e.target.closest('#composer .slot'); if (!s) return;
+    if (suppress) { suppress = false; return; }
+    openPicker(s.dataset.slot);
+  });
+})();
+
+/* =========================================================
+   BOOT
+   ========================================================= */
+function makeIcon(){
+  try {
+    const c = document.createElement('canvas'); c.width = c.height = 180;
+    const x = c.getContext('2d');
+    x.fillStyle = '#1C2638'; x.fillRect(0, 0, 180, 180);
+    x.strokeStyle = '#F7F8F6'; x.lineWidth = 8; x.lineCap = 'round'; x.lineJoin = 'round';
+    x.beginPath(); x.arc(90, 50, 13, Math.PI, Math.PI * 2.35); x.lineTo(90, 74); x.stroke();
+    x.beginPath(); x.moveTo(90, 74); x.lineTo(30, 122); x.lineTo(150, 122); x.closePath(); x.stroke();
+    x.strokeStyle = '#E45C7D'; x.lineWidth = 5; x.setLineDash([10, 8]);
+    x.beginPath(); x.moveTo(42, 146); x.lineTo(138, 146); x.stroke();
+    const l = document.createElement('link'); l.rel = 'apple-touch-icon'; l.href = c.toDataURL('image/png');
+    document.head.appendChild(l);
+  } catch(e) {}
+}
+async function initAI(){
+  try {
+    if (!(window.claude && typeof window.claude.use === 'function')) return;
+    const smp = await window.claude.use('sample');
+    if (!smp) return;
+    let lim = null;
+    try { lim = await smp.limits(); } catch(e) {}
+    if (lim && lim.images) S.ai = {sample:smp};
+  } catch(e) {}
+}
+async function init(){
+  makeIcon();
+  render();
+  let store = null;
+  const aiP = initAI();
+  if (window.claude && typeof window.claude.use === 'function') window.claude.use('downloads').then(d => { S.downloads = d; }).catch(() => {});
+  try {
+    if (window.claude && typeof window.claude.use === 'function') {
+      const res = await Promise.all([window.claude.use('db'), window.claude.use('assets')]);
+      if (res[0] && res[1]) store = cloudStore(res[0], res[1]);
+    }
+  } catch(e) {}
+  if (!store) store = localStore();
+  S.store = store; S.mode = store.mode;
+  try { await store.start(); } catch(e) { toast('Impossible de charger le dressing.'); }
+  S.ready = true;
+  render();
+  aiP.then(() => { if (S.ai && sheetState) { /* next sheet will show AI options */ } });
+}
+window.__penderie = {S, evaluate, generate, buildLoads, render, makeZip, readZip, buildBackup, runImport};
+init();
+})();
+</script>
+</body>
+</html>

@@ -310,6 +310,27 @@ details.sec > .inner{padding-bottom:14px}
 .bsec h3{margin:0;font-size:22px;font-weight:820;font-stretch:66%;line-height:1}
 .bar{height:8px;border-radius:4px;background:var(--chip);overflow:hidden}
 .bar i{display:block;height:100%;width:0;background:var(--accent);transition:width .2s}
+.s-visage{grid-column:3;grid-row:1 / 3;align-self:center;justify-self:center;width:80%;height:calc(90 * var(--u))}
+.s-cou{grid-column:1;grid-row:3;align-self:start;justify-self:start;width:86%;height:calc(96 * var(--u))}
+.s-ceinture{grid-column:1;grid-row:4;align-self:start;justify-self:start;width:86%;height:calc(70 * var(--u))}
+.s-sac{grid-column:3;grid-row:4;align-self:start;justify-self:end;width:86%;height:calc(110 * var(--u))}
+.live .slot.empty.acc{border-style:dotted;background:transparent}
+.dirt{position:absolute;left:-4px;top:-4px;font-size:10px;font-weight:700;background:#C93A5B;color:#fff;border-radius:6px;padding:2px 5px;z-index:4}
+.filt{margin:0 0 12px;border-radius:14px;background:var(--surface);box-shadow:0 0 0 1px var(--line);padding:0 12px}
+.filt summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 2px}
+.filt summary::-webkit-details-marker{display:none}
+.filt summary b{font-size:15px;font-weight:680;flex-shrink:0}
+.filt summary span{font-size:13.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.filt[open] summary{border-bottom:1px dashed var(--line)}
+.frow{display:grid;grid-template-columns:72px minmax(0,1fr);gap:8px;align-items:center;padding:10px 0}
+.frow + .frow{border-top:1px solid var(--line)}
+.frow .dl{padding-top:0}
+.hs{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:3px 2px;align-items:center}
+.hs::-webkit-scrollbar{display:none}
+.swf{width:30px;height:30px;border-radius:50%;border:0;background:var(--c);flex-shrink:0;cursor:pointer;box-shadow:inset 0 0 0 1px rgba(0,0,0,.14)}
+.swf.on{box-shadow:0 0 0 2px var(--surface),0 0 0 4px var(--accent)}
+.newtag{display:flex;gap:6px;margin-top:8px}
+.newtag .inp{min-height:38px;font-size:16px}
 .toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);
   background:var(--ink);color:var(--surface);padding:11px 14px;border-radius:12px;font-size:14px;display:flex;gap:14px;align-items:center;
   z-index:60;width:max-content;max-width:calc(100vw - 32px);box-shadow:0 6px 18px var(--shadow);line-height:1.35}
@@ -360,20 +381,26 @@ details.sec > .inner{padding-bottom:14px}
 const ZONES = [
   {id:'tete', label:'Tête', cats:['casquette','bonnet','chapeau']},
   {id:'yeux', label:'Lunettes', cats:['lunettes']},
+  {id:'visage', label:'Visage', cats:['boucles','piercing']},
+  {id:'cou', label:'Cou', cats:['cravate','noeud','echarpe','foulard','collier']},
   {id:'haut', label:'Hauts', cats:['tshirt','polo','chemise','pull','sweat']},
   {id:'ensemble', label:'Une pièce', cats:['qamis','djellaba','robe','abaya','combinaison']},
   {id:'dessus', label:'Par-dessus', cats:['veste','gilet','sansmanche','manteau']},
   {id:'poignet', label:'Poignets', cats:['montre','bracelet','bague','bijou']},
   {id:'bas', label:'Bas', cats:['pantalon','jean','short','pantacourt']},
   {id:'chaussettes', label:'Chaussettes', cats:['chaussettes']},
-  {id:'pieds', label:'Chaussures', cats:['baskets','chaussures','sandales']}
+  {id:'pieds', label:'Chaussures', cats:['baskets','chaussures','sandales']},
+  {id:'ceinture', label:'Ceinture', cats:['ceinture']},
+  {id:'sac', label:'Sac', cats:['sac']}
 ];
 const CAT_LABEL = {
   casquette:'Casquette', bonnet:'Bonnet', chapeau:'Chapeau', lunettes:'Lunettes',
   tshirt:'T-shirt', polo:'Polo', chemise:'Chemise', pull:'Pull', sweat:'Sweat',
   qamis:'Qamis', djellaba:'Djellaba', robe:'Robe', abaya:'Abaya', combinaison:'Combinaison',
   veste:'Veste', gilet:'Gilet', sansmanche:'Gilet sans manche', manteau:'Manteau',
-  montre:'Montre', bracelet:'Bracelet', bague:'Bague', bijou:'Bijou',
+  montre:'Montre', bracelet:'Bracelet', bague:'Bague', bijou:'Autre bijou',
+  boucles:'Boucles d’oreilles', piercing:'Piercing', cravate:'Cravate', noeud:'Nœud papillon', echarpe:'Écharpe', foulard:'Foulard', collier:'Collier / chaîne',
+  ceinture:'Ceinture', sac:'Sac',
   pantalon:'Pantalon', jean:'Jean', short:'Short', pantacourt:'Pantacourt',
   chaussettes:'Chaussettes', baskets:'Baskets', chaussures:'Chaussures de ville', sandales:'Sandales'
 };
@@ -386,6 +413,9 @@ const CATDEF = {
   qamis:{f:3,w:1,kg:.5,tex:true}, djellaba:{f:3,w:2,kg:.9,tex:true}, robe:{f:3,w:0,kg:.35,tex:true}, abaya:{f:3,w:1,kg:.5,tex:true}, combinaison:{f:2,w:0,kg:.45,tex:true},
   veste:{f:3,w:1,kg:.9,tex:true}, gilet:{f:3,w:1,kg:.45,tex:true}, sansmanche:{f:2,w:1,kg:.5,tex:true}, manteau:{f:3,w:2,kg:1.4,tex:true},
   montre:{f:null,w:null,kg:0,tex:false}, bracelet:{f:null,w:null,kg:0,tex:false}, bague:{f:null,w:null,kg:0,tex:false}, bijou:{f:null,w:null,kg:0,tex:false},
+  boucles:{f:null,w:null,kg:0,tex:false}, piercing:{f:null,w:null,kg:0,tex:false}, collier:{f:null,w:null,kg:0,tex:false},
+  cravate:{f:4,w:null,kg:.05,tex:true}, noeud:{f:4,w:null,kg:.03,tex:true}, echarpe:{f:2,w:2,kg:.2,tex:true}, foulard:{f:3,w:1,kg:.08,tex:true},
+  ceinture:{f:3,w:null,kg:0,tex:false}, sac:{f:2,w:null,kg:0,tex:false},
   pantalon:{f:3,w:1,kg:.55,tex:true}, jean:{f:2,w:1,kg:.7,tex:true}, short:{f:2,w:0,kg:.3,tex:true}, pantacourt:{f:2,w:0,kg:.4,tex:true},
   chaussettes:{f:null,w:null,kg:.06,tex:true},
   baskets:{f:2,w:1,kg:.8,tex:false}, chaussures:{f:4,w:1,kg:.9,tex:false}, sandales:{f:2,w:0,kg:.4,tex:false}
@@ -396,6 +426,8 @@ const ZONE = Object.fromEntries(ZONES.map(z => [z.id, z]));
 const SLOTS = {
   tete:{zone:'tete', ph:'Tête', title:'Sur la tête'},
   yeux:{zone:'yeux', ph:'Lunettes', title:'Lunettes'},
+  visage:{zone:'visage', ph:'Visage', title:'Bijoux de visage'},
+  cou:{zone:'cou', ph:'Cou', title:'Cou (cravate, écharpe…)'},
   dessus:{zone:'dessus', ph:'Par-dessus', title:'Par-dessus'},
   haut:{zone:'haut', ph:'Haut', title:'Haut'},
   ensemble:{zone:'ensemble', ph:'Une pièce', title:'Une pièce (qamis, robe…)'},
@@ -403,10 +435,28 @@ const SLOTS = {
   md:{zone:'poignet', ph:'Poignet', title:'Poignet droit'},
   bas:{zone:'bas', ph:'Bas', title:'Bas'},
   chaussettes:{zone:'chaussettes', ph:'Chaussettes', title:'Chaussettes'},
-  pieds:{zone:'pieds', ph:'Chaussures', title:'Chaussures'}
+  pieds:{zone:'pieds', ph:'Chaussures', title:'Chaussures'},
+  ceinture:{zone:'ceinture', ph:'Ceinture', title:'Ceinture'},
+  sac:{zone:'sac', ph:'Sac', title:'Sac'}
+};
+const ACC_SLOTS = new Set(['yeux','visage','cou','mg','md','ceinture','sac']);
+const JEWEL = new Set(['montre','bracelet','bague','bijou','boucles','piercing','collier']);
+/* Occasions (étiquettes de style) : multi-sélection, + étiquettes perso */
+const TAG_LVL = {sport:1, casual:2, chic:3, habille:4};
+const TAG_LBL = {sport:'Sport', casual:'Casual', chic:'Chic', habille:'Habillé'};
+const DEF_TAGS = {
+  casquette:['casual','sport'], bonnet:['casual','sport'], chapeau:['casual','chic'], lunettes:[],
+  boucles:[], piercing:[], collier:[], cravate:['chic','habille'], noeud:['habille'], echarpe:['casual','chic'], foulard:['chic','casual'],
+  tshirt:['casual','sport'], polo:['casual','chic'], chemise:['chic','casual'], pull:['casual','chic'], sweat:['casual','sport'],
+  qamis:['chic','casual'], djellaba:['chic','casual'], robe:['chic','casual'], abaya:['chic','casual'], combinaison:['casual'],
+  veste:['casual','chic'], gilet:['casual','chic'], sansmanche:['casual','sport'], manteau:['casual','chic'],
+  montre:[], bracelet:[], bague:[], bijou:[],
+  pantalon:['chic','casual'], jean:['casual'], short:['casual','sport'], pantacourt:['casual'],
+  chaussettes:[], baskets:['casual','sport'], chaussures:['chic','habille'], sandales:['casual'],
+  ceinture:['casual','chic'], sac:['casual','chic']
 };
 const SLOT_KEYS = Object.keys(SLOTS);
-const ZONE_SLOT = {tete:'tete', yeux:'yeux', haut:'haut', ensemble:'ensemble', dessus:'dessus', bas:'bas', chaussettes:'chaussettes', pieds:'pieds'};
+const ZONE_SLOT = {tete:'tete', yeux:'yeux', visage:'visage', cou:'cou', ceinture:'ceinture', sac:'sac', haut:'haut', ensemble:'ensemble', dessus:'dessus', bas:'bas', chaussettes:'chaussettes', pieds:'pieds'};
 /* lg = groupe de lavage */
 const PALETTE = [
   {name:'noir',hex:'#1c1c1e',fam:'neutre',lg:'fonce'},
@@ -477,7 +527,9 @@ const S = {
   current: lsGet('penderie.current') || {},
   locks: lsGet('penderie.locks') || {},
   basket: lsGet('penderie.basket') || [],
-  ctx: Object.assign({meteo:'doux', occasion:'casual'}, lsGet('penderie.ctx') || {}),
+  ctx: Object.assign({meteo:'doux', occasion:'casual', colors:[]}, lsGet('penderie.ctx') || {}),
+  customTags: lsGet('penderie.tags') || [],
+  filtOpen: lsGet('penderie.filtopen') !== false,
   autoAI: lsGet('penderie.autoai') !== false,
   tab:'tenue', filter:'all', plan:null
 };
@@ -493,6 +545,32 @@ const isTextile = it => !!(CATDEF[it.cat] && CATDEF[it.cat].tex);
 const styleOf = it => it.style != null ? it.style : (CATDEF[it.cat] ? CATDEF[it.cat].f : null);
 const warmthOf = it => it.warmth != null ? it.warmth : (CATDEF[it.cat] ? CATDEF[it.cat].w : null);
 const motifOf = it => it.motif || 'uni';
+const tagLabel = t => TAG_LBL[t] || t;
+function tagsOf(it){
+  if (Array.isArray(it.tags)) return it.tags;
+  if (it.style != null) return [{1:'sport',2:'casual',3:'chic',4:'habille'}[it.style]].filter(Boolean);
+  return (DEF_TAGS[it.cat] || []).slice();
+}
+function allTags(){
+  const set = new Set(Object.keys(TAG_LVL));
+  S.items.forEach(it => (Array.isArray(it.tags) ? it.tags : []).forEach(t => set.add(t)));
+  (S.customTags || []).forEach(t => set.add(t));
+  return Array.from(set);
+}
+function tagKey(v){
+  const l = v.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  if (TAG_LVL[l]) return l;
+  const ex = allTags().find(t => t.toLowerCase() === v.toLowerCase());
+  return ex || (v.charAt(0).toUpperCase() + v.slice(1));
+}
+function levelOf(it, occ){
+  const t = tagsOf(it), ls = t.map(x => TAG_LVL[x]).filter(Boolean);
+  if (!ls.length) return null;
+  const target = TAG_LVL[occ];
+  if (target && t.includes(occ)) return target;
+  if (!target) return ls.reduce((a,b) => a + b, 0) / ls.length;
+  return ls.reduce((best, l) => Math.abs(l - target) < Math.abs(best - target) ? l : best, ls[0]);
+}
 
 let toastT;
 function toast(msg, label, fn){
@@ -580,6 +658,7 @@ function colorOf(it){
   return {name:p.name, hex, lab, L:lab[0], h:hueOf(p.hex), fam:p.fam, lg:p.lg};
 }
 function metalOf(it){
+  if (!JEWEL.has(it.cat)) return null;
   const c = colorOf(it); if (!c) return null;
   if (['doré','jaune','moutarde','camel','beige','orange'].includes(c.name)) return 'or';
   if (['argenté','gris','gris clair','blanc','anthracite'].includes(c.name)) return 'argent';
@@ -826,15 +905,18 @@ function bindPaste(zone, onBlob){
 /* =========================================================
    CLAUDE (sample) — lit la pièce et l'étiquette sur l'usage de l'utilisateur
    ========================================================= */
-const FRONT_PROMPT = `Tu analyses la photo détourée d'un vêtement ou accessoire pour une application de garde-robe.
+function frontPrompt(){
+  const tags = allTags().map(t => TAG_LVL[t] ? t : t).join(', ');
+  return `Tu analyses la photo détourée d'un vêtement ou accessoire pour une application de garde-robe.
 Réponds uniquement avec un objet JSON de cette forme :
-{"categorie":"...","couleur":"...","motif":"uni","style":2,"chaleur":1,"nom":"..."}
-- categorie : une valeur parmi ${Object.keys(CAT_LABEL).join(', ')} (tshirt = t-shirt, sansmanche = gilet sans manche ou doudoune sans manche, chaussures = chaussures de ville/cuir, baskets = sneakers, qamis = tunique longue homme type kamis/thobe, djellaba = djellaba ou gandoura, abaya = abaya, robe = robe, combinaison = combinaison ou salopette).
-- couleur : la couleur dominante, une valeur parmi ${PALETTE.map(p => p.name).join(', ')} (doré/argenté seulement pour montres et bijoux ; denim = jean bleu).
+{"categorie":"...","couleur":"...","motif":"uni","occasions":["casual"],"chaleur":1,"nom":"..."}
+- categorie : une valeur parmi ${Object.keys(CAT_LABEL).join(', ')} (tshirt = t-shirt, sansmanche = gilet ou doudoune sans manche, chaussures = chaussures de ville/cuir, baskets = sneakers, qamis = tunique longue homme type kamis/thobe, djellaba = djellaba ou gandoura, combinaison = combinaison ou salopette, boucles = boucles d'oreilles, noeud = nœud papillon, collier = collier ou chaîne, bijou = autre bijou porté à la main).
+- couleur : la couleur dominante, une valeur parmi ${PALETTE.map(p => p.name).join(', ')} (doré/argenté seulement pour bijoux et montres ; denim = jean bleu).
 - motif : "uni" ou "motif" (rayures, carreaux, imprimé, gros logo ou graphique = motif).
-- style : 1 = sport, 2 = casual, 3 = chic décontracté, 4 = habillé.
-- chaleur : 0 = été/léger, 1 = mi-saison, 2 = hiver/chaud.
+- occasions : une ou plusieurs valeurs parmi ${tags} (sport, casual, chic, habille = habillé). Mets toutes celles qui conviennent : un jogging = ["sport","casual"], une chemise blanche = ["chic","casual"], une cravate = ["chic","habille"]. Tableau vide pour un accessoire neutre qui va avec tout.
+- chaleur : 0 = été/léger, 1 = mi-saison, 2 = hiver/chaud (null pour un bijou ou accessoire sans effet).
 - nom : nom court en français, 2 à 5 mots, sans marque inventée (ex. "Veste en jean brut").`;
+}
 const LABEL_PROMPT = `Photo d'une étiquette d'entretien de vêtement. Lis les symboles (norme GINETEX / ISO 3758) et le texte imprimé.
 Réponds uniquement avec un objet JSON de cette forme :
 {"lisible":true,"lavage":"machine","temperature":30,"programme":"normal","blanchiment":"non","sechage":"non","repassage":2,"nettoyage_sec":false,"a_part":false,"composition":"100% coton"}
@@ -868,7 +950,11 @@ function normFront(r){
   const p = PAL[cn] || PALETTE.find(x => cn && cn.includes(x.name));
   if (p) out.color = {name:p.name, hex:p.hex};
   if (r.motif === 'uni' || r.motif === 'motif') out.motif = r.motif;
-  const st = Math.round(Number(r.style)); if (st >= 1 && st <= 4) out.style = st;
+  if (Array.isArray(r.occasions)) {
+    const known = allTags();
+    const t = r.occasions.map(x => tagKey(String(x))).filter(x => known.includes(x));
+    out.tags = Array.from(new Set(t));
+  }
   const w = Math.round(Number(r.chaleur)); if (w >= 0 && w <= 2 && r.chaleur !== null && r.chaleur !== '') out.warmth = w;
   if (r.nom) out.name = String(r.nom).slice(0, 40);
   return out;
@@ -893,7 +979,7 @@ function normCare(r){
   c.compo = String(r.composition || '').slice(0, 80);
   return c;
 }
-async function aiFront(blob){ return normFront(await S.ai.sample.json(FRONT_PROMPT, {images:[blob], modelTier:'quick'})); }
+async function aiFront(blob){ return normFront(await S.ai.sample.json(frontPrompt(), {images:[blob], modelTier:'quick'})); }
 async function aiLabel(blob){
   const r = await S.ai.sample.json(LABEL_PROMPT, {images:[blob]});
   if (r && r.lisible === false) { const e = new Error('illisible'); e.code = 'illisible'; throw e; }
@@ -908,27 +994,31 @@ const RULES = [
   'Deux couleurs vives ne passent que si elles sont voisines sur le cercle chromatique ; sinon, une seule.',
   'Un contraste clair/foncé entre le haut et le bas structure la silhouette. Même couleur vive en haut et en bas : à éviter.',
   'Un seul motif (rayures, carreaux, imprimé) par tenue, le reste uni.',
-  'Toutes les pièces au même niveau de style (sport, casual, chic décontracté, habillé), un cran d’écart maximum.',
+  'Chaque pièce porte une ou plusieurs occasions (sport, casual, chic, habillé ou tes propres étiquettes). Le dé ne prend que les pièces de l’occasion filtrée et garde un niveau de style cohérent, un cran d’écart maximum.',
   'Jean sur jean seulement si les deux délavages sont nettement différents.',
   'En chic : chaussures plus foncées que le pantalon, chaussettes assorties au pantalon ou aux chaussures, jamais blanches. Pas de casquette.',
   'Une pièce (qamis, djellaba, robe, abaya, combinaison) remplace le haut et le bas ; une veste ou un gilet peut aller par-dessus.',
   'Jamais de chaussettes avec des sandales. Pas de short avec des chaussures de ville.',
-  'Ne mélange pas doré et argenté, et une seule montre.',
+  'Ne mélange pas doré et argenté (poignets, visage, cou), et une seule montre.',
+  'Cravate ou nœud papillon uniquement avec une chemise, jamais en sport. En chic, ceinture assortie aux chaussures.',
+  'Les pièces au linge sale ne sont jamais proposées : elles reviennent dès que tu les retires du panier.',
   'Météo : chaud = léger et sans veste chaude, doux = une couche légère, froid = une vraie couche chaude par-dessus, pas de short ni de sandales.'
 ];
 function evaluate(slots, ctx){
   const P = k => slots[k] ? getItem(slots[k]) : null;
   const main = ['dessus','haut','bas','ensemble','pieds'].map(P).filter(Boolean);
   if (main.length < 2) return null;
-  const visible = ['tete','dessus','haut','bas','ensemble','pieds'].map(P).filter(Boolean);
+  const ens = P('ensemble');
+  const haut = ens ? null : P('haut'), dessus = P('dessus'), bas = ens ? null : P('bas'), pieds = P('pieds'), tete = P('tete'), so = P('chaussettes'), cou = P('cou'), ceint = P('ceinture');
+  const visible = [tete, dessus, haut, bas, ens, pieds].filter(Boolean);
   const good = [], bad = [];
   let s = 62;
   const add = (v, msg) => { s += v; if (msg) (v >= 0 ? good : bad).push({v, msg}); };
-  const ens = P('ensemble');
-  const haut = ens ? null : P('haut'), dessus = P('dessus'), bas = ens ? null : P('bas'), pieds = P('pieds'), tete = P('tete'), so = P('chaussettes');
+  const occ = ctx.occasion && ctx.occasion !== 'all' ? ctx.occasion : null;
+  const isChic = occ === 'chic' || occ === 'habille';
 
   /* Couleurs */
-  const cols = visible.map(colorOf).filter(Boolean);
+  const cols = visible.concat(cou && cou.cat !== 'collier' ? [cou] : []).map(colorOf).filter(Boolean);
   const vivid = [];
   cols.forEach(c => { if (c.fam === 'couleur' && !vivid.some(v => v.name === c.name)) vivid.push(c); });
   if (vivid.length === 0) add(4, 'Palette neutre, facile à porter');
@@ -954,22 +1044,23 @@ function evaluate(slots, ctx){
   }
 
   /* Motifs */
-  const pat = visible.filter(it => motifOf(it) === 'motif').length;
+  const pat = visible.concat(cou ? [cou] : []).filter(it => motifOf(it) === 'motif').length;
   if (pat >= 2) add(-18, 'Plusieurs motifs : garde un seul imprimé');
   else if (pat === 1) add(2, 'Un motif mis en valeur par des pièces unies');
 
-  /* Niveau de style */
-  const fs = visible.map(styleOf).filter(v => v != null);
-  if (fs.length) {
-    const spread = Math.max.apply(null, fs) - Math.min.apply(null, fs);
+  /* Occasion et cohérence de style */
+  const lv = visible.concat(cou ? [cou] : []).map(it => levelOf(it, occ)).filter(v => v != null);
+  if (lv.length > 1) {
+    const spread = Math.max.apply(null, lv) - Math.min.apply(null, lv);
     if (spread <= 1) add(8, 'Toutes les pièces au même niveau de style');
-    else if (spread === 2) add(-10, 'Styles un peu éloignés entre les pièces');
+    else if (spread <= 2) add(-10, 'Styles un peu éloignés entre les pièces');
     else add(-24, 'Styles incompatibles (sport et habillé)');
-    const target = ctx.occasion === 'sport' ? 1.3 : ctx.occasion === 'chic' ? 3.4 : 2.2;
-    const avg = fs.reduce((a,b) => a + b, 0) / fs.length;
-    const off = Math.abs(avg - target);
-    if (off <= .7) add(5, `Dans le ton pour une tenue ${OCC_LBL[ctx.occasion]}`);
-    else if (off > 1.2) add(-12, `Pas vraiment ${OCC_LBL[ctx.occasion]} comme tenue`);
+  }
+  if (occ) {
+    const tagged = SLOT_KEYS.map(P).filter(it => it && tagsOf(it).length);
+    const off = tagged.filter(it => !tagsOf(it).includes(occ));
+    if (tagged.length && !off.length) add(6, `Toutes les pièces sont taguées ${tagLabel(occ)}`);
+    else if (off.length) add(Math.max(-24, -8 * off.length), `Pas taguée(s) ${tagLabel(occ)} : ${listNames(off)}`);
   }
 
   /* Météo */
@@ -983,6 +1074,7 @@ function evaluate(slots, ctx){
     if (shortish) add(6, 'Short ou pantacourt, idéal quand il fait chaud');
     if (pieds && pieds.cat === 'sandales') add(3, 'Sandales de saison');
     if (tete && tete.cat === 'bonnet') add(-30, 'Bonnet par temps chaud : non');
+    if (cou && cou.cat === 'echarpe') add(-20, 'Écharpe par temps chaud : non');
     if (P('yeux')) add(3, 'Lunettes de soleil bienvenues');
   } else if (ctx.meteo === 'doux') {
     if (shortish) add(-6, 'Un peu léger pour un temps doux');
@@ -991,91 +1083,153 @@ function evaluate(slots, ctx){
     if (dessus) { if (w(dessus) === 1) add(5, 'Une couche légère, parfait pour la mi-saison'); else if (w(dessus) === 2) add(-6, 'Couche un peu chaude pour un temps doux'); }
   } else {
     if (shortish) add(-30, 'Trop léger pour le froid');
-    if (ens && w(ens) === 2) add(4, `${itemLabel(ens)} bien chaud, de saison`);
     if (pieds && pieds.cat === 'sandales') add(-30, 'Sandales par temps froid : non');
+    if (ens && w(ens) === 2) add(4, `${itemLabel(ens)} bien chaud, de saison`);
     if (!dessus) add(hasDessusInWardrobe ? -20 : -6, hasDessusInWardrobe ? 'Il manque une couche chaude par-dessus' : 'Ajoute une veste ou un manteau au dressing pour le froid');
     else if (w(dessus) === 2) add(8, 'Bien couvert pour le froid'); else add(2, 'Couche du dessus un peu légère pour le froid');
     if (tete && tete.cat === 'bonnet') add(4, 'Bonnet de saison');
+    if (cou && cou.cat === 'echarpe') add(5, 'Écharpe de saison');
   }
 
   /* Codes précis */
   if (pieds && pieds.cat === 'sandales' && so) add(-30, 'Pas de chaussettes avec des sandales');
   if (shortish && pieds && pieds.cat === 'chaussures') add(-18, 'Short et chaussures de ville ne vont pas ensemble');
-  if (tete && tete.cat === 'casquette' && ctx.occasion === 'chic') add(-18, 'Casquette et tenue chic ne vont pas ensemble');
-  if (ctx.occasion === 'chic' && pieds && bas && pieds.cat !== 'sandales') {
+  if (tete && tete.cat === 'casquette' && isChic) add(-18, 'Casquette et tenue chic ne vont pas ensemble');
+  if (isChic && pieds && bas && pieds.cat !== 'sandales') {
     const a = colorOf(pieds), b = colorOf(bas);
     if (a && b) { if (a.L <= b.L + 5) add(5, 'Chaussures plus foncées que le pantalon : règle classique respectée'); else add(-6, 'En chic, préfère des chaussures plus foncées que le pantalon'); }
   }
   if (so && pieds && pieds.cat !== 'sandales') {
     const c = colorOf(so), b = bas && colorOf(bas), f = colorOf(pieds);
-    if (c && ctx.occasion === 'chic') {
+    if (c && isChic) {
       if (c.L > 85 && c.fam !== 'couleur') add(-12, 'Chaussettes blanches avec une tenue chic : à éviter');
       else if ((b && dE(c.lab, b.lab) < 28) || (f && dE(c.lab, f.lab) < 28)) add(5, 'Chaussettes assorties au pantalon ou aux chaussures');
     }
   }
-  const wrists = ['mg','md'].map(P).filter(Boolean);
-  const metals = new Set(wrists.map(metalOf).filter(Boolean));
+  if (cou && (cou.cat === 'cravate' || cou.cat === 'noeud')) {
+    if (!haut || haut.cat !== 'chemise') add(-15, `${CAT_LABEL[cou.cat]} sans chemise : à éviter`);
+    else add(4, 'Chemise et cravate, le classique');
+    if (occ === 'sport') add(-20, 'Cravate et tenue sport ne vont pas ensemble');
+  }
+  if (ceint && pieds && isChic) {
+    const a = colorOf(ceint), b = colorOf(pieds);
+    if (a && b) { if (dE(a.lab, b.lab) < 25) add(5, 'Ceinture assortie aux chaussures'); else add(-5, 'En chic, assortis la ceinture aux chaussures'); }
+  }
+  const jewels = ['mg','md','visage','cou'].map(P).filter(it => it && JEWEL.has(it.cat));
+  const metals = new Set(jewels.map(metalOf).filter(Boolean));
   if (metals.size > 1) add(-10, 'Évite de mélanger doré et argenté');
-  if (wrists.filter(it => it.cat === 'montre').length > 1) add(-25, 'Une seule montre à la fois');
+  if (['mg','md'].map(P).filter(it => it && it.cat === 'montre').length > 1) add(-25, 'Une seule montre à la fois');
 
   s = Math.max(0, Math.min(100, Math.round(s)));
   const label = s >= 85 ? 'Très bon accord' : s >= 70 ? 'Bon accord' : s >= 55 ? 'Correct' : 'À revoir';
+  const dirty = new Set(S.basket);
+  const dirtyItems = SLOT_KEYS.map(P).filter(it => it && dirty.has(it.id));
+  if (dirtyItems.length) bad.push({v:-999, msg:`Au linge sale : ${listNames(dirtyItems)}`});
   good.sort((a,b) => b.v - a.v); bad.sort((a,b) => a.v - b.v);
   return {score:s, label, good, bad};
 }
-const PROB = {chaud:{dessus:.12, tete:.35, yeux:.65}, doux:{dessus:.65, tete:.2, yeux:.3}, froid:{dessus:1, tete:.55, yeux:.05}};
+const PROB = {chaud:{dessus:.12, tete:.35, yeux:.65, cou:.08}, doux:{dessus:.65, tete:.2, yeux:.3, cou:.25}, froid:{dessus:1, tete:.55, yeux:.05, cou:.6}};
+const REQUIRED = new Set(['haut','bas','ensemble','pieds']);
+const COLOR_SLOTS = ['tete','dessus','haut','bas','ensemble','pieds','cou','sac'];
 function poolFor(slot, ctx){
   const zone = SLOTS[slot].zone;
-  const all = itemsIn(zone);
+  const dirty = new Set(S.basket);
+  const all = itemsIn(zone).filter(it => !dirty.has(it.id));
+  const occ = ctx.occasion && ctx.occasion !== 'all' ? ctx.occasion : null;
   const ok = it => {
-    const c = it.cat, w = warmthOf(it), f = styleOf(it);
-    if (ctx.meteo === 'chaud' && (c === 'bonnet' || c === 'manteau' || (w === 2 && (zone === 'haut' || zone === 'dessus' || zone === 'ensemble')))) return false;
+    const c = it.cat, w = warmthOf(it);
+    if (ctx.meteo === 'chaud' && (c === 'bonnet' || c === 'manteau' || c === 'echarpe' || (w === 2 && ['haut','dessus','ensemble','cou'].includes(zone)))) return false;
     if (ctx.meteo === 'froid' && (c === 'short' || c === 'pantacourt' || c === 'sandales')) return false;
-    if (ctx.occasion === 'chic' && (f === 1 || c === 'casquette' || c === 'sandales' || c === 'sweat')) return false;
-    if (ctx.occasion === 'sport' && f != null && f >= 4) return false;
+    if (occ) { const t = tagsOf(it); if (t.length && !t.includes(occ)) return false; }
     return true;
   };
   const f = all.filter(ok);
-  return f.length ? f : all;
+  const fallback = !f.length && REQUIRED.has(slot) && all.length > 0;
+  return {items: f.length ? f : (fallback ? all : []), fallback};
 }
-function generate(){
-  const ctx = S.ctx, pools = {};
-  SLOT_KEYS.forEach(s => { pools[s] = poolFor(s, ctx); });
-  const rnd = a => a[Math.floor(Math.random() * a.length)];
-  const pr = PROB[ctx.meteo] || PROB.doux;
-  const cands = [];
-  const locked = s => !!(S.locks[s] && S.current[s] && getItem(S.current[s]));
-  const nE = pools.ensemble.length, nSep = Math.min(pools.haut.length, pools.bas.length);
-  const pEns = nE ? (nSep ? Math.min(.5, nE / (nE + nSep) + .1) : 1) : 0;
-  for (let n = 0; n < 700; n++) {
-    const c = {};
-    const useEns = locked('ensemble') ? true : (locked('haut') || locked('bas')) ? false : Math.random() < pEns;
-    for (const s of SLOT_KEYS) {
-      if (useEns && (s === 'haut' || s === 'bas')) continue;
-      if (!useEns && s === 'ensemble') continue;
-      if (locked(s)) { c[s] = S.current[s]; continue; }
-      const P = pools[s]; if (!P.length) continue;
-      let p = 1;
-      if (s === 'dessus') p = pr.dessus; else if (s === 'tete') p = pr.tete; else if (s === 'yeux') p = pr.yeux;
-      else if (s === 'mg') p = .55; else if (s === 'md') p = .3;
-      if (s === 'tete' && ctx.occasion === 'chic') p *= .3;
-      if (Math.random() < p) c[s] = rnd(P).id;
-    }
-    const pi = getItem(c.pieds);
-    if (pi && pi.cat === 'sandales' && !S.locks.chaussettes) delete c.chaussettes;
-    if (c.mg && c.md === c.mg) delete c.md;
-    const e = evaluate(c, ctx);
-    if (e) cands.push({c, s:e.score, k:JSON.stringify(c)});
-  }
-  if (!cands.length) return null;
-  cands.sort((a,b) => b.s - a.s);
-  const top = [];
-  for (const x of cands) { if (!top.some(t => t.k === x.k)) top.push(x); if (top.length >= 6) break; }
+function pickWeighted(top){
   const floor = top[top.length - 1].s;
   const weights = top.map(t => Math.pow(t.s - floor + 6, 1.5));
   let r = Math.random() * weights.reduce((a,b) => a + b, 0);
-  for (let i = 0; i < top.length; i++) { r -= weights[i]; if (r <= 0) return top[i].c; }
-  return top[0].c;
+  for (let i = 0; i < top.length; i++) { r -= weights[i]; if (r <= 0) return top[i]; }
+  return top[0];
+}
+function generate(){
+  const ctx = S.ctx, pools = {}, fb = {};
+  SLOT_KEYS.forEach(s => { const r = poolFor(s, ctx); pools[s] = r.items; fb[s] = r.fallback; });
+  const dirty = new Set(S.basket);
+  const rnd = a => a[Math.floor(Math.random() * a.length)];
+  const pr = PROB[ctx.meteo] || PROB.doux;
+  const occ = ctx.occasion && ctx.occasion !== 'all' ? ctx.occasion : null;
+  const isChic = occ === 'chic' || occ === 'habille';
+  const colorsReq = (ctx.colors || []).filter(c => PAL[c]);
+  const cname = it => { const c = it && colorOf(it); return c ? c.name : null; };
+  const locked = s => !!(S.locks[s] && S.current[s] && getItem(S.current[s]) && !dirty.has(S.current[s]));
+  for (const col of colorsReq) {
+    const inLock = COLOR_SLOTS.some(s => locked(s) && cname(getItem(S.current[s])) === col);
+    if (!inLock && !COLOR_SLOTS.some(s => pools[s].some(it => cname(it) === col))) return {err:`Aucune pièce propre en ${col}${occ ? ' taguée ' + tagLabel(occ) : ''} pour cette météo.`};
+  }
+  const nE = pools.ensemble.length, nSep = Math.min(pools.haut.length, pools.bas.length);
+  if (!nE && !nSep && !locked('ensemble')) return {err:'Pas assez de pièces propres : il faut au moins un haut et un bas (ou une pièce entière).'};
+  const pEns = nE ? (nSep ? Math.min(.5, nE / (nE + nSep) + .1) : 1) : 0;
+  const cands = [];
+  for (let n = 0; n < 800; n++) {
+    const c = {};
+    const useEns = locked('ensemble') ? true : (locked('haut') || locked('bas')) ? false : Math.random() < pEns;
+    const skip = s => (useEns && (s === 'haut' || s === 'bas')) || (!useEns && s === 'ensemble');
+    const forced = {};
+    for (const col of colorsReq) {
+      if (COLOR_SLOTS.some(s => !skip(s) && locked(s) && cname(getItem(S.current[s])) === col)) continue;
+      const opts = COLOR_SLOTS.filter(s => !skip(s) && !locked(s) && !forced[s] && pools[s].some(it => cname(it) === col));
+      if (opts.length) { const s = rnd(opts); forced[s] = rnd(pools[s].filter(it => cname(it) === col)).id; }
+    }
+    for (const s of SLOT_KEYS) {
+      if (skip(s)) continue;
+      if (locked(s)) { c[s] = S.current[s]; continue; }
+      if (forced[s]) { c[s] = forced[s]; continue; }
+      const P = pools[s]; if (!P.length) continue;
+      let p = 1;
+      if (s === 'dessus') p = pr.dessus; else if (s === 'tete') p = isChic ? pr.tete * .3 : pr.tete; else if (s === 'yeux') p = pr.yeux;
+      else if (s === 'cou') p = isChic ? Math.max(.5, pr.cou) : pr.cou;
+      else if (s === 'visage') p = .5; else if (s === 'sac') p = .25; else if (s === 'ceinture') p = .5;
+      else if (s === 'mg') p = .55; else if (s === 'md') p = .3;
+      if (Math.random() < p) c[s] = rnd(P).id;
+    }
+    const pi = getItem(c.pieds);
+    if (pi && pi.cat === 'sandales' && !locked('chaussettes')) delete c.chaussettes;
+    const bi = getItem(c.bas);
+    if (c.ceinture && !locked('ceinture') && !(bi && (bi.cat === 'pantalon' || bi.cat === 'jean'))) delete c.ceinture;
+    if (c.mg && c.md === c.mg) delete c.md;
+    if (colorsReq.length && !colorsReq.every(col => COLOR_SLOTS.some(s => c[s] && cname(getItem(c[s])) === col))) continue;
+    const e = evaluate(c, ctx);
+    if (e) cands.push({c, s:e.score, k:JSON.stringify(c)});
+  }
+  if (!cands.length) return {err:'Aucune combinaison possible avec ces filtres. Élargis la couleur ou l’occasion.'};
+  cands.sort((a,b) => b.s - a.s);
+  const top = [];
+  for (const x of cands) { if (!top.some(t => t.k === x.k)) top.push(x); if (top.length >= 6) break; }
+  const chosen = pickWeighted(top).c;
+  const warn = ['haut','bas','ensemble','pieds'].filter(s => chosen[s] && fb[s] && !locked(s)).map(s => SLOTS[s].ph.toLowerCase());
+  return {c:chosen, warn};
+}
+function rerollSlot(slot){
+  const pool = poolFor(slot, S.ctx).items.filter(it => it.id !== S.current[slot]);
+  if (!pool.length) { toast('Pas d’autre pièce propre pour cette zone avec ces filtres.'); return; }
+  const scored = pool.map(it => {
+    const c = Object.assign({}, S.current); c[slot] = it.id;
+    if (slot === 'ensemble') { delete c.haut; delete c.bas; } else if (slot === 'haut' || slot === 'bas') delete c.ensemble;
+    const e = evaluate(c, S.ctx);
+    return {id:it.id, s: e ? e.score : 50};
+  }).sort((a,b) => b.s - a.s);
+  setSlot(slot, pickWeighted(scored.slice(0, 4)).id, 1);
+}
+function availableColors(){
+  const dirty = new Set(S.basket);
+  const zones = new Set(COLOR_SLOTS.map(s => SLOTS[s].zone));
+  const names = new Set();
+  S.items.forEach(it => { if (!dirty.has(it.id) && zones.has(CAT_ZONE[it.cat])) { const c = colorOf(it); if (c) names.add(c.name); } });
+  (S.ctx.colors || []).forEach(n => names.add(n));
+  return PALETTE.filter(p => names.has(p.name));
 }
 
 /* =========================================================
@@ -1260,23 +1414,26 @@ function bindCareEditor(box, c, onChange){
    ========================================================= */
 function outfitHTML(slots, live){
   const tag = live ? 'button' : 'span';
+  const dirty = new Set(S.basket);
   const cell = id => {
     const sl = SLOTS[id];
     const it = slots[id] ? getItem(slots[id]) : null;
+    const acc = ACC_SLOTS.has(id);
+    if (!it) { if (!live) return ''; if (acc && !itemsIn(sl.zone).length) return ''; }
     const inner = it
-      ? `<img src="${esc(src(it))}" alt="" class="${it.transparent === false ? 'opaque' : ''}" draggable="false">${live && S.locks[id] ? `<span class="lk">${ic('lock', 12)}</span>` : ''}`
-      : (live ? `<span class="ph">+ ${esc(sl.ph)}</span>` : '');
-    const aria = live ? ` type="button" aria-label="${esc(sl.title)}${it ? ' : ' + esc(itemLabel(it)) : ', vide'}"` : '';
-    return `<${tag} class="slot s-${id}${id === 'ensemble' ? ' s-haut' : ''} ${it ? 'full' : 'empty'}" data-slot="${id}"${aria}>${inner}</${tag}>`;
+      ? `<img src="${esc(src(it))}" alt="" class="${it.transparent === false ? 'opaque' : ''}" draggable="false">${live && S.locks[id] ? `<span class="lk">${ic('lock', 12)}</span>` : ''}${live && dirty.has(it.id) ? '<span class="dirt">sale</span>' : ''}`
+      : `<span class="ph">+ ${esc(sl.ph)}</span>`;
+    const aria = live ? ` type="button" aria-label="${esc(sl.title)}${it ? ' : ' + esc(itemLabel(it)) : ', vide'}${S.locks[id] ? ', gardée' : ''}"` : '';
+    return `<${tag} class="slot s-${id}${id === 'ensemble' ? ' s-haut' : ''}${acc ? ' acc' : ''} ${it ? 'full' : 'empty'}" data-slot="${id}"${aria}>${inner}</${tag}>`;
   };
   const ens = getItem(slots.ensemble);
   const hasD = !!getItem(slots.dessus), hasH = ens ? true : !!getItem(slots.haut);
   const ts = hasD && hasH ? 'both' : hasD ? 'dessus' : hasH ? 'haut' : 'none';
   const wrap = live ? 'div' : 'span';
   return `<${wrap} class="outfit ${live ? 'live' : 'mini'}">`
-    + cell('tete') + cell('yeux')
+    + cell('tete') + cell('yeux') + cell('visage') + cell('cou')
     + `<${wrap} class="torse${ens ? ' long' : ''}" data-s="${ts}">${cell('dessus')}${ens ? cell('ensemble') : cell('haut')}</${wrap}>`
-    + cell('mg') + cell('md') + (ens ? '' : cell('bas')) + cell('chaussettes') + cell('pieds')
+    + cell('mg') + cell('md') + (ens ? '' : cell('bas')) + cell('ceinture') + cell('sac') + cell('chaussettes') + cell('pieds')
     + `</${wrap}>`;
 }
 function tileHTML(it, attr, on, extra){
@@ -1300,26 +1457,37 @@ function renderTenue(){
   if (!S.ready) { v.innerHTML = '<div class="loading">Ouverture du dressing…</div>'; return; }
   const n = filledCount(S.current);
   const has = S.items.length > 0;
-  const seg = (k, opts) => `<div class="seg" role="group" aria-label="${k === 'meteo' ? 'Météo' : 'Occasion'}">${opts.map(o => `<button type="button" data-ctxk="${k}" data-ctxv="${o[0]}" aria-pressed="${S.ctx[k] === o[0]}">${o[1]}</button>`).join('')}</div>`;
+  const occ = S.ctx.occasion || 'all';
+  const cols = S.ctx.colors || [];
+  const METEO = {chaud:'Chaud', doux:'Doux', froid:'Froid'};
+  const summary = `${METEO[S.ctx.meteo] || 'Doux'}, ${occ === 'all' ? 'toutes occasions' : tagLabel(occ)}, ${cols.length ? cols.join(' + ') : 'toutes couleurs'}`;
+  const filters = `<details class="filt" data-filt ${S.filtOpen ? 'open' : ''}><summary><b>Filtres</b><span>${esc(summary)}</span></summary>
+    <div class="frow"><span class="dl">Météo</span><div class="seg" role="group" aria-label="Météo">${[['chaud','Chaud'],['doux','Doux'],['froid','Froid']].map(o => `<button type="button" data-ctxk="meteo" data-ctxv="${o[0]}" aria-pressed="${S.ctx.meteo === o[0]}">${o[1]}</button>`).join('')}</div></div>
+    <div class="frow"><span class="dl">Occasion</span><div class="hs">${[['all','Toutes']].concat(allTags().map(t => [t, tagLabel(t)])).map(o => `<button type="button" class="chip sm ${occ === o[0] ? 'on' : ''}" data-ctxk="occasion" data-ctxv="${esc(o[0])}">${esc(o[1])}</button>`).join('')}</div></div>
+    <div class="frow"><span class="dl">Couleur</span><div class="hs"><button type="button" class="chip sm ${cols.length ? '' : 'on'}" data-colf="">Toutes</button>${availableColors().map(p => `<button type="button" class="swf ${cols.includes(p.name) ? 'on' : ''}" data-colf="${esc(p.name)}" style="--c:${p.hex}" aria-label="${esc(p.name)}" aria-pressed="${cols.includes(p.name)}" title="${esc(p.name)}"></button>`).join('')}</div></div>
+  </details>`;
   const ev = evaluate(S.current, S.ctx);
-  const tag = ev ? `<div class="tag" aria-live="polite"><div class="sc"><b>${ev.score}</b><span>${ev.label}</span></div><ul>${ev.good.slice(0, 3).map(g => `<li>${esc(g.msg)}</li>`).join('')}${ev.bad.slice(0, 3).map(g => `<li class="bad">${esc(g.msg)}</li>`).join('')}</ul><button type="button" class="rules" data-act="rules">Les règles utilisées</button></div>` : '';
-  const textileCount = SLOT_KEYS.map(k => getItem(S.current[k])).filter(it => it && isTextile(it)).length;
+  const tag = ev ? `<div class="tag" aria-live="polite"><div class="sc"><b>${ev.score}</b><span>${ev.label}</span></div><ul>${ev.bad.filter(b => b.v === -999).map(g => `<li class="bad">${esc(g.msg)}</li>`).join('')}${ev.good.slice(0, 3).map(g => `<li>${esc(g.msg)}</li>`).join('')}${ev.bad.filter(b => b.v !== -999).slice(0, 3).map(g => `<li class="bad">${esc(g.msg)}</li>`).join('')}</ul><button type="button" class="rules" data-act="rules">Les règles utilisées</button></div>` : '';
+  const textileCount = SLOT_KEYS.map(k => getItem(S.current[k])).filter(it => it && isTextile(it) && !S.basket.includes(it.id)).length;
+  const nLocks = SLOT_KEYS.filter(k => S.locks[k] && getItem(S.current[k])).length;
   v.innerHTML = `
     <header class="top">
-      <div><h1>Tenue</h1><p class="sub">${n === 0 ? 'Touche une zone pour t’habiller' : pl(n, 'pièce portée', 'pièces portées')}</p></div>
+      <div><h1>Tenue</h1><p class="sub">${n === 0 ? 'Touche une zone pour t’habiller' : pl(n, 'pièce portée', 'pièces portées') + (nLocks ? `, ${pl(nLocks, 'gardée', 'gardées')}` : '')}</p></div>
       <div class="acts">
-        <button type="button" class="icon hot" data-act="random" aria-label="Générer une tenue" ${has ? '' : 'disabled'}>${ic('dice')}</button>
+        <button type="button" class="icon hot" data-act="random" aria-label="${nLocks ? 'Relancer sauf les pièces gardées' : 'Générer une tenue'}" ${has ? '' : 'disabled'}>${ic('dice')}</button>
         <button type="button" class="icon" data-act="clear" aria-label="Tout retirer" ${n ? '' : 'disabled'}>${ic('reset')}</button>
         <button type="button" class="pill" data-act="save" ${n ? '' : 'disabled'}>Enregistrer</button>
       </div>
     </header>
-    <div class="ctx">${seg('meteo', [['chaud','Chaud'],['doux','Doux'],['froid','Froid']])}${seg('occasion', [['casual','Casual'],['chic','Chic'],['sport','Sport']])}</div>
+    ${has ? filters : ''}
     <div class="paper dots" id="composer"><span class="reg a"></span><span class="reg b"></span><span class="reg c"></span><span class="reg d"></span>${outfitHTML(S.current, true)}</div>
     ${has
-      ? `<div class="under">${textileCount ? `<button type="button" class="ghost" data-act="outfit-basket">${ic('basket', 18)}Mettre au panier</button>` : ''}</div>
+      ? `<div class="under">${nLocks ? `<button type="button" class="ghost" data-act="unlock">${ic('lock', 16)}Libérer tout</button>` : ''}${textileCount ? `<button type="button" class="ghost" data-act="outfit-basket">${ic('basket', 18)}Au linge sale</button>` : ''}</div>
          ${tag}
-         <p class="hint">Le dé compose une tenue selon la météo, l’occasion et les codes de style. Glisse une pièce pour en changer, touche-la pour choisir ou la garder au prochain tirage.</p>`
+         <p class="hint">Le dé relance tout sauf les pièces gardées. <b>Appui long</b> sur une pièce pour la garder, <b>touche-la</b> pour la choisir ou en tirer une autre au hasard, <b>glisse</b> pour faire défiler.</p>`
       : `<div class="empty"><p>Ton dressing est vide. Commence par coller la photo d’une pièce.</p><div class="row"><button type="button" class="btn primary" data-act="add">Ajouter une pièce</button></div></div>`}`;
+  const fd = $('[data-filt]', v);
+  if (fd) fd.addEventListener('toggle', () => { S.filtOpen = fd.open; lsSet('penderie.filtopen', fd.open); });
 }
 
 function renderDressing(){
@@ -1329,10 +1497,12 @@ function renderDressing(){
   S.items.forEach(i => { const z = CAT_ZONE[i.cat]; counts[z] = (counts[z] || 0) + 1; });
   const noLab = S.items.filter(i => isTextile(i) && !i.care);
   const n = S.items.length;
-  let list = S.filter === 'all' ? S.items : S.filter === 'nolabel' ? noLab : S.items.filter(i => CAT_ZONE[i.cat] === S.filter);
+  let list = S.filter === 'all' ? S.items : S.filter === 'nolabel' ? noLab : S.filter === 'dirty' ? S.items.filter(i => S.basket.includes(i.id)) : S.items.filter(i => CAT_ZONE[i.cat] === S.filter);
   list = list.slice().sort((a,b) => (b.createdAt||0) - (a.createdAt||0));
   const chips = [['all','Tout',n]].concat(ZONES.map(z => [z.id, z.label, counts[z.id] || 0]));
   if (noLab.length) chips.push(['nolabel','Sans étiquette', noLab.length]);
+  const dirtyL = S.items.filter(i => S.basket.includes(i.id));
+  if (dirtyL.length) chips.push(['dirty','Au sale', dirtyL.length]);
   const inBasket = new Set(S.basket);
   v.innerHTML = `
     <header class="top"><div><h1>Dressing</h1>
@@ -1419,10 +1589,12 @@ function cycle(slot, dir){
   setSlot(slot, list[i].id, dir);
 }
 function randomize(){
-  const c = generate();
-  if (!c) { toast('Ajoute au moins un haut et un bas pour générer une tenue.'); return; }
-  S.current = c; persist(); renderTenue();
+  const r = generate();
+  if (!r || r.err) { toast(r ? r.err : 'Impossible de générer une tenue.'); return; }
+  S.current = r.c; persist(); renderTenue();
   $$('#composer .slot img').forEach((im, i) => { im.style.animationDelay = (i * 45) + 'ms'; im.classList.add('drop'); });
+  if (r.warn && r.warn.length) toast(`Pas de ${r.warn.join(', ')} propre tagué ${tagLabel(S.ctx.occasion)} : pièce hors filtre utilisée.`);
+  else toast('Tenue générée', 'Enregistrer', openSaveOutfit);
 }
 function clearAll(){
   const prev = Object.assign({}, S.current), pl0 = Object.assign({}, S.locks);
@@ -1473,7 +1645,6 @@ function detailsSummary(st){
   const parts = [];
   if (st.color) parts.push(st.color.name);
   const def = st.cat && CATDEF[st.cat];
-  if (def && def.f != null) parts.push(STYLE_LBL[st.style != null ? st.style : def.f].toLowerCase());
   if (def && def.w != null) parts.push(WARM_LBL[st.warmth != null ? st.warmth : def.w].toLowerCase());
   if (st.motif === 'motif') parts.push('motif');
   return parts.join(', ') || 'À compléter';
@@ -1481,10 +1652,9 @@ function detailsSummary(st){
 function detailsHTML(st){
   const z = st.cat ? CAT_ZONE[st.cat] : null;
   const def = st.cat ? CATDEF[st.cat] : null;
-  const pal = PALETTE.filter(p => p.fam !== 'metal' || z === 'poignet');
+  const pal = PALETTE.filter(p => p.fam !== 'metal' || ['poignet','visage','cou'].includes(z));
   const row = (label, key, opts, cur) => `<div class="drow"><span class="dl">${label}</span><div class="czc">${opts.map(o => `<button type="button" class="chip sm ${String(cur) === String(o[0]) ? 'on' : ''}" data-dk="${key}" data-dv="${o[0]}">${o[1]}</button>`).join('')}</div></div>`;
   let h = `<div class="drow"><span class="dl">Couleur</span><div class="sw">${pal.map(p => `<button type="button" class="swc ${st.color && st.color.name === p.name ? 'on' : ''}" data-col="${esc(p.name)}" style="--c:${p.hex}" aria-label="${esc(p.name)}" title="${esc(p.name)}"></button>`).join('')}</div><span class="dv">${st.color ? esc(st.color.name) : 'Choisis la couleur dominante'}</span></div>`;
-  if (def && def.f != null) h += row('Style', 'style', [[1,'Sport'],[2,'Casual'],[3,'Chic décontracté'],[4,'Habillé']], st.style != null ? st.style : def.f);
   if (def && def.w != null) h += row('Saison', 'warmth', [[0,'Été'],[1,'Mi-saison'],[2,'Hiver']], st.warmth != null ? st.warmth : def.w);
   h += row('Aspect', 'motif', [['uni','Uni'],['motif','Motif / imprimé']], st.motif || 'uni');
   return `<div class="dets">${h}</div>`;
@@ -1499,6 +1669,39 @@ function mountDetails(root, st){
     const d = e.target.closest('[data-dk]');
     if (d) { const k = d.dataset.dk; st[k] = k === 'motif' ? d.dataset.dv : Number(d.dataset.dv); st.touched.add(k); paint(); }
   });
+  return paint;
+}
+const curTags = st => st.tags != null ? st.tags : (st.cat ? (DEF_TAGS[st.cat] || []) : []);
+function tagsHTML(st){
+  const cur = curTags(st);
+  return `<div class="czc">${allTags().map(t => `<button type="button" class="chip sm ${cur.includes(t) ? 'on' : ''}" data-tag="${esc(t)}" aria-pressed="${cur.includes(t)}">${esc(tagLabel(t))}</button>`).join('')}<button type="button" class="chip sm" data-newtag>+ Nouvelle</button></div>
+    <div class="newtag" data-newbox hidden><input class="inp" data-newin placeholder="Ex. Travail, Soirée, Mosquée" maxlength="24" autocomplete="off"><button type="button" class="btn sm" data-newok>Ajouter</button></div>
+    ${curTags(st).length ? '' : '<p class="ctext" style="margin-top:6px">Aucune occasion : la pièce va avec toutes les tenues.</p>'}`;
+}
+function mountTags(root, st){
+  const box = $('[data-tags]', root);
+  const paint = () => { box.innerHTML = tagsHTML(st); };
+  paint();
+  const addNew = () => {
+    const inp = $('[data-newin]', box);
+    const raw = inp.value.trim().replace(/\s+/g, ' ').slice(0, 24);
+    if (!raw) return;
+    const key = tagKey(raw);
+    if (!allTags().includes(key)) { S.customTags = (S.customTags || []).concat([key]); lsSet('penderie.tags', S.customTags); }
+    const cur = curTags(st).slice(); if (!cur.includes(key)) cur.push(key);
+    st.tags = cur; st.touched.add('tags'); paint();
+  };
+  box.addEventListener('click', e => {
+    const t = e.target.closest('[data-tag]');
+    if (t) {
+      const cur = curTags(st).slice(), v = t.dataset.tag, i = cur.indexOf(v);
+      if (i >= 0) cur.splice(i, 1); else cur.push(v);
+      st.tags = cur; st.touched.add('tags'); paint(); return;
+    }
+    if (e.target.closest('[data-newtag]')) { const nb = $('[data-newbox]', box); nb.hidden = false; $('[data-newin]', box).focus(); return; }
+    if (e.target.closest('[data-newok]')) addNew();
+  });
+  box.addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.matches('[data-newin]')) { e.preventDefault(); addNew(); } });
   return paint;
 }
 function setAiStatus(root, msg, busy){
@@ -1579,16 +1782,23 @@ function openPicker(slot){
   const cur = S.current[slot];
   const locked = !!S.locks[slot];
   const ens = (slot === 'haut' || slot === 'bas') ? itemsIn('ensemble') : [];
+  const dirty = new Set(S.basket);
+  const tD = (it, attr, on) => tileHTML(it, attr, on, dirty.has(it.id) ? '<span class="nolab">au sale</span>' : '');
   openSheet(`
     <div class="sh-head"><h2>${esc(sl.title)}</h2>${closeBtn}</div>
-    ${cur && getItem(cur) ? `<button type="button" class="btn sm wide" data-lock aria-pressed="${locked}" style="margin-bottom:14px">${ic('lock', 16)}${locked ? 'Gardée au prochain tirage (toucher pour libérer)' : 'Garder cette pièce au prochain tirage'}</button>` : ''}
+    <div class="row2" style="margin-top:0">
+      <button type="button" class="btn sm" data-reroll>${ic('dice', 16)}Autre au hasard</button>
+      ${cur && getItem(cur) ? `<button type="button" class="btn sm" data-lock aria-pressed="${locked}">${ic('lock', 16)}${locked ? 'Libérer' : 'Garder'}</button>` : '<span></span>'}
+    </div>
+    <p class="how" style="margin:0 2px 14px">« Autre au hasard » change seulement cette pièce et garde le reste. « Garder » la protège quand tu relances le dé.</p>
     <div class="grid">
       <button type="button" class="tile dash ${!cur ? 'on' : ''}" data-pick=""><span class="ti">Aucun</span><span class="tl">${slot === 'ensemble' ? 'Revenir à haut + bas' : 'Retirer'}</span></button>
-      ${list.map(it => tileHTML(it, 'data-pick', cur === it.id)).join('')}
+      ${list.map(it => tD(it, 'data-pick', cur === it.id)).join('')}
       <button type="button" class="tile dash" data-addfor="${slot}"><span class="ti">+ Ajouter</span><span class="tl">Nouvelle pièce</span></button>
     </div>
-    ${ens.length ? `<h3 class="h3">Ou une pièce entière (remplace haut et bas)</h3><div class="grid">${ens.map(it => tileHTML(it, 'data-pickens')).join('')}</div>` : ''}`, root => {
+    ${ens.length ? `<h3 class="h3">Ou une pièce entière (remplace haut et bas)</h3><div class="grid">${ens.map(it => tD(it, 'data-pickens')).join('')}</div>` : ''}`, root => {
     root.addEventListener('click', e => {
+      if (e.target.closest('[data-reroll]')) { closeSheet(); rerollSlot(slot); return; }
       const pe = e.target.closest('[data-pickens]');
       if (pe) { setSlot('ensemble', pe.dataset.pickens, 1); closeSheet(); return; }
       if (e.target.closest('[data-lock]')) { if (S.locks[slot]) delete S.locks[slot]; else S.locks[slot] = true; persist(); renderTenue(); closeSheet(); toast(S.locks[slot] ? 'Pièce gardée au prochain tirage' : 'Pièce libérée'); return; }
@@ -1604,7 +1814,7 @@ function openAdd(opts){
   const slot = opts.slot || null;
   const only = slot ? SLOTS[slot].zone : null;
   const z = only ? ZONE[only] : (ZONE[S.filter] || null);
-  const st = sheetState = {kind:'add', slot, onlyZone:only, cat: z && z.cats.length === 1 ? z.cats[0] : null, color:null, style:null, warmth:null, motif:'uni', care:null, img:null, labelImg:null, touched:new Set()};
+  const st = sheetState = {kind:'add', slot, onlyZone:only, cat: z && z.cats.length === 1 ? z.cats[0] : null, color:null, tags:null, warmth:null, motif:'uni', care:null, img:null, labelImg:null, touched:new Set()};
   openSheet(`
     <div class="sh-head"><h2>${slot ? 'Ajouter : ' + esc(SLOTS[slot].title.toLowerCase()) : 'Ajouter une pièce'}</h2>${closeBtn}</div>
     <div class="drop" data-drop><img class="pv" data-prev alt="Aperçu de la pièce" hidden>
@@ -1614,7 +1824,8 @@ function openAdd(opts){
     <p class="warn" data-warn hidden>Photo non détourée : son fond restera visible. Pour un rendu propre, copie le sujet depuis Photos.</p>
     <p class="aist" data-aist hidden></p>
     <div class="field"><span>Catégorie</span>${catsHTML(only, st.cat)}</div>
-    <details class="sec"><summary><b>Couleur, style, saison</b><span data-dsum></span></summary><div class="inner" data-details></div></details>
+    <div class="field"><span>Occasions <em>(plusieurs possibles)</em></span><div data-tags></div></div>
+    <details class="sec"><summary><b>Couleur, saison, aspect</b><span data-dsum></span></summary><div class="inner" data-details></div></details>
     <details class="sec" data-csec><summary><b>Étiquette d’entretien</b><span data-csum></span></summary><div class="inner">${careBlockHTML()}</div></details>
     <label class="field"><span>Nom <em>(facultatif)</em></span><input data-name placeholder="Ex. veste en jean brut" maxlength="60" autocomplete="off"></label>
     ${S.ai ? `<label class="switch">Analyse automatique par Claude (sur ton usage) <input type="checkbox" data-auto ${S.autoAI ? 'checked' : ''}></label>` : ''}
@@ -1625,6 +1836,7 @@ function bindAdd(root, st){
   const paste = $('[data-paste]', root), prev = $('[data-prev]', root), warn = $('[data-warn]', root), save = $('[data-save]', root), drop = $('[data-drop]', root), nameIn = $('[data-name]', root);
   const upd = () => { save.disabled = !(st.img && st.cat); };
   const repaintDetails = mountDetails(root, st);
+  const repaintTags = mountTags(root, st);
   mountCare(root, st, {});
   nameIn.addEventListener('input', () => st.touched.add('name'));
   const auto = $('[data-auto]', root);
@@ -1632,7 +1844,7 @@ function bindAdd(root, st){
   const markCats = () => $$('[data-cat]', root).forEach(b => b.classList.toggle('on', b.dataset.cat === st.cat));
   $('.cats', root).addEventListener('click', e => {
     const c = e.target.closest('[data-cat]'); if (!c) return;
-    st.cat = c.dataset.cat; st.touched.add('cat'); markCats(); repaintDetails(); upd();
+    st.cat = c.dataset.cat; st.touched.add('cat'); markCats(); repaintDetails(); repaintTags(); upd();
   });
   const analyze = async () => {
     if (!S.ai || !S.autoAI || !st.img) return;
@@ -1642,9 +1854,9 @@ function bindAdd(root, st){
       const r = await aiFront(st.img.blob);
       if (tok !== st.frontTok || sheetState !== st) return;
       if (r.cat && !st.touched.has('cat') && (!st.onlyZone || CAT_ZONE[r.cat] === st.onlyZone)) st.cat = r.cat;
-      ['color','style','warmth','motif'].forEach(k => { if (r[k] != null && !st.touched.has(k)) st[k] = r[k]; });
+      ['color','tags','warmth','motif'].forEach(k => { if (r[k] != null && !st.touched.has(k)) st[k] = r[k]; });
       if (r.name && !st.touched.has('name') && !nameIn.value) nameIn.value = r.name;
-      markCats(); repaintDetails(); upd();
+      markCats(); repaintDetails(); repaintTags(); upd();
       setAiStatus(root, 'Rempli par Claude : vérifie et ajuste si besoin.');
     } catch(e) { if (tok === st.frontTok) setAiStatus(root, aiFail(e)); }
   };
@@ -1671,13 +1883,15 @@ function bindAdd(root, st){
   $('[data-file]', root).onchange = e => { const f = e.target.files && e.target.files[0]; if (f) take(f); e.target.value = ''; };
   const resetForNext = () => {
     [st.img, st.labelImg].forEach(x => { if (x && x.preview) URL.revokeObjectURL(x.preview); });
-    st.img = null; st.labelImg = null; st.care = null; st.color = null; st.style = null; st.warmth = null; st.motif = 'uni';
-    st.touched = new Set(['cat']);
+    st.img = null; st.labelImg = null; st.care = null; st.color = null; st.warmth = null; st.motif = 'uni';
+    const keepTags = st.touched.has('tags') ? st.tags : null;
+    st.tags = keepTags;
+    st.touched = new Set(keepTags ? ['cat','tags'] : ['cat']);
     prev.hidden = true; prev.removeAttribute('src'); drop.classList.remove('has'); warn.hidden = true;
     const lp = $('[data-lprev]', root); lp.hidden = true; lp.removeAttribute('src'); $('[data-ldrop]', root).classList.remove('has');
     const ed = $('[data-ceditor]', root); ed.hidden = true; ed.innerHTML = '';
     nameIn.value = ''; setAiStatus(root, '');
-    repaintDetails(); mountCareRepaint(root, st); upd();
+    repaintDetails(); repaintTags(); mountCareRepaint(root, st); upd();
   };
   save.onclick = async () => {
     if (!st.img || !st.cat) return;
@@ -1685,7 +1899,7 @@ function bindAdd(root, st){
     save.disabled = true; save.textContent = 'Ajout…';
     try {
       const meta = {cat:st.cat, name:nameIn.value.trim(), w:st.img.w, h:st.img.h, transparent:st.img.transparent,
-        color:st.color || null, style:st.style, warmth:st.warmth, motif:st.motif || 'uni', care:st.care || null};
+        color:st.color || null, tags:curTags(st).slice(), style:null, warmth:st.warmth, motif:st.motif || 'uni', care:st.care || null};
       const id = await S.store.addItem(meta, st.img.blob, st.labelImg ? st.labelImg.blob : null);
       if (st.slot) { setSlot(st.slot, id, 1); closeSheet(); toast('Ajouté à la tenue'); }
       else { save.textContent = label; resetForNext(); toast('Pièce ajoutée. Colle la suivante.'); }
@@ -1714,7 +1928,7 @@ document.addEventListener('paste', e => {
 
 function openItem(id){
   const it = getItem(id); if (!it) return;
-  const st = sheetState = {kind:'item', id, cat:it.cat, color: it.color || colorCache.get(it.id) || null, style:it.style != null ? it.style : null, warmth:it.warmth != null ? it.warmth : null,
+  const st = sheetState = {kind:'item', id, cat:it.cat, color: it.color || colorCache.get(it.id) || null, tags: tagsOf(it).slice(), warmth:it.warmth != null ? it.warmth : null,
     motif:it.motif || 'uni', care: it.care ? Object.assign({}, it.care) : null, labelImg:null, hasLabel: !!labelSrc(it), touched:new Set()};
   const inB = S.basket.includes(id);
   openSheet(`
@@ -1727,11 +1941,13 @@ function openItem(id){
     <p class="aist" data-aist hidden></p>
     <label class="field"><span>Nom</span><input data-name value="${esc(it.name || '')}" placeholder="${esc(CAT_LABEL[it.cat] || '')}" maxlength="60" autocomplete="off"></label>
     <div class="field"><span>Catégorie</span>${catsHTML(null, it.cat)}</div>
-    <details class="sec" open><summary><b>Couleur, style, saison</b><span data-dsum></span></summary><div class="inner" data-details></div></details>
+    <div class="field"><span>Occasions <em>(plusieurs possibles)</em></span><div data-tags></div></div>
+    <details class="sec" open><summary><b>Couleur, saison, aspect</b><span data-dsum></span></summary><div class="inner" data-details></div></details>
     ${isTextile(it) ? `<details class="sec" data-csec ${it.care ? '' : 'open'}><summary><b>Étiquette d’entretien</b><span data-csum></span></summary><div class="inner">${careBlockHTML()}</div></details>` : ''}
     <button type="button" class="btn danger wide" data-del style="margin-top:14px">Supprimer cette pièce</button>
     <div class="foot"><button type="button" class="btn primary wide" data-save>Enregistrer les modifications</button></div>`, root => {
     mountDetails(root, st);
+    mountTags(root, st);
     if (isTextile(it)) mountCare(root, st, {existingLabel: labelSrc(it) || null});
     $('.cats', root).addEventListener('click', e => {
       const c = e.target.closest('[data-cat]'); if (!c) return;
@@ -1740,7 +1956,7 @@ function openItem(id){
     });
     $('[data-save]', root).onclick = async ev => {
       const b = ev.currentTarget; b.disabled = true;
-      const patch = {cat:st.cat, name:$('[data-name]', root).value.trim(), color:st.color || null, style:st.style, warmth:st.warmth, motif:st.motif || 'uni'};
+      const patch = {cat:st.cat, name:$('[data-name]', root).value.trim(), color:st.color || null, tags:curTags(st).slice(), style:null, warmth:st.warmth, motif:st.motif || 'uni'};
       if (isTextile(it)) patch.care = st.care || null;
       try { await S.store.updateItem(id, patch, st.labelImg ? st.labelImg.blob : null); closeSheet(); toast('Modifications enregistrées'); }
       catch(err) { b.disabled = false; toast(errMsg(err)); }
@@ -1946,6 +2162,7 @@ function cleanMeta(r){
     transparent: r.transparent !== false, color:null, style:null, warmth:null, motif: r.motif === 'motif' ? 'motif' : 'uni', care:null};
   if (r.color && PAL[r.color.name]) m.color = {name:r.color.name, hex: /^#[0-9a-f]{6}$/i.test(r.color.hex || '') ? r.color.hex : PAL[r.color.name].hex};
   const st = Number(r.style); if (r.style != null && st >= 1 && st <= 4) m.style = Math.round(st);
+  if (Array.isArray(r.tags)) m.tags = r.tags.filter(t => typeof t === 'string' && t.length && t.length <= 24).slice(0, 12);
   const wa = Number(r.warmth); if (r.warmth != null && wa >= 0 && wa <= 2) m.warmth = Math.round(wa);
   if (r.care && typeof r.care === 'object') m.care = normCare({lavage:r.care.wash, temperature:r.care.temp, programme:r.care.cycle, blanchiment:r.care.bleach,
     sechage:r.care.dry, repassage:r.care.iron, nettoyage_sec:r.care.dryclean, a_part:r.care.bleeds, composition:r.care.compo});
@@ -1958,7 +2175,7 @@ async function buildBackup(onProgress, alive){
   for (const it of list) {
     if (!alive()) return null;
     const rec = {id:it.id, cat:it.cat, name:it.name || '', w:it.w || 0, h:it.h || 0, transparent:it.transparent !== false, color:it.color || colorCache.get(it.id) || null,
-      style:it.style != null ? it.style : null, warmth:it.warmth != null ? it.warmth : null, motif:it.motif || 'uni', care:it.care || null, createdAt:it.createdAt || 0, image:null, label:null};
+      tags:tagsOf(it), warmth:it.warmth != null ? it.warmth : null, motif:it.motif || 'uni', care:it.care || null, createdAt:it.createdAt || 0, image:null, label:null};
     const img = await itemBlob(it, 'front');
     if (img) { const u8 = new Uint8Array(await img.arrayBuffer()); rec.image = `images/${safeId(it.id)}.${extOf(u8)}`; files.push({name:rec.image, data:u8}); } else missing++;
     const lab = await itemBlob(it, 'label');
@@ -1968,7 +2185,7 @@ async function buildBackup(onProgress, alive){
   }
   const data = {app:'penderie', version:1, exportedAt:new Date().toISOString(), items,
     outfits:S.outfits.map(o => ({id:o.id, name:o.name || '', slots:o.slots || {}, createdAt:o.createdAt || 0})),
-    basket:S.basket, current:S.current, locks:S.locks, ctx:S.ctx};
+    basket:S.basket, current:S.current, locks:S.locks, ctx:S.ctx, customTags:S.customTags || []};
   files.unshift({name:'penderie.json', data:new TextEncoder().encode(JSON.stringify(data))});
   return {blob:makeZip(files), missing, count:list.length};
 }
@@ -2012,6 +2229,7 @@ async function runImport(z, data, ui){
         await retry(() => S.store.addOutfit({name:String(o.name || 'Tenue').slice(0, 60), slots}, {id:oid, createdAt:Number(o.createdAt) || Date.now(), bulk:true}));
         oAdded++;
       }
+      if (Array.isArray(data.customTags)) { const set = new Set(S.customTags || []); data.customTags.forEach(t => { if (typeof t === 'string' && t.length <= 24) set.add(t); }); S.customTags = Array.from(set); lsSet('penderie.tags', S.customTags); }
       if (Array.isArray(data.basket)) { const set = new Set(S.basket); data.basket.forEach(x => { if (map[x]) set.add(map[x]); }); S.basket = Array.from(set); saveBasket(); }
       if (!filledCount(S.current) && data.current && typeof data.current === 'object') {
         const c = {}; Object.keys(data.current).forEach(k => { if (SLOTS[k] && map[data.current[k]]) c[k] = map[data.current[k]]; }); S.current = c; persist();
@@ -2105,6 +2323,12 @@ document.addEventListener('click', e => {
   if (t.closest('#sheet')) return;
   const tab = t.closest('[data-tab]');
   if (tab) { S.tab = tab.dataset.tab; renderNav(); window.scrollTo(0, 0); return; }
+  const cf = t.closest('[data-colf]');
+  if (cf) {
+    const v = cf.dataset.colf; let cols = (S.ctx.colors || []).slice();
+    if (!v) cols = []; else if (cols.includes(v)) cols = cols.filter(x => x !== v); else { cols.push(v); if (cols.length > 2) cols.shift(); }
+    S.ctx.colors = cols; lsSet('penderie.ctx', S.ctx); renderTenue(); return;
+  }
   const cx = t.closest('[data-ctxk]');
   if (cx) { S.ctx[cx.dataset.ctxk] = cx.dataset.ctxv; lsSet('penderie.ctx', S.ctx); renderTenue(); return; }
   const act = t.closest('[data-act]');
@@ -2116,10 +2340,12 @@ document.addEventListener('click', e => {
     else if (a === 'save') openSaveOutfit();
     else if (a === 'rules') openRules();
     else if (a === 'backup') openBackup();
+    else if (a === 'unlock') { S.locks = {}; persist(); renderTenue(); toast('Toutes les pièces sont libérées'); }
     else if (a === 'basket-add') openBasketPicker();
     else if (a === 'outfit-basket') {
       const n = addToBasket(SLOT_KEYS.map(k => S.current[k]).filter(Boolean));
-      toast(n ? `${pl(n, 'pièce ajoutée', 'pièces ajoutées')} au panier` : 'Déjà dans le panier');
+      renderTenue();
+      toast(n ? `${pl(n, 'pièce ajoutée', 'pièces ajoutées')} au linge sale` : 'Déjà au linge sale');
     }
     else if (a === 'basket-rm') { const prev = removeFromBasket([act.dataset.id]); toast('Retiré du panier', 'Annuler', () => { S.basket = prev; saveBasket(); render(); }); }
     else if (a === 'basket-clear') { const prev = removeFromBasket(S.basket.slice()); toast('Panier vidé', 'Annuler', () => { S.basket = prev; saveBasket(); render(); }); }
@@ -2140,10 +2366,30 @@ document.addEventListener('click', e => {
 
 (function bindComposer(){
   const vt = $('#v-tenue');
-  let drag = null, suppress = false;
-  vt.addEventListener('pointerdown', e => { const s = e.target.closest('#composer .slot'); drag = s ? {slot:s.dataset.slot, x:e.clientX, y:e.clientY} : null; });
-  vt.addEventListener('pointercancel', () => { drag = null; });
+  let drag = null, suppress = false, lp = null;
+  const cancelLp = () => { if (lp) { clearTimeout(lp); lp = null; } };
+  vt.addEventListener('contextmenu', e => { if (e.target.closest('#composer')) e.preventDefault(); });
+  vt.addEventListener('pointerdown', e => {
+    const s = e.target.closest('#composer .slot');
+    drag = s ? {slot:s.dataset.slot, x:e.clientX, y:e.clientY} : null;
+    cancelLp();
+    if (s && s.classList.contains('full')) {
+      const slot = s.dataset.slot;
+      lp = setTimeout(() => {
+        lp = null;
+        if (!drag || drag.slot !== slot) return;
+        drag = null; suppress = true; setTimeout(() => { suppress = false; }, 700);
+        if (S.locks[slot]) delete S.locks[slot]; else S.locks[slot] = true;
+        persist(); renderTenue();
+        toast(S.locks[slot] ? 'Pièce gardée au prochain tirage' : 'Pièce libérée');
+        if (navigator.vibrate) try { navigator.vibrate(15); } catch(err) {}
+      }, 480);
+    }
+  });
+  vt.addEventListener('pointermove', e => { if (drag && (Math.abs(e.clientX - drag.x) > 10 || Math.abs(e.clientY - drag.y) > 10)) cancelLp(); });
+  vt.addEventListener('pointercancel', () => { drag = null; cancelLp(); });
   vt.addEventListener('pointerup', e => {
+    cancelLp();
     if (!drag) return;
     const dx = e.clientX - drag.x, dy = e.clientY - drag.y, slot = drag.slot;
     drag = null;
@@ -2202,7 +2448,7 @@ async function init(){
   render();
   aiP.then(() => { if (S.ai && sheetState) { /* next sheet will show AI options */ } });
 }
-window.__penderie = {S, evaluate, generate, buildLoads, render, makeZip, readZip, buildBackup, runImport};
+window.__penderie = {S, evaluate, generate, buildLoads, render, makeZip, readZip, buildBackup, runImport, rerollSlot, tagsOf};
 init();
 })();
 </script>

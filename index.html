@@ -163,8 +163,8 @@ img.opaque{mix-blend-mode:multiply;filter:none !important}
 .basket{display:flex;gap:10px;overflow-x:auto;margin:0 -16px;padding:4px 16px 8px;scrollbar-width:none}
 .basket::-webkit-scrollbar{display:none}
 .bk{position:relative;width:70px;flex-shrink:0}
-.bk .ti{width:70px;height:84px;display:grid;place-items:center;background:var(--paper);border-radius:12px;padding:8px;box-shadow:0 0 0 1px var(--line);border:0;cursor:pointer}
-.bk .ti img{max-width:100%;max-height:100%;object-fit:contain}
+.bk .ti{width:70px;height:84px;display:flex;align-items:center;justify-content:center;overflow:hidden;background:var(--paper);border-radius:12px;padding:8px;box-shadow:0 0 0 1px var(--line);border:0;cursor:pointer}
+.bk .ti img{width:100%;height:100%;object-fit:contain;display:block}
 .bk .rm{position:absolute;right:-5px;top:-5px;width:24px;height:24px;border-radius:50%;border:0;background:var(--ink);color:var(--surface);display:grid;place-items:center;cursor:pointer}
 .load{background:var(--surface);border-radius:16px;padding:16px;margin-bottom:12px;box-shadow:0 0 0 1px var(--line),0 10px 24px -16px var(--shadow-lg)}
 .load-head{display:flex;gap:14px;align-items:center}
@@ -183,8 +183,8 @@ img.opaque{mix-blend-mode:multiply;filter:none !important}
 .meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
 .meta span{font-size:12.5px;padding:5px 10px;border-radius:999px;background:var(--chip);font-weight:560}
 .thumbs{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}
-.thumbs button{width:50px;height:60px;background:var(--paper);border-radius:9px;display:grid;place-items:center;padding:5px;border:0;cursor:pointer;box-shadow:0 0 0 1px var(--line)}
-.thumbs img{max-width:100%;max-height:100%;object-fit:contain}
+.thumbs button{width:50px;height:60px;background:var(--paper);border-radius:9px;display:flex;align-items:center;justify-content:center;overflow:hidden;padding:5px;border:0;cursor:pointer;box-shadow:0 0 0 1px var(--line)}
+.thumbs img{width:100%;height:100%;object-fit:contain;display:block}
 .notes{margin:12px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px}
 .notes li{font-size:13.5px;line-height:1.4;padding-left:18px;position:relative}
 .notes li::before{content:"";position:absolute;left:2px;top:.55em;width:8px;border-top:1.5px dashed var(--seam)}
@@ -331,6 +331,27 @@ details.sec > .inner{padding-bottom:14px}
 .swf.on{box-shadow:0 0 0 2px var(--surface),0 0 0 4px var(--accent)}
 .newtag{display:flex;gap:6px;margin-top:8px}
 .newtag .inp{min-height:38px;font-size:16px}
+.seg.two{grid-template-columns:1fr 1fr}
+.onb{position:fixed;inset:0;z-index:80;background:var(--bg);display:flex;justify-content:center;overflow-y:auto;
+  padding:calc(18px + env(safe-area-inset-top,0px)) 20px calc(18px + env(safe-area-inset-bottom,0px))}
+.onb-in{width:100%;max-width:460px;display:flex;flex-direction:column;min-height:100%}
+.onb-prog{display:flex;gap:6px;margin:6px 0 30px}
+.onb-prog i{flex:1;border-top:2px dashed var(--line)}
+.onb-prog i.on{border-color:var(--accent)}
+.onb-body{flex:1;display:flex;flex-direction:column;gap:10px}
+.onb-art{color:var(--seam);margin-bottom:6px}
+.onb h2{margin:0 0 4px;font-size:46px;line-height:.9;font-weight:850;font-stretch:62%}
+.onb p{margin:0 0 8px;color:var(--muted);font-size:15.5px;line-height:1.45}
+.onb h3{margin:14px 0 2px;font-size:15px;font-weight:680}
+.opt{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:60px;padding:10px 18px;border-radius:14px;border:0;width:100%;
+  background:var(--surface);box-shadow:0 0 0 1px var(--line);font-size:17px;font-weight:640;cursor:pointer;text-align:left;color:var(--ink)}
+.opt span{display:flex;flex-direction:column;gap:3px}
+.opt small{color:var(--muted);font-weight:450;font-size:13.5px}
+.opt.on{box-shadow:0 0 0 2px var(--accent)}
+.opt.on svg{color:var(--accent)}
+.opt.sm{min-height:50px;justify-content:center;font-size:16px}
+.optg{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.onb-foot{display:grid;grid-template-columns:1fr 2fr;gap:10px;padding-top:24px}
 .toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);
   background:var(--ink);color:var(--surface);padding:11px 14px;border-radius:12px;font-size:14px;display:flex;gap:14px;align-items:center;
   z-index:60;width:max-content;max-width:calc(100vw - 32px);box-shadow:0 6px 18px var(--shadow);line-height:1.35}
@@ -379,7 +400,7 @@ details.sec > .inner{padding-bottom:14px}
    DATA
    ========================================================= */
 const ZONES = [
-  {id:'tete', label:'Tête', cats:['casquette','bonnet','chapeau']},
+  {id:'tete', label:'Tête', cats:['voile','casquette','bonnet','chapeau']},
   {id:'yeux', label:'Lunettes', cats:['lunettes']},
   {id:'visage', label:'Visage', cats:['boucles','piercing']},
   {id:'cou', label:'Cou', cats:['cravate','noeud','echarpe','foulard','collier']},
@@ -387,25 +408,26 @@ const ZONES = [
   {id:'ensemble', label:'Une pièce', cats:['qamis','djellaba','robe','abaya','combinaison']},
   {id:'dessus', label:'Par-dessus', cats:['veste','gilet','sansmanche','manteau']},
   {id:'poignet', label:'Poignets', cats:['montre','bracelet','bague','bijou']},
-  {id:'bas', label:'Bas', cats:['pantalon','jean','short','pantacourt']},
+  {id:'bas', label:'Bas', cats:['pantalon','jean','short','shortjean','pantacourt','jupe']},
   {id:'chaussettes', label:'Chaussettes', cats:['chaussettes']},
-  {id:'pieds', label:'Chaussures', cats:['baskets','chaussures','sandales']},
+  {id:'pieds', label:'Chaussures', cats:['baskets','chaussures','talons','sandales']},
   {id:'ceinture', label:'Ceinture', cats:['ceinture']},
   {id:'sac', label:'Sac', cats:['sac']}
 ];
 const CAT_LABEL = {
-  casquette:'Casquette', bonnet:'Bonnet', chapeau:'Chapeau', lunettes:'Lunettes',
+  voile:'Voile', casquette:'Casquette', bonnet:'Bonnet', chapeau:'Chapeau', lunettes:'Lunettes', jupe:'Jupe', talons:'Talons',
   tshirt:'T-shirt', polo:'Polo', chemise:'Chemise', pull:'Pull', sweat:'Sweat',
   qamis:'Qamis', djellaba:'Djellaba', robe:'Robe', abaya:'Abaya', combinaison:'Combinaison',
   veste:'Veste', gilet:'Gilet', sansmanche:'Gilet sans manche', manteau:'Manteau',
   montre:'Montre', bracelet:'Bracelet', bague:'Bague', bijou:'Autre bijou',
   boucles:'Boucles d’oreilles', piercing:'Piercing', cravate:'Cravate', noeud:'Nœud papillon', echarpe:'Écharpe', foulard:'Foulard', collier:'Collier / chaîne',
   ceinture:'Ceinture', sac:'Sac',
-  pantalon:'Pantalon', jean:'Jean', short:'Short', pantacourt:'Pantacourt',
+  pantalon:'Pantalon', jean:'Jean', short:'Short', shortjean:'Short en jean', pantacourt:'Pantacourt',
   chaussettes:'Chaussettes', baskets:'Baskets', chaussures:'Chaussures de ville', sandales:'Sandales'
 };
 /* f: style 1 sport … 4 habillé ; w: 0 été, 1 mi-saison, 2 hiver ; kg: poids sec approx ; tex: passe en machine/lavage */
 const CATDEF = {
+  voile:{f:null,w:null,kg:.15,tex:true}, jupe:{f:3,w:1,kg:.35,tex:true}, talons:{f:4,w:1,kg:.6,tex:false},
   casquette:{f:2,w:0,kg:.1,tex:true}, bonnet:{f:2,w:2,kg:.1,tex:true}, chapeau:{f:3,w:0,kg:.15,tex:false},
   lunettes:{f:null,w:null,kg:0,tex:false},
   tshirt:{f:2,w:0,kg:.18,tex:true}, polo:{f:3,w:0,kg:.22,tex:true}, chemise:{f:3,w:0,kg:.25,tex:true},
@@ -416,7 +438,7 @@ const CATDEF = {
   boucles:{f:null,w:null,kg:0,tex:false}, piercing:{f:null,w:null,kg:0,tex:false}, collier:{f:null,w:null,kg:0,tex:false},
   cravate:{f:4,w:null,kg:.05,tex:true}, noeud:{f:4,w:null,kg:.03,tex:true}, echarpe:{f:2,w:2,kg:.2,tex:true}, foulard:{f:3,w:1,kg:.08,tex:true},
   ceinture:{f:3,w:null,kg:0,tex:false}, sac:{f:2,w:null,kg:0,tex:false},
-  pantalon:{f:3,w:1,kg:.55,tex:true}, jean:{f:2,w:1,kg:.7,tex:true}, short:{f:2,w:0,kg:.3,tex:true}, pantacourt:{f:2,w:0,kg:.4,tex:true},
+  pantalon:{f:3,w:1,kg:.55,tex:true}, jean:{f:2,w:1,kg:.7,tex:true}, short:{f:2,w:0,kg:.3,tex:true}, shortjean:{f:2,w:0,kg:.45,tex:true}, pantacourt:{f:2,w:0,kg:.4,tex:true},
   chaussettes:{f:null,w:null,kg:.06,tex:true},
   baskets:{f:2,w:1,kg:.8,tex:false}, chaussures:{f:4,w:1,kg:.9,tex:false}, sandales:{f:2,w:0,kg:.4,tex:false}
 };
@@ -445,13 +467,14 @@ const JEWEL = new Set(['montre','bracelet','bague','bijou','boucles','piercing',
 const TAG_LVL = {sport:1, casual:2, chic:3, habille:4};
 const TAG_LBL = {sport:'Sport', casual:'Casual', chic:'Chic', habille:'Habillé'};
 const DEF_TAGS = {
+  voile:[], jupe:['casual','chic'], talons:['chic','habille'],
   casquette:['casual','sport'], bonnet:['casual','sport'], chapeau:['casual','chic'], lunettes:[],
   boucles:[], piercing:[], collier:[], cravate:['chic','habille'], noeud:['habille'], echarpe:['casual','chic'], foulard:['chic','casual'],
   tshirt:['casual','sport'], polo:['casual','chic'], chemise:['chic','casual'], pull:['casual','chic'], sweat:['casual','sport'],
   qamis:['chic','casual'], djellaba:['chic','casual'], robe:['chic','casual'], abaya:['chic','casual'], combinaison:['casual'],
   veste:['casual','chic'], gilet:['casual','chic'], sansmanche:['casual','sport'], manteau:['casual','chic'],
   montre:[], bracelet:[], bague:[], bijou:[],
-  pantalon:['chic','casual'], jean:['casual'], short:['casual','sport'], pantacourt:['casual'],
+  pantalon:['chic','casual'], jean:['casual'], short:['casual','sport'], shortjean:['casual'], pantacourt:['casual'],
   chaussettes:[], baskets:['casual','sport'], chaussures:['chic','habille'], sandales:['casual'],
   ceinture:['casual','chic'], sac:['casual','chic']
 };
@@ -508,6 +531,7 @@ const ICON = {
   lock:'<rect x="5.5" y="10.5" width="13" height="9" rx="2"/><path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5"/>',
   check:'<path d="M5.5 12.5l4 4 9-9"/>',
   basket:'<path d="M4 9h16l-1.6 9.2a2 2 0 0 1-2 1.8H7.6a2 2 0 0 1-2-1.8z"/><path d="M8.5 9l3.5-5 3.5 5"/>',
+  gear:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>',
   backup:'<path d="M12 4v10M8 10l4 4 4-4"/><path d="M5 15v3a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3"/>',
   sparkle:'<path d="M12 4l1.6 4.4L18 10l-4.4 1.6L12 16l-1.6-4.4L6 10l4.4-1.6z"/>'
 };
@@ -529,6 +553,9 @@ const S = {
   basket: lsGet('penderie.basket') || [],
   ctx: Object.assign({meteo:'doux', occasion:'casual', colors:[]}, lsGet('penderie.ctx') || {}),
   customTags: lsGet('penderie.tags') || [],
+  profile: lsGet('penderie.profile') || null,
+  drawMode: lsGet('penderie.drawmode') || 'surprise',
+  seen: new Set(), seenSig: '',
   filtOpen: lsGet('penderie.filtopen') !== false,
   autoAI: lsGet('penderie.autoai') !== false,
   tab:'tenue', filter:'all', plan:null
@@ -546,6 +573,13 @@ const styleOf = it => it.style != null ? it.style : (CATDEF[it.cat] ? CATDEF[it.
 const warmthOf = it => it.warmth != null ? it.warmth : (CATDEF[it.cat] ? CATDEF[it.cat].w : null);
 const motifOf = it => it.motif || 'uni';
 const tagLabel = t => TAG_LBL[t] || t;
+const prof = () => S.profile || {};
+function hiddenCats(){
+  const p = prof(), h = new Set();
+  if (p.sexe === 'homme') ['voile','robe','abaya','jupe','talons'].forEach(c => h.add(c));
+  else if (p.sexe === 'femme') { h.add('qamis'); if (p.voile === 'non') h.add('voile'); }
+  return h;
+}
 function tagsOf(it){
   if (Array.isArray(it.tags)) return it.tags;
   if (it.style != null) return [{1:'sport',2:'casual',3:'chic',4:'habille'}[it.style]].filter(Boolean);
@@ -664,7 +698,7 @@ function metalOf(it){
   if (['argenté','gris','gris clair','blanc','anthracite'].includes(c.name)) return 'argent';
   return null;
 }
-const isDenim = it => it.cat === 'jean' || (colorOf(it) && colorOf(it).name === 'denim');
+const isDenim = it => it.cat === 'jean' || it.cat === 'shortjean' || (colorOf(it) && colorOf(it).name === 'denim');
 
 /* =========================================================
    STORES
@@ -910,7 +944,7 @@ function frontPrompt(){
   return `Tu analyses la photo détourée d'un vêtement ou accessoire pour une application de garde-robe.
 Réponds uniquement avec un objet JSON de cette forme :
 {"categorie":"...","couleur":"...","motif":"uni","occasions":["casual"],"chaleur":1,"nom":"..."}
-- categorie : une valeur parmi ${Object.keys(CAT_LABEL).join(', ')} (tshirt = t-shirt, sansmanche = gilet ou doudoune sans manche, chaussures = chaussures de ville/cuir, baskets = sneakers, qamis = tunique longue homme type kamis/thobe, djellaba = djellaba ou gandoura, combinaison = combinaison ou salopette, boucles = boucles d'oreilles, noeud = nœud papillon, collier = collier ou chaîne, bijou = autre bijou porté à la main).
+- categorie : une valeur parmi ${Object.keys(CAT_LABEL).filter(c => !hiddenCats().has(c)).join(', ')} (voile = voile/hijab, talons = chaussures à talons, tshirt = t-shirt, sansmanche = gilet ou doudoune sans manche, chaussures = chaussures de ville/cuir, baskets = sneakers, qamis = tunique longue homme type kamis/thobe, djellaba = djellaba ou gandoura, combinaison = combinaison ou salopette, shortjean = short en jean (short = short en tissu ou sport), boucles = boucles d'oreilles, noeud = nœud papillon, collier = collier ou chaîne, bijou = autre bijou porté à la main).
 - couleur : la couleur dominante, une valeur parmi ${PALETTE.map(p => p.name).join(', ')} (doré/argenté seulement pour bijoux et montres ; denim = jean bleu).
 - motif : "uni" ou "motif" (rayures, carreaux, imprimé, gros logo ou graphique = motif).
 - occasions : une ou plusieurs valeurs parmi ${tags} (sport, casual, chic, habille = habillé). Mets toutes celles qui conviennent : un jogging = ["sport","casual"], une chemise blanche = ["chic","casual"], une cravate = ["chic","habille"]. Tableau vide pour un accessoire neutre qui va avec tout.
@@ -945,7 +979,7 @@ function normFront(r){
   if (!r || typeof r !== 'object') return out;
   const cat = String(r.categorie || '').toLowerCase().trim();
   const ck = Object.keys(CAT_LABEL).find(k => k === cat || CAT_LABEL[k].toLowerCase() === cat);
-  if (ck) out.cat = ck;
+  if (ck && !hiddenCats().has(ck)) out.cat = ck;
   const cn = String((r.couleur && r.couleur.nom) || r.couleur || '').toLowerCase().trim();
   const p = PAL[cn] || PALETTE.find(x => cn && cn.includes(x.name));
   if (p) out.color = {name:p.name, hex:p.hex};
@@ -1001,6 +1035,8 @@ const RULES = [
   'Jamais de chaussettes avec des sandales. Pas de short avec des chaussures de ville.',
   'Ne mélange pas doré et argenté (poignets, visage, cou), et une seule montre.',
   'Cravate ou nœud papillon uniquement avec une chemise, jamais en sport. En chic, ceinture assortie aux chaussures.',
+  'Voile « tous les jours » : un voile dans chaque tenue, choisi pour s’accorder aux couleurs du reste.',
+  'Tirage « Surprise » : une tenue au hasard parmi les mieux notées. « Meilleures d’abord » : la mieux notée pas encore vue. Aucun des deux ne repropose une tenue déjà tirée tant que les filtres ne changent pas.',
   'Les pièces au linge sale ne sont jamais proposées : elles reviennent dès que tu les retires du panier.',
   'Météo : chaud = léger et sans veste chaude, doux = une couche légère, froid = une vraie couche chaude par-dessus, pas de short ni de sandales.'
 ];
@@ -1066,7 +1102,7 @@ function evaluate(slots, ctx){
   /* Météo */
   const w = it => { const v = warmthOf(it); return v == null ? 1 : v; };
   const hasDessusInWardrobe = itemsIn('dessus').length > 0;
-  const shortish = bas && (bas.cat === 'short' || bas.cat === 'pantacourt');
+  const shortish = bas && (bas.cat === 'short' || bas.cat === 'shortjean' || bas.cat === 'pantacourt');
   if (ctx.meteo === 'chaud') {
     if (haut && w(haut) === 2) add(-15, 'Haut trop chaud pour la météo');
     if (ens && w(ens) === 2) add(-15, `${itemLabel(ens)} trop chaud pour la météo`);
@@ -1139,10 +1175,14 @@ function poolFor(slot, ctx){
   const ok = it => {
     const c = it.cat, w = warmthOf(it);
     if (ctx.meteo === 'chaud' && (c === 'bonnet' || c === 'manteau' || c === 'echarpe' || (w === 2 && ['haut','dessus','ensemble','cou'].includes(zone)))) return false;
-    if (ctx.meteo === 'froid' && (c === 'short' || c === 'pantacourt' || c === 'sandales')) return false;
+    if (ctx.meteo === 'froid' && (c === 'short' || c === 'shortjean' || c === 'pantacourt' || c === 'sandales')) return false;
     if (occ) { const t = tagsOf(it); if (t.length && !t.includes(occ)) return false; }
     return true;
   };
+  if (slot === 'tete' && prof().voile === 'toujours') {
+    const v = all.filter(it => it.cat === 'voile');
+    if (v.length) { const fv = v.filter(ok); return {items: fv.length ? fv : v, fallback:false}; }
+  }
   const f = all.filter(ok);
   const fallback = !f.length && REQUIRED.has(slot) && all.length > 0;
   return {items: f.length ? f : (fallback ? all : []), fallback};
@@ -1154,7 +1194,7 @@ function pickWeighted(top){
   for (let i = 0; i < top.length; i++) { r -= weights[i]; if (r <= 0) return top[i]; }
   return top[0];
 }
-function generate(){
+function generate(retried){
   const ctx = S.ctx, pools = {}, fb = {};
   SLOT_KEYS.forEach(s => { const r = poolFor(s, ctx); pools[s] = r.items; fb[s] = r.fallback; });
   const dirty = new Set(S.basket);
@@ -1172,6 +1212,11 @@ function generate(){
   const nE = pools.ensemble.length, nSep = Math.min(pools.haut.length, pools.bas.length);
   if (!nE && !nSep && !locked('ensemble')) return {err:'Pas assez de pièces propres : il faut au moins un haut et un bas (ou une pièce entière).'};
   const pEns = nE ? (nSep ? Math.min(.5, nE / (nE + nSep) + .1) : 1) : 0;
+  const hasVoile = pools.tete.some(it => it.cat === 'voile');
+  const pTete = prof().voile === 'toujours' && hasVoile ? 1 : prof().voile === 'parfois' && hasVoile ? .5 : (isChic ? pr.tete * .3 : pr.tete);
+  const sig = JSON.stringify([ctx, SLOT_KEYS.filter(locked).map(x => [x, S.current[x]]), S.basket.slice().sort(), S.items.length, prof().voile || '']);
+  if (sig !== S.seenSig) { S.seen = new Set(); S.seenSig = sig; }
+  let seenHits = 0;
   const cands = [];
   for (let n = 0; n < 800; n++) {
     const c = {};
@@ -1189,7 +1234,7 @@ function generate(){
       if (forced[s]) { c[s] = forced[s]; continue; }
       const P = pools[s]; if (!P.length) continue;
       let p = 1;
-      if (s === 'dessus') p = pr.dessus; else if (s === 'tete') p = isChic ? pr.tete * .3 : pr.tete; else if (s === 'yeux') p = pr.yeux;
+      if (s === 'dessus') p = pr.dessus; else if (s === 'tete') p = pTete; else if (s === 'yeux') p = pr.yeux;
       else if (s === 'cou') p = isChic ? Math.max(.5, pr.cou) : pr.cou;
       else if (s === 'visage') p = .5; else if (s === 'sac') p = .25; else if (s === 'ceinture') p = .5;
       else if (s === 'mg') p = .55; else if (s === 'md') p = .3;
@@ -1198,19 +1243,26 @@ function generate(){
     const pi = getItem(c.pieds);
     if (pi && pi.cat === 'sandales' && !locked('chaussettes')) delete c.chaussettes;
     const bi = getItem(c.bas);
-    if (c.ceinture && !locked('ceinture') && !(bi && (bi.cat === 'pantalon' || bi.cat === 'jean'))) delete c.ceinture;
+    if (c.ceinture && !locked('ceinture') && !(bi && (bi.cat === 'pantalon' || bi.cat === 'jean' || bi.cat === 'shortjean'))) delete c.ceinture;
     if (c.mg && c.md === c.mg) delete c.md;
     if (colorsReq.length && !colorsReq.every(col => COLOR_SLOTS.some(s => c[s] && cname(getItem(c[s])) === col))) continue;
+    const k = JSON.stringify(c);
+    if (S.seen.has(k)) { seenHits++; continue; }
     const e = evaluate(c, ctx);
-    if (e) cands.push({c, s:e.score, k:JSON.stringify(c)});
+    if (e) cands.push({c, s:e.score, k});
   }
-  if (!cands.length) return {err:'Aucune combinaison possible avec ces filtres. Élargis la couleur ou l’occasion.'};
+  if (!cands.length) {
+    if (seenHits && !retried) { S.seen = new Set(); const r = generate(true); if (r && !r.err) r.cycled = true; return r; }
+    return {err:'Aucune combinaison possible avec ces filtres. Élargis la couleur ou l’occasion.'};
+  }
   cands.sort((a,b) => b.s - a.s);
   const top = [];
   for (const x of cands) { if (!top.some(t => t.k === x.k)) top.push(x); if (top.length >= 6) break; }
-  const chosen = pickWeighted(top).c;
+  const pick = S.drawMode === 'best' ? top[0] : pickWeighted(top);
+  S.seen.add(pick.k);
+  const chosen = pick.c;
   const warn = ['haut','bas','ensemble','pieds'].filter(s => chosen[s] && fb[s] && !locked(s)).map(s => SLOTS[s].ph.toLowerCase());
-  return {c:chosen, warn};
+  return {c:chosen, warn, score:pick.s};
 }
 function rerollSlot(slot){
   const pool = poolFor(slot, S.ctx).items.filter(it => it.id !== S.current[slot]);
@@ -1235,7 +1287,7 @@ function availableColors(){
 /* =========================================================
    LAUNDRY ENGINE
    ========================================================= */
-const CAP = {normal:6, delicat:3.5, laine:2};
+function caps(){ const m = Number(prof().machine) || 7; return {normal: m * .8, delicat: m * .5, laine: Math.min(2.5, m * .3)}; }
 const GROUP_ORDER = ['blanc','clair','couleur','fonce','apart'];
 const PROG_RANK = {normal:0, delicat:1, laine:2};
 const PROG_LBL = {normal:'Programme coton', delicat:'Programme synthétique / délicat', laine:'Programme laine / très délicat'};
@@ -1247,6 +1299,7 @@ function groupLabel(gs){
   return ({blanc:'Blancs', clair:'Clairs', couleur:'Couleurs', fonce:'Foncés', apart:'À part', 'blanc+clair':'Blancs et clairs', 'couleur+fonce':'Couleurs et foncés'})[k] || 'Mélange';
 }
 function buildLoads(ids){
+  const CAP = caps();
   const out = {loads:[], hand:[], nowash:[], missing:[]};
   const mach = [];
   ids.map(getItem).filter(Boolean).forEach(it => {
@@ -1259,7 +1312,7 @@ function buildLoads(ids){
   const progOf = it => isWool(it) ? 'laine' : it.care.cycle === 'delicat' ? 'delicat' : 'normal';
   const grpOf = it => {
     const c = colorOf(it); let g = c ? c.lg : 'couleur';
-    if (it.cat === 'jean') g = 'fonce';
+    if (it.cat === 'jean' || it.cat === 'shortjean') g = 'fonce';
     if (it.care.bleeds && g !== 'fonce') g = 'apart';
     return g;
   };
@@ -1324,15 +1377,18 @@ function makeLoad(B, items){
   const inside = items.filter(it => it.cat !== 'chaussettes' && (isDenim(it) || motifOf(it) === 'motif' || (colorOf(it) && colorOf(it).lg === 'fonce')));
   if (B.prog === 'laine') notes.push({t:'Programme laine : essorage doux, pas d’adoucissant'});
   if (inside.length) notes.push({t:`À retourner à l’envers : ${listNames(inside)}`});
-  if (items.some(it => ['jean','veste','sweat','gilet','sansmanche','manteau','pantalon'].includes(it.cat))) notes.push({t:'Ferme les zips et les boutons avant de lancer'});
+  if (items.some(it => ['jean','shortjean','veste','sweat','gilet','sansmanche','manteau','pantalon'].includes(it.cat))) notes.push({t:'Ferme les zips et les boutons avant de lancer'});
   if (items.some(it => it.cat === 'chaussettes')) notes.push({t:'Chaussettes dans un filet pour ne pas les perdre'});
   if (gs.includes('blanc') && !gs.includes('apart')) {
     if (items.every(it => it.care.bleach === 'oui')) notes.push({t:'Javel possible en cas de taches'});
     else if (items.every(it => it.care.bleach !== 'non')) notes.push({t:'Détachant à l’oxygène possible, pas de javel'});
   }
+  if (items.some(it => it.cat === 'voile')) notes.push({t:'Voiles dans un filet de lavage'});
+  const hasDryer = prof().dryer !== false;
   const dry = {tambour:[], bas:[], air:[], plat:[]};
   items.forEach(it => {
     if (isWool(it)) dry.plat.push(it);
+    else if (!hasDryer) dry.air.push(it);
     else if (it.care.dry === 'normal') dry.tambour.push(it);
     else if (it.care.dry === 'doux') dry.bas.push(it);
     else dry.air.push(it);
@@ -1340,7 +1396,7 @@ function makeLoad(B, items){
   const drying = [];
   if (dry.tambour.length) drying.push(`Sèche-linge : ${listNames(dry.tambour)}`);
   if (dry.bas.length) drying.push(`Sèche-linge basse température : ${listNames(dry.bas)}`);
-  if (dry.air.length) drying.push(`À l’air libre : ${listNames(dry.air)}`);
+  if (dry.air.length) drying.push(hasDryer ? `À l’air libre : ${listNames(dry.air)}` : `Sur l’étendoir : ${listNames(dry.air)}`);
   if (dry.plat.length) drying.push(`À plat, sans sèche-linge : ${listNames(dry.plat)}`);
   let detergent = 'Lessive couleurs';
   if (B.prog === 'laine') detergent = 'Lessive laine et délicats';
@@ -1422,7 +1478,7 @@ function outfitHTML(slots, live){
     if (!it) { if (!live) return ''; if (acc && !itemsIn(sl.zone).length) return ''; }
     const inner = it
       ? `<img src="${esc(src(it))}" alt="" class="${it.transparent === false ? 'opaque' : ''}" draggable="false">${live && S.locks[id] ? `<span class="lk">${ic('lock', 12)}</span>` : ''}${live && dirty.has(it.id) ? '<span class="dirt">sale</span>' : ''}`
-      : `<span class="ph">+ ${esc(sl.ph)}</span>`;
+      : `<span class="ph">+ ${esc(id === 'tete' && prof().voile === 'toujours' ? 'Voile' : sl.ph)}</span>`;
     const aria = live ? ` type="button" aria-label="${esc(sl.title)}${it ? ' : ' + esc(itemLabel(it)) : ', vide'}${S.locks[id] ? ', gardée' : ''}"` : '';
     return `<${tag} class="slot s-${id}${id === 'ensemble' ? ' s-haut' : ''}${acc ? ' acc' : ''} ${it ? 'full' : 'empty'}" data-slot="${id}"${aria}>${inner}</${tag}>`;
   };
@@ -1460,11 +1516,12 @@ function renderTenue(){
   const occ = S.ctx.occasion || 'all';
   const cols = S.ctx.colors || [];
   const METEO = {chaud:'Chaud', doux:'Doux', froid:'Froid'};
-  const summary = `${METEO[S.ctx.meteo] || 'Doux'}, ${occ === 'all' ? 'toutes occasions' : tagLabel(occ)}, ${cols.length ? cols.join(' + ') : 'toutes couleurs'}`;
+  const summary = `${METEO[S.ctx.meteo] || 'Doux'}, ${occ === 'all' ? 'toutes occasions' : tagLabel(occ)}, ${cols.length ? cols.join(' + ') : 'toutes couleurs'}${S.drawMode === 'best' ? ', meilleures d’abord' : ''}`;
   const filters = `<details class="filt" data-filt ${S.filtOpen ? 'open' : ''}><summary><b>Filtres</b><span>${esc(summary)}</span></summary>
     <div class="frow"><span class="dl">Météo</span><div class="seg" role="group" aria-label="Météo">${[['chaud','Chaud'],['doux','Doux'],['froid','Froid']].map(o => `<button type="button" data-ctxk="meteo" data-ctxv="${o[0]}" aria-pressed="${S.ctx.meteo === o[0]}">${o[1]}</button>`).join('')}</div></div>
     <div class="frow"><span class="dl">Occasion</span><div class="hs">${[['all','Toutes']].concat(allTags().map(t => [t, tagLabel(t)])).map(o => `<button type="button" class="chip sm ${occ === o[0] ? 'on' : ''}" data-ctxk="occasion" data-ctxv="${esc(o[0])}">${esc(o[1])}</button>`).join('')}</div></div>
     <div class="frow"><span class="dl">Couleur</span><div class="hs"><button type="button" class="chip sm ${cols.length ? '' : 'on'}" data-colf="">Toutes</button>${availableColors().map(p => `<button type="button" class="swf ${cols.includes(p.name) ? 'on' : ''}" data-colf="${esc(p.name)}" style="--c:${p.hex}" aria-label="${esc(p.name)}" aria-pressed="${cols.includes(p.name)}" title="${esc(p.name)}"></button>`).join('')}</div></div>
+    <div class="frow"><span class="dl">Tirage</span><div class="seg two" role="group" aria-label="Ordre des tirages">${[['surprise','Surprise'],['best','Meilleures d’abord']].map(o => `<button type="button" data-draw="${o[0]}" aria-pressed="${S.drawMode === o[0]}">${o[1]}</button>`).join('')}</div></div>
   </details>`;
   const ev = evaluate(S.current, S.ctx);
   const tag = ev ? `<div class="tag" aria-live="polite"><div class="sc"><b>${ev.score}</b><span>${ev.label}</span></div><ul>${ev.bad.filter(b => b.v === -999).map(g => `<li class="bad">${esc(g.msg)}</li>`).join('')}${ev.good.slice(0, 3).map(g => `<li>${esc(g.msg)}</li>`).join('')}${ev.bad.filter(b => b.v !== -999).slice(0, 3).map(g => `<li class="bad">${esc(g.msg)}</li>`).join('')}</ul><button type="button" class="rules" data-act="rules">Les règles utilisées</button></div>` : '';
@@ -1507,7 +1564,7 @@ function renderDressing(){
   v.innerHTML = `
     <header class="top"><div><h1>Dressing</h1>
       <p class="sub">${n === 0 ? 'Aucune pièce' : pl(n, 'pièce', 'pièces')}, ${S.mode === 'cloud' ? 'sauvegardées en ligne' : 'stockées sur cet appareil'}</p></div>
-      <div class="acts"><button type="button" class="icon" data-act="backup" aria-label="Sauvegarde : exporter ou importer">${ic('backup')}</button></div></header>
+      <div class="acts"><button type="button" class="icon" data-act="settings" aria-label="Réglages">${ic('gear')}</button><button type="button" class="icon" data-act="backup" aria-label="Sauvegarde : exporter ou importer">${ic('backup')}</button></div></header>
     <div class="filters">${chips.map(c => `<button type="button" class="chip ${S.filter === c[0] ? 'on' : ''}" data-filter="${c[0]}">${esc(c[1])}<span class="ct">${c[2]}</span></button>`).join('')}</div>
     ${list.length
       ? `<div class="grid">${list.map(it => tileHTML(it, 'data-item', false, isTextile(it) && !it.care ? '<span class="nolab">étiquette ?</span>' : (inBasket.has(it.id) ? `<span class="check">${ic('basket', 13)}</span>` : ''))).join('')}</div>`
@@ -1594,7 +1651,8 @@ function randomize(){
   S.current = r.c; persist(); renderTenue();
   $$('#composer .slot img').forEach((im, i) => { im.style.animationDelay = (i * 45) + 'ms'; im.classList.add('drop'); });
   if (r.warn && r.warn.length) toast(`Pas de ${r.warn.join(', ')} propre tagué ${tagLabel(S.ctx.occasion)} : pièce hors filtre utilisée.`);
-  else toast('Tenue générée', 'Enregistrer', openSaveOutfit);
+  else if (r.cycled) toast('Tu as vu toutes les meilleures tenues : on repart du début', 'Enregistrer', openSaveOutfit);
+  else toast(S.drawMode === 'best' ? `Tenue suivante du classement (${r.score}/100)` : 'Tenue générée', 'Enregistrer', openSaveOutfit);
 }
 function clearAll(){
   const prev = Object.assign({}, S.current), pl0 = Object.assign({}, S.locks);
@@ -1638,7 +1696,8 @@ function closeSheet(){
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('#sheet').hidden) closeSheet(); });
 
 function catsHTML(onlyZone, sel){
-  const zs = onlyZone ? [ZONE[onlyZone]] : ZONES;
+  const hid = hiddenCats();
+  const zs = (onlyZone ? [ZONE[onlyZone]] : ZONES).map(z => ({label:z.label, cats:z.cats.filter(c => !hid.has(c) || c === sel)})).filter(z => z.cats.length);
   return `<div class="cats ${onlyZone ? 'single' : ''}">${zs.map(z => `<div class="cz">${onlyZone ? '' : `<span class="czl">${esc(z.label)}</span>`}<div class="czc">${z.cats.map(c => `<button type="button" class="chip sm ${sel === c ? 'on' : ''}" data-cat="${c}">${esc(CAT_LABEL[c])}</button>`).join('')}</div></div>`).join('')}</div>`;
 }
 function detailsSummary(st){
@@ -2185,7 +2244,7 @@ async function buildBackup(onProgress, alive){
   }
   const data = {app:'penderie', version:1, exportedAt:new Date().toISOString(), items,
     outfits:S.outfits.map(o => ({id:o.id, name:o.name || '', slots:o.slots || {}, createdAt:o.createdAt || 0})),
-    basket:S.basket, current:S.current, locks:S.locks, ctx:S.ctx, customTags:S.customTags || []};
+    basket:S.basket, current:S.current, locks:S.locks, ctx:S.ctx, customTags:S.customTags || [], profile:S.profile || null};
   files.unshift({name:'penderie.json', data:new TextEncoder().encode(JSON.stringify(data))});
   return {blob:makeZip(files), missing, count:list.length};
 }
@@ -2229,6 +2288,7 @@ async function runImport(z, data, ui){
         await retry(() => S.store.addOutfit({name:String(o.name || 'Tenue').slice(0, 60), slots}, {id:oid, createdAt:Number(o.createdAt) || Date.now(), bulk:true}));
         oAdded++;
       }
+      if (data.profile && typeof data.profile === 'object' && !prof().done) { S.profile = Object.assign({}, data.profile, {done:true}); lsSet('penderie.profile', S.profile); }
       if (Array.isArray(data.customTags)) { const set = new Set(S.customTags || []); data.customTags.forEach(t => { if (typeof t === 'string' && t.length <= 24) set.add(t); }); S.customTags = Array.from(set); lsSet('penderie.tags', S.customTags); }
       if (Array.isArray(data.basket)) { const set = new Set(S.basket); data.basket.forEach(x => { if (map[x]) set.add(map[x]); }); S.basket = Array.from(set); saveBasket(); }
       if (!filledCount(S.current) && data.current && typeof data.current === 'object') {
@@ -2315,6 +2375,87 @@ function openBackup(){
   });
 }
 
+
+/* =========================================================
+   ACCUEIL (premier lancement) + RÉGLAGES
+   ========================================================= */
+const PROFILE_DEF = () => ({sexe:null, voile:'non', style:'casual', machine:7, dryer:true});
+function saveProfile(a){
+  S.profile = Object.assign({}, a, {done:true});
+  lsSet('penderie.profile', S.profile);
+  S.seen = new Set();
+}
+function openOnboarding(){
+  if ($('.onb')) return;
+  const a = Object.assign(PROFILE_DEF(), S.profile || {});
+  let step = 0;
+  const el = document.createElement('div');
+  el.className = 'onb'; el.setAttribute('role', 'dialog'); el.setAttribute('aria-modal', 'true'); el.setAttribute('aria-label', 'Bienvenue');
+  document.body.appendChild(el);
+  const steps = () => ['sexe'].concat(a.sexe === 'femme' ? ['voile'] : []).concat(['style', 'lessive', 'fin']);
+  const opt = (key, val, label, sub) => `<button type="button" class="opt ${String(a[key]) === String(val) ? 'on' : ''}" data-k="${key}" data-v="${val}" aria-pressed="${String(a[key]) === String(val)}"><span>${label}${sub ? `<small>${sub}</small>` : ''}</span>${String(a[key]) === String(val) ? ic('check', 22) : ''}</button>`;
+  const small = (key, val, label) => `<button type="button" class="opt sm ${String(a[key]) === String(val) ? 'on' : ''}" data-k="${key}" data-v="${val}" aria-pressed="${String(a[key]) === String(val)}">${label}</button>`;
+  const paint = () => {
+    const list = steps(); if (step >= list.length) step = list.length - 1;
+    const cur = list[step];
+    let body = '';
+    if (cur === 'sexe') body = `<div class="onb-art">${hangerArt}</div><h2>Bienvenue dans Penderie</h2><p>Quelques questions pour adapter l’appli à toi. Tu pourras tout changer plus tard dans les réglages.</p><h3>Tu es…</h3>${opt('sexe', 'homme', 'Un homme')}${opt('sexe', 'femme', 'Une femme')}`;
+    if (cur === 'voile') body = `<h2>Le voile</h2><p>Pour que le générateur l’intègre à tes tenues et l’accorde aux couleurs.</p>${opt('voile', 'toujours', 'Oui, tous les jours', 'Un voile dans chaque tenue générée')}${opt('voile', 'parfois', 'Parfois', 'Le dé en propose souvent, pas à chaque fois')}${opt('voile', 'non', 'Non')}`;
+    if (cur === 'style') body = `<h2>Ton style</h2><p>Ce que tu portes le plus souvent. Ce sera l’occasion choisie par défaut quand tu lances le dé.</p>${opt('style', 'casual', 'Casual', 'Jean, t-shirt, baskets…')}${opt('style', 'chic', 'Chic', 'Chemise, pantalon, chaussures de ville…')}${opt('style', 'sport', 'Sport', 'Jogging, maillot, baskets…')}${opt('style', 'all', 'Un peu de tout')}`;
+    if (cur === 'lessive') body = `<h2>Ta lessive</h2><p>Pour remplir les machines sans les surcharger et te dire comment sécher.</p><h3>Capacité de ta machine</h3><div class="optg">${small('machine', 5, '5 kg')}${small('machine', 7, '6 à 7 kg')}${small('machine', 9, '8 à 9 kg')}${small('machine', 11, '10 kg et +')}</div><h3>Tu as un sèche-linge ?</h3><div class="optg">${small('dryer', true, 'Oui')}${small('dryer', false, 'Non')}</div><p style="margin-top:8px">Pas sûr ? Laisse 6 à 7 kg, c’est la taille la plus courante.</p>`;
+    if (cur === 'fin') body = `<div class="onb-art">${hangerArt}</div><h2>C’est prêt</h2><p>Ajoute tes vêtements un par un : dans Photos, appui long sur le vêtement, <b>Copier</b>, puis colle-le dans l’appli.</p>${S.mode === 'local' ? '<p>Tout est stocké sur ce téléphone : exporte une sauvegarde de temps en temps (Dressing, bouton flèche).</p>' : ''}`;
+    const canNext = cur !== 'sexe' || !!a.sexe;
+    el.innerHTML = `<div class="onb-in"><div class="onb-prog" aria-hidden="true">${list.map((_, i) => `<i class="${i <= step ? 'on' : ''}"></i>`).join('')}</div>
+      <div class="onb-body">${body}</div>
+      <div class="onb-foot">${step ? '<button type="button" class="btn" data-back>Retour</button>' : '<span></span>'}<button type="button" class="btn primary" data-next ${canNext ? '' : 'disabled'}>${cur === 'fin' ? (S.items.length ? 'C’est parti' : 'Ajouter ma première pièce') : 'Continuer'}</button></div></div>`;
+    el.scrollTop = 0;
+  };
+  const finish = () => {
+    saveProfile(a);
+    S.ctx.occasion = a.style || 'casual'; lsSet('penderie.ctx', S.ctx);
+    el.remove();
+    if (!S.items.length) { S.tab = 'dressing'; render(); openAdd(); } else render();
+  };
+  el.addEventListener('click', e => {
+    const o = e.target.closest('[data-k]');
+    if (o) {
+      const k = o.dataset.k, v = o.dataset.v;
+      a[k] = k === 'machine' ? Number(v) : k === 'dryer' ? v === 'true' : v;
+      if (k === 'sexe' && v === 'homme') a.voile = 'non';
+      paint(); return;
+    }
+    if (e.target.closest('[data-back]')) { step = Math.max(0, step - 1); paint(); return; }
+    if (e.target.closest('[data-next]')) { if (steps()[step] === 'fin') finish(); else { step++; paint(); } }
+  });
+  paint();
+}
+function openSettings(){
+  const a = Object.assign(PROFILE_DEF(), S.profile || {});
+  const row = (label, key, opts) => `<div class="drow"><span class="dl">${label}</span><div class="czc">${opts.map(o => `<button type="button" class="chip sm ${String(a[key]) === String(o[0]) ? 'on' : ''}" data-k="${key}" data-v="${o[0]}">${o[1]}</button>`).join('')}</div></div>`;
+  const body = () => `<div class="dets">
+      ${row('Profil', 'sexe', [['homme','Homme'],['femme','Femme']])}
+      ${a.sexe === 'femme' ? row('Voile', 'voile', [['toujours','Tous les jours'],['parfois','Parfois'],['non','Non']]) : ''}
+      ${row('Style', 'style', [['casual','Casual'],['chic','Chic'],['sport','Sport'],['all','Un peu de tout']])}
+      ${row('Machine', 'machine', [[5,'5 kg'],[7,'6-7 kg'],[9,'8-9 kg'],[11,'10 kg +']])}
+      ${row('Sèche-linge', 'dryer', [[true,'Oui'],[false,'Non']])}</div>
+    <p class="how">Le profil adapte les catégories proposées (le qamis pour un homme ; robe, jupe, abaya, talons et voile pour une femme). Les pièces déjà ajoutées restent visibles.</p>`;
+  openSheet(`<div class="sh-head"><h2>Réglages</h2>${closeBtn}</div><div data-set>${body()}</div>
+    <div class="row2"><button type="button" class="btn" data-bk>${ic('backup', 18)}Sauvegarde</button><button type="button" class="btn" data-onb>Revoir l’accueil</button></div>`, root => {
+    const box = $('[data-set]', root);
+    box.addEventListener('click', e => {
+      const o = e.target.closest('[data-k]'); if (!o) return;
+      const k = o.dataset.k, v = o.dataset.v;
+      a[k] = k === 'machine' ? Number(v) : k === 'dryer' ? v === 'true' : v;
+      if (k === 'sexe' && v === 'homme') a.voile = 'non';
+      saveProfile(a);
+      if (k === 'style') { S.ctx.occasion = v; lsSet('penderie.ctx', S.ctx); }
+      box.innerHTML = body(); render();
+    });
+    $('[data-bk]', root).onclick = () => openBackup();
+    $('[data-onb]', root).onclick = () => { closeSheet(); openOnboarding(); };
+  });
+}
+
 /* =========================================================
    GLOBAL EVENTS
    ========================================================= */
@@ -2323,6 +2464,8 @@ document.addEventListener('click', e => {
   if (t.closest('#sheet')) return;
   const tab = t.closest('[data-tab]');
   if (tab) { S.tab = tab.dataset.tab; renderNav(); window.scrollTo(0, 0); return; }
+  const dm = t.closest('[data-draw]');
+  if (dm) { S.drawMode = dm.dataset.draw; lsSet('penderie.drawmode', S.drawMode); S.seen = new Set(); renderTenue(); return; }
   const cf = t.closest('[data-colf]');
   if (cf) {
     const v = cf.dataset.colf; let cols = (S.ctx.colors || []).slice();
@@ -2340,6 +2483,7 @@ document.addEventListener('click', e => {
     else if (a === 'save') openSaveOutfit();
     else if (a === 'rules') openRules();
     else if (a === 'backup') openBackup();
+    else if (a === 'settings') openSettings();
     else if (a === 'unlock') { S.locks = {}; persist(); renderTenue(); toast('Toutes les pièces sont libérées'); }
     else if (a === 'basket-add') openBasketPicker();
     else if (a === 'outfit-basket') {
@@ -2446,9 +2590,10 @@ async function init(){
   try { await store.start(); } catch(e) { toast('Impossible de charger le dressing.'); }
   S.ready = true;
   render();
+  if (!prof().done) openOnboarding();
   aiP.then(() => { if (S.ai && sheetState) { /* next sheet will show AI options */ } });
 }
-window.__penderie = {S, evaluate, generate, buildLoads, render, makeZip, readZip, buildBackup, runImport, rerollSlot, tagsOf};
+window.__penderie = {S, openOnboarding, hiddenCats, caps, evaluate, generate, buildLoads, render, makeZip, readZip, buildBackup, runImport, rerollSlot, tagsOf};
 init();
 })();
 </script>

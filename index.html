@@ -352,6 +352,15 @@ details.sec > .inner{padding-bottom:14px}
 .opt.sm{min-height:50px;justify-content:center;font-size:16px}
 .optg{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .onb-foot{display:grid;grid-template-columns:1fr 2fr;gap:10px;padding-top:24px}
+.s-bas{align-items:flex-start}
+.noimg{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;width:100%;height:100%;min-height:40px;color:#8994A5;font-size:11px;font-weight:600;text-align:center;line-height:1.2}
+.noimg em{font-style:normal}
+.bk.bulk{width:auto}
+.bpill{display:flex;flex-direction:column;justify-content:center;height:84px;min-width:92px;padding:0 14px;border-radius:12px;background:var(--chip);font-size:13.5px;font-weight:650;line-height:1.25}
+.bpill small{font-weight:450;color:var(--muted);font-size:12px}
+.bchip{display:inline-flex;align-items:center;height:60px;padding:0 12px;border-radius:9px;background:var(--chip);font-size:12.5px;font-weight:600;max-width:100%}
+.stepper{display:flex;align-items:center;gap:16px}
+.stepper b{font-size:24px;min-width:2ch;text-align:center;font-variant-numeric:tabular-nums;font-weight:750}
 .toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);
   background:var(--ink);color:var(--surface);padding:11px 14px;border-radius:12px;font-size:14px;display:flex;gap:14px;align-items:center;
   z-index:60;width:max-content;max-width:calc(100vw - 32px);box-shadow:0 6px 18px var(--shadow);line-height:1.35}
@@ -556,10 +565,17 @@ const S = {
   profile: lsGet('penderie.profile') || null,
   drawMode: lsGet('penderie.drawmode') || 'surprise',
   seen: new Set(), seenSig: '',
+  bulk: lsGet('penderie.bulk') || [],
   filtOpen: lsGet('penderie.filtopen') !== false,
   autoAI: lsGet('penderie.autoai') !== false,
   tab:'tenue', filter:'all', plan:null
 };
+const IMG_H = {short:60, shortjean:60, pantacourt:80, jupe:74, casquette:82, bonnet:82, chapeau:90};
+function imgTag(it, extra){
+  const u = it && !it.broken ? src(it) : '';
+  if (!u) return `<span class="noimg">${ic('x', 16)}<em>Photo à remplacer</em></span>`;
+  return `<img src="${esc(u)}" alt="" data-iid="${esc(it.id)}" class="${it.transparent === false ? 'opaque' : ''}" ${extra || ''}>`;
+}
 const itemLabel = it => (it && (it.name || CAT_LABEL[it.cat])) || 'Pièce';
 const src = it => S.store ? S.store.src(it) : '';
 const labelSrc = it => S.store ? S.store.labelSrc(it) : '';
@@ -726,46 +742,94 @@ function localStore(){
     });
   };
   const urls = new Map();
-  const url = (key, blob) => { if (!blob) return ''; if (!urls.has(key)) urls.set(key, URL.createObjectURL(blob)); return urls.get(key); };
-  const drop = key => { const u = urls.get(key); if (u) { URL.revokeObjectURL(u); urls.delete(key); } };
-  async function refresh(){
-    S.items = (await tx('items', 'readonly', s => s.getAll())) || [];
-    S.outfits = (await tx('outfits', 'readonly', s => s.getAll())) || [];
-    render();
+  const url = (key, blob) => {
+    if (!blob) return '';
+    const c = urls.get(key);
+    if (c && c.blob === blob) return c.url;
+    if (c) URL.revokeObjectURL(c.url);
+    const u = URL.createObjectURL(blob); urls.set(key, {blob, url:u}); return u;
+  };
+  const drop = key => { const c = urls.get(key); if (c) { URL.revokeObjectURL(c.url); urls.delete(key); } };
+  const SKIP = new Set(['blob','labelBlob','broken','img','imgType','lab','labType']);
+  const meta = it => { const m = {}; Object.keys(it).forEach(k => { if (!SKIP.has(k)) m[k] = it[k]; }); return m; };
+  /* Safari perd parfois les Blob stockés dans IndexedDB : on stocke des ArrayBuffer et on garde des Blob en mémoire */
+  async function toRec(it){
+    const r = meta(it);
+    if (it.blob) { r.img = await it.blob.arrayBuffer(); r.imgType = it.blob.type || 'image/png'; }
+    if (it.labelBlob) { r.lab = await it.labelBlob.arrayBuffer(); r.labType = it.labelBlob.type || 'image/jpeg'; }
+    return r;
   }
+  async function fromRec(r){
+    const it = meta(r); let fix = false;
+    if (r.img) it.blob = new Blob([r.img], {type:r.imgType || 'image/png'});
+    else if (r.blob) { try { it.blob = new Blob([await r.blob.arrayBuffer()], {type:r.blob.type || 'image/png'}); fix = true; } catch(e) { it.blob = null; it.broken = true; } }
+    else { it.blob = null; it.broken = true; }
+    if (r.lab) it.labelBlob = new Blob([r.lab], {type:r.labType || 'image/jpeg'});
+    else if (r.labelBlob) { try { it.labelBlob = new Blob([await r.labelBlob.arrayBuffer()], {type:r.labelBlob.type || 'image/jpeg'}); fix = true; } catch(e) { it.labelBlob = null; } }
+    else it.labelBlob = null;
+    return {it, fix};
+  }
+  async function loadAll(){
+    const recs = (await tx('items', 'readonly', s => s.getAll())) || [];
+    const list = [], fixes = [];
+    for (const r of recs) { const x = await fromRec(r); list.push(x.it); if (x.fix) fixes.push(x.it); }
+    for (const it of fixes) { try { const rec = await toRec(it); await tx('items', 'readwrite', s => s.put(rec)); } catch(e) {} }
+    S.items = list;
+    S.outfits = (await tx('outfits', 'readonly', s => s.getAll())) || [];
+  }
+  const upsert = it => { const i = S.items.findIndex(x => x.id === it.id); if (i >= 0) S.items[i] = it; else S.items.push(it); };
   return {
     mode:'local',
-    start: refresh,
+    async start(){ await loadAll(); render(); },
+    async reload(){ await loadAll(); render(); },
     src: it => it ? url('F:' + it.id, it.blob) : '',
     labelSrc: it => it ? url('L:' + it.id, it.labelBlob) : '',
-    reload: refresh,
-    async addItem(meta, blob, labelBlob, opt){
+    async addItem(meta0, blob, labelBlob, opt){
       opt = opt || {};
-      const it = Object.assign({id:opt.id || uid(), createdAt:opt.createdAt || Date.now()}, meta, {blob, labelBlob: labelBlob || null});
-      await tx('items', 'readwrite', s => s.put(it));
-      if (!opt.bulk) await refresh();
+      const it = Object.assign({id:opt.id || uid(), createdAt:opt.createdAt || Date.now()}, meta0, {blob:blob || null, labelBlob:labelBlob || null});
+      const rec = await toRec(it);
+      await tx('items', 'readwrite', s => s.put(rec));
+      upsert(it);
+      if (!opt.bulk) render();
       return it.id;
     },
-    async updateItem(id, patch, labelBlob){
-      const it = getItem(id); if (!it) return;
-      const rec = Object.assign({}, it, patch);
-      if (labelBlob) { rec.labelBlob = labelBlob; drop('L:' + id); }
+    async updateItem(id, patch, labelBlob, frontBlob){
+      const cur = getItem(id); if (!cur) return;
+      const it = Object.assign({}, cur, patch);
+      if (labelBlob) it.labelBlob = labelBlob;
+      if (frontBlob) { it.blob = frontBlob; delete it.broken; }
+      const rec = await toRec(it);
       await tx('items', 'readwrite', s => s.put(rec));
-      await refresh();
+      upsert(it);
+      render();
     },
     async deleteItem(id){
       await tx('items', 'readwrite', s => s.delete(id));
       drop('F:' + id); drop('L:' + id);
-      await refresh();
+      S.items = S.items.filter(x => x.id !== id);
+      render();
     },
     async addOutfit(o, opt){
       opt = opt || {};
-      await tx('outfits', 'readwrite', s => s.put(Object.assign({id:opt.id || uid(), createdAt:opt.createdAt || Date.now()}, o)));
-      if (!opt.bulk) await refresh();
+      const rec = Object.assign({id:opt.id || uid(), createdAt:opt.createdAt || Date.now()}, o);
+      await tx('outfits', 'readwrite', s => s.put(rec));
+      S.outfits = S.outfits.filter(x => x.id !== rec.id).concat([rec]);
+      if (!opt.bulk) render();
     },
     async deleteOutfit(id){
       await tx('outfits', 'readwrite', s => s.delete(id));
-      await refresh();
+      S.outfits = S.outfits.filter(x => x.id !== id);
+      render();
+    },
+    async repair(id){
+      try {
+        const r = await tx('items', 'readonly', s => s.get(id));
+        if (!r) return false;
+        const x = await fromRec(r);
+        drop('F:' + id); drop('L:' + id);
+        upsert(x.it);
+        return !!x.it.blob;
+      } catch(e) { return false; }
     }
   };
 }
@@ -802,16 +866,16 @@ function cloudStore(db, assets){
       await items.doc(id).set(Object.assign({}, meta, {asset:up.id, label: lab ? lab.id : null, createdAt:opt.createdAt || Date.now()}));
       return id;
     },
-    async updateItem(id, patch, labelBlob){
+    async updateItem(id, patch, labelBlob, frontBlob){
       const p = Object.assign({}, patch);
-      let old = null;
-      if (labelBlob) {
-        const up = await assets.upload(labelBlob, {type: labelBlob.type || 'image/jpeg'});
-        const it = getItem(id); old = it && it.label; p.label = up.id;
-      }
+      const it = getItem(id);
+      const olds = [];
+      if (labelBlob) { const up = await assets.upload(labelBlob, {type: labelBlob.type || 'image/jpeg'}); if (it && it.label) olds.push(it.label); p.label = up.id; }
+      if (frontBlob) { const up = await assets.upload(frontBlob, {type: frontBlob.type || 'image/png'}); if (it && it.asset) olds.push(it.asset); p.asset = up.id; }
       await items.doc(id).update(p);
-      if (old) { try { await assets.delete(old); } catch(e) {} }
+      for (const o of olds) { try { await assets.delete(o); } catch(e) {} }
     },
+    async repair(){ return false; },
     async deleteItem(id){
       const it = getItem(id);
       await items.doc(id).delete();
@@ -826,6 +890,39 @@ function cloudStore(db, assets){
 /* =========================================================
    IMAGES
    ========================================================= */
+/* Boîte utile de l'image : ignore le fond transparent ou uni (et les ombres légères) */
+function contentBox(d, w, h){
+  let clear = 0;
+  for (let i = 3; i < d.length; i += 4) if (d[i] < 200) clear++;
+  const transparent = clear > w * h * 0.02;
+  const rows = new Uint32Array(h), cols = new Uint32Array(w);
+  if (transparent) {
+    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) if (d[(y * w + x) * 4 + 3] > 40) { rows[y]++; cols[x]++; }
+  } else {
+    const P = 6, corners = [[0,0],[w-P,0],[0,h-P],[w-P,h-P]], avg = [];
+    for (const [x0, y0] of corners) {
+      let r = 0, g = 0, b = 0, n = 0;
+      for (let y = Math.max(0, y0); y < Math.min(h, y0 + P); y++) for (let x = Math.max(0, x0); x < Math.min(w, x0 + P); x++) { const i = (y * w + x) * 4; r += d[i]; g += d[i+1]; b += d[i+2]; n++; }
+      avg.push([r / n, g / n, b / n]);
+    }
+    const spread = Math.max.apply(null, avg.map(a => Math.max.apply(null, avg.map(c => Math.abs(a[0]-c[0]) + Math.abs(a[1]-c[1]) + Math.abs(a[2]-c[2])))));
+    if (spread > 60) return {x:0, y:0, w, h, transparent:false};
+    const bg = [0,1,2].map(k => avg.reduce((a, c) => a + c[k], 0) / 4);
+    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+      const i = (y * w + x) * 4;
+      if (Math.abs(d[i] - bg[0]) + Math.abs(d[i+1] - bg[1]) + Math.abs(d[i+2] - bg[2]) > 42) { rows[y]++; cols[x]++; }
+    }
+  }
+  const rt = Math.max(2, Math.round(w * 0.004)), ct = Math.max(2, Math.round(h * 0.004));
+  let y0 = 0; while (y0 < h && rows[y0] < rt) y0++;
+  let y1 = h - 1; while (y1 > y0 && rows[y1] < rt) y1--;
+  let x0 = 0; while (x0 < w && cols[x0] < ct) x0++;
+  let x1 = w - 1; while (x1 > x0 && cols[x1] < ct) x1--;
+  if (y0 >= y1 || x0 >= x1) return {x:0, y:0, w, h, transparent};
+  const pad = Math.round(Math.max(x1 - x0, y1 - y0) * 0.03);
+  const bx = Math.max(0, x0 - pad), by = Math.max(0, y0 - pad);
+  return {x:bx, y:by, w:Math.min(w, x1 + pad + 1) - bx, h:Math.min(h, y1 + pad + 1) - by, transparent};
+}
 function loadImg(blob){
   return new Promise((res, rej) => {
     const u = URL.createObjectURL(blob);
@@ -843,24 +940,9 @@ async function processImage(blob){
   const c = document.createElement('canvas'); c.width = w; c.height = h;
   const x = c.getContext('2d', {willReadFrequently:true});
   x.drawImage(im, 0, 0, w, h);
-  const d = x.getImageData(0, 0, w, h).data;
-  let minX = w, minY = h, maxX = -1, maxY = -1, clear = 0;
-  for (let yy = 0; yy < h; yy++) {
-    const row = yy * w;
-    for (let xx = 0; xx < w; xx++) {
-      if (d[(row + xx) * 4 + 3] > 16) {
-        if (xx < minX) minX = xx; if (xx > maxX) maxX = xx;
-        if (yy < minY) minY = yy; if (yy > maxY) maxY = yy;
-      } else clear++;
-    }
-  }
-  const transparent = clear > w * h * 0.02 && maxX >= 0;
-  let sx = 0, sy = 0, sw = w, sh = h;
-  if (transparent) {
-    const p = Math.round(Math.max(maxX - minX, maxY - minY) * 0.02);
-    sx = Math.max(0, minX - p); sy = Math.max(0, minY - p);
-    sw = Math.min(w, maxX + p + 1) - sx; sh = Math.min(h, maxY + p + 1) - sy;
-  }
+  const box = contentBox(x.getImageData(0, 0, w, h).data, w, h);
+  const transparent = box.transparent;
+  const sx = box.x, sy = box.y, sw = box.w, sh = box.h;
   const k2 = Math.min(1, 900 / Math.max(sw, sh));
   const o = document.createElement('canvas');
   o.width = Math.max(1, Math.round(sw * k2)); o.height = Math.max(1, Math.round(sh * k2));
@@ -873,6 +955,41 @@ async function processImage(blob){
   let color = null;
   try { color = dominantColor(o, o.width, o.height, transparent); } catch(e) {}
   return {blob:out, w:o.width, h:o.height, transparent, color, preview:URL.createObjectURL(out)};
+}
+async function trimImage(blob){
+  const im = await loadImg(blob);
+  const W = im.naturalWidth, H = im.naturalHeight;
+  const k = Math.min(1, 1200 / Math.max(W, H));
+  const w = Math.max(1, Math.round(W * k)), h = Math.max(1, Math.round(H * k));
+  const c = document.createElement('canvas'); c.width = w; c.height = h;
+  const x = c.getContext('2d', {willReadFrequently:true}); x.drawImage(im, 0, 0, w, h);
+  const box = contentBox(x.getImageData(0, 0, w, h).data, w, h);
+  if (box.w * box.h > 0.9 * w * h) return null;
+  const k2 = Math.min(1, 900 / Math.max(box.w, box.h));
+  const o = document.createElement('canvas'); o.width = Math.max(1, Math.round(box.w * k2)); o.height = Math.max(1, Math.round(box.h * k2));
+  const ox = o.getContext('2d'); ox.imageSmoothingQuality = 'high';
+  ox.drawImage(c, box.x, box.y, box.w, box.h, 0, 0, o.width, o.height);
+  const out = await new Promise(r => o.toBlob(r, box.transparent ? 'image/png' : 'image/jpeg', 0.86));
+  return out ? {blob:out, w:o.width, h:o.height} : null;
+}
+let normJob = false;
+async function normalizeAll(){
+  if (normJob || !S.store) return;
+  normJob = true; let cropped = 0;
+  try {
+    for (const it of S.items.slice()) {
+      if (it.norm >= 1 || it.broken) continue;
+      const blob = await itemBlob(it, 'front'); if (!blob) continue;
+      let r = null;
+      try { r = await trimImage(blob); } catch(e) { r = null; }
+      try {
+        if (r) { await S.store.updateItem(it.id, {norm:1, w:r.w, h:r.h}, null, r.blob); cropped++; }
+        else await S.store.updateItem(it.id, {norm:1});
+      } catch(e) { break; }
+      if (S.mode === 'cloud') await sleep(150);
+    }
+  } finally { normJob = false; }
+  if (cropped) toast(`${pl(cropped, 'photo recadrée', 'photos recadrées')} pour harmoniser les tailles`);
 }
 async function processLabel(blob){
   const im = await loadImg(blob);
@@ -1293,16 +1410,36 @@ const PROG_RANK = {normal:0, delicat:1, laine:2};
 const PROG_LBL = {normal:'Programme coton', delicat:'Programme synthétique / délicat', laine:'Programme laine / très délicat'};
 const SPIN = {normal:1000, delicat:800, laine:600};
 const isWool = it => !!(it.care && (it.care.cycle === 'tres_delicat' || /laine|cachemire|mohair|alpaga|angora|soie|wool|cashmere|silk/i.test(it.care.compo || '')));
-const kgOf = arr => arr.reduce((a, it) => a + ((CATDEF[it.cat] && CATDEF[it.cat].kg) || .3), 0);
+const kgOf = arr => arr.reduce((a, it) => a + (it.kg != null ? it.kg : ((CATDEF[it.cat] && CATDEF[it.cat].kg) || .3)), 0);
+const LG_LBL = {blanc:'blanc', clair:'clair', couleur:'couleur', fonce:'foncé'};
+const BULK = {
+  sousvet:{label:'Sous-vêtements', kg:.08, care:{temp:40}},
+  chaussettes:{label:'Chaussettes (paires)', kg:.06, cat:'chaussettes', care:{temp:40}},
+  soutien:{label:'Soutiens-gorge', kg:.08, femme:true, filet:true, care:{temp:30, cycle:'delicat', dry:'non'}},
+  collants:{label:'Collants', kg:.05, femme:true, filet:true, care:{temp:30, cycle:'delicat', dry:'non'}},
+  pyjama:{label:'Pyjamas', kg:.35, care:{temp:40}},
+  serviette:{label:'Serviettes', kg:.5, care:{temp:60, bleach:'oxygene'}},
+  drap:{label:'Draps et housses', kg:.9, care:{temp:60, bleach:'oxygene'}},
+  torchon:{label:'Torchons', kg:.1, care:{temp:60, bleach:'oxygene'}}
+};
+const bulkKinds = () => Object.keys(BULK).filter(k => !(prof().sexe === 'homme' && BULK[k].femme));
+function saveBulk(){ lsSet('penderie.bulk', S.bulk); }
+function bulkItems(){
+  return (S.bulk || []).filter(e => BULK[e.kind]).map(e => {
+    const k = BULK[e.kind];
+    return {id:'bulk:' + e.id, bulk:true, cat:k.cat || 'bulk', name:`${e.n} ${k.label.toLowerCase()} (${LG_LBL[e.lg]})`, kg:k.kg * e.n, lgFixed:e.lg, filet:!!k.filet,
+      care:Object.assign(DEFAULT_CARE(), {dry:'normal', iron:0, compo:'coton'}, k.care)};
+  });
+}
 function groupLabel(gs){
   const k = gs.slice().sort((a,b) => GROUP_ORDER.indexOf(a) - GROUP_ORDER.indexOf(b)).join('+');
   return ({blanc:'Blancs', clair:'Clairs', couleur:'Couleurs', fonce:'Foncés', apart:'À part', 'blanc+clair':'Blancs et clairs', 'couleur+fonce':'Couleurs et foncés'})[k] || 'Mélange';
 }
-function buildLoads(ids){
+function buildLoads(ids, extra){
   const CAP = caps();
   const out = {loads:[], hand:[], nowash:[], missing:[]};
   const mach = [];
-  ids.map(getItem).filter(Boolean).forEach(it => {
+  ids.map(getItem).filter(Boolean).concat(extra || []).forEach(it => {
     const c = it.care;
     if (!c) out.missing.push(it);
     else if (c.wash === 'non') out.nowash.push(it);
@@ -1311,6 +1448,7 @@ function buildLoads(ids){
   });
   const progOf = it => isWool(it) ? 'laine' : it.care.cycle === 'delicat' ? 'delicat' : 'normal';
   const grpOf = it => {
+    if (it.bulk) return it.lgFixed;
     const c = colorOf(it); let g = c ? c.lg : 'couleur';
     if (it.cat === 'jean' || it.cat === 'shortjean') g = 'fonce';
     if (it.care.bleeds && g !== 'fonce') g = 'apart';
@@ -1384,6 +1522,7 @@ function makeLoad(B, items){
     else if (items.every(it => it.care.bleach !== 'non')) notes.push({t:'Détachant à l’oxygène possible, pas de javel'});
   }
   if (items.some(it => it.cat === 'voile')) notes.push({t:'Voiles dans un filet de lavage'});
+  if (items.some(it => it.filet)) notes.push({t:'Soutiens-gorge et collants dans un filet de lavage'});
   const hasDryer = prof().dryer !== false;
   const dry = {tambour:[], bas:[], air:[], plat:[]};
   items.forEach(it => {
@@ -1475,9 +1614,9 @@ function outfitHTML(slots, live){
     const sl = SLOTS[id];
     const it = slots[id] ? getItem(slots[id]) : null;
     const acc = ACC_SLOTS.has(id);
-    if (!it) { if (!live) return ''; if (acc && !itemsIn(sl.zone).length) return ''; }
+    if (!it && !live) return '';
     const inner = it
-      ? `<img src="${esc(src(it))}" alt="" class="${it.transparent === false ? 'opaque' : ''}" draggable="false">${live && S.locks[id] ? `<span class="lk">${ic('lock', 12)}</span>` : ''}${live && dirty.has(it.id) ? '<span class="dirt">sale</span>' : ''}`
+      ? `${imgTag(it, `draggable="false"${IMG_H[it.cat] ? ` style="max-height:${IMG_H[it.cat]}%"` : ''}`)}${live && S.locks[id] ? `<span class="lk">${ic('lock', 12)}</span>` : ''}${live && dirty.has(it.id) ? '<span class="dirt">sale</span>' : ''}`
       : `<span class="ph">+ ${esc(id === 'tete' && prof().voile === 'toujours' ? 'Voile' : sl.ph)}</span>`;
     const aria = live ? ` type="button" aria-label="${esc(sl.title)}${it ? ' : ' + esc(itemLabel(it)) : ', vide'}${S.locks[id] ? ', gardée' : ''}"` : '';
     return `<${tag} class="slot s-${id}${id === 'ensemble' ? ' s-haut' : ''}${acc ? ' acc' : ''} ${it ? 'full' : 'empty'}" data-slot="${id}"${aria}>${inner}</${tag}>`;
@@ -1494,7 +1633,7 @@ function outfitHTML(slots, live){
 }
 function tileHTML(it, attr, on, extra){
   const c = colorOf(it);
-  return `<button type="button" class="tile ${on ? 'on' : ''}" ${attr}="${esc(it.id)}"><span class="ti">${c ? `<span class="dotc" style="--c:${esc(c.hex)}"></span>` : ''}${extra || ''}<img src="${esc(src(it))}" alt="" loading="lazy" class="${it.transparent === false ? 'opaque' : ''}"></span><span class="tl">${esc(itemLabel(it))}</span></button>`;
+  return `<button type="button" class="tile ${on ? 'on' : ''}" ${attr}="${esc(it.id)}"><span class="ti">${c ? `<span class="dotc" style="--c:${esc(c.hex)}"></span>` : ''}${extra || ''}${imgTag(it, 'loading="lazy"')}</span><span class="tl">${esc(itemLabel(it))}</span></button>`;
 }
 
 /* =========================================================
@@ -1504,7 +1643,7 @@ function renderNav(){
   ['tenue','dressing','lessive','tenues'].forEach(t => { $('#v-' + t).hidden = S.tab !== t; });
   $$('[data-tab]').forEach(b => { if (b.dataset.tab === S.tab) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); });
   $('#fab').hidden = !S.ready || S.tab !== 'dressing';
-  const n = S.basket.filter(id => getItem(id)).length;
+  const n = S.basket.filter(id => getItem(id)).length + (S.bulk || []).length;
   const bdg = $('#bdg'); bdg.hidden = !n; bdg.textContent = n;
 }
 
@@ -1576,9 +1715,10 @@ function renderLessive(){
   if (!S.ready) { v.innerHTML = ''; return; }
   const ids = S.basket.filter(id => getItem(id));
   if (ids.length !== S.basket.length) { S.basket = ids; saveBasket(); }
-  const n = ids.length;
-  const plan = S.plan = buildLoads(ids);
-  const thumbs = arr => `<div class="thumbs">${arr.map(it => `<button type="button" data-item="${esc(it.id)}" aria-label="${esc(itemLabel(it))}"><img src="${esc(src(it))}" alt="" class="${it.transparent === false ? 'opaque' : ''}"></button>`).join('')}</div>`;
+  const bulkList = bulkItems();
+  const n = ids.length + bulkList.length;
+  const plan = S.plan = buildLoads(ids, bulkList);
+  const thumbs = arr => `<div class="thumbs">${arr.map(it => it.bulk ? `<span class="bchip">${esc(it.name)}</span>` : `<button type="button" data-item="${esc(it.id)}" aria-label="${esc(itemLabel(it))}">${imgTag(it)}</button>`).join('')}</div>`;
   const loadCard = (L, i) => `
     <article class="load g-${L.tint}">
       <div class="load-head"><div class="drum"><b>${L.temp}°</b></div>
@@ -1602,11 +1742,12 @@ function renderLessive(){
     <header class="top"><div><h1>Lessive</h1><p class="sub">${n ? pl(n, 'pièce dans le panier', 'pièces dans le panier') : 'Panier vide'}</p></div>
       <div class="acts">${n ? '<button type="button" class="icon" data-act="basket-clear" aria-label="Vider le panier">' + ic('reset') + '</button>' : ''}<button type="button" class="pill" data-act="basket-add">Ajouter</button></div></header>
     ${n
-      ? `<div class="basket">${ids.map(id => { const it = getItem(id); return `<div class="bk"><button type="button" class="ti" data-item="${esc(id)}" aria-label="${esc(itemLabel(it))}"><img src="${esc(src(it))}" alt="" class="${it.transparent === false ? 'opaque' : ''}"></button><button type="button" class="rm" data-act="basket-rm" data-id="${esc(id)}" aria-label="Retirer du panier">${ic('x', 14)}</button></div>`; }).join('')}</div>
+      ? `<div class="basket">${ids.map(id => { const it = getItem(id); return `<div class="bk"><button type="button" class="ti" data-item="${esc(id)}" aria-label="${esc(itemLabel(it))}">${imgTag(it)}</button><button type="button" class="rm" data-act="basket-rm" data-id="${esc(id)}" aria-label="Retirer du panier">${ic('x', 14)}</button></div>`; }).join('')}${(S.bulk || []).filter(e => BULK[e.kind]).map(e => `<div class="bk bulk"><span class="bpill">${e.n} × ${esc(BULK[e.kind].label)}<small>${LG_LBL[e.lg]}</small></span><button type="button" class="rm" data-act="basket-rm" data-id="bulk:${esc(e.id)}" aria-label="Retirer du panier">${ic('x', 14)}</button></div>`).join('')}</div>
+         <div class="under" style="justify-content:flex-start;margin-top:6px"><button type="button" class="ghost" data-act="bulk-add">+ Linge en vrac</button></div>
          <h2 class="h2">${plan.loads.length ? pl(plan.loads.length, 'machine à lancer', 'machines à lancer') : 'Tri du panier'}</h2>${cards}`
       : `<div class="empty"><svg viewBox="0 0 64 64" width="64" height="64" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="12" y="6" width="40" height="52" rx="6"/><circle cx="32" cy="36" r="13"/><circle cx="32" cy="36" r="8" stroke-dasharray="3 3"/><path d="M19 15h6"/></svg>
          <p>Mets tes vêtements sales dans le panier : les machines sont triées selon leurs étiquettes, couleurs et matières.</p>
-         <div class="row"><button type="button" class="btn primary" data-act="basket-add">Choisir dans le dressing</button>${filledCount(S.current) ? '<button type="button" class="btn" data-act="outfit-basket">Tenue du jour</button>' : ''}</div></div>`}`;
+         <div class="row"><button type="button" class="btn primary" data-act="basket-add">Choisir dans le dressing</button><button type="button" class="btn" data-act="bulk-add">Linge en vrac</button>${filledCount(S.current) ? '<button type="button" class="btn" data-act="outfit-basket">Tenue du jour</button>' : ''}</div></div>`}`;
 }
 
 function renderTenues(){
@@ -1666,9 +1807,12 @@ function addToBasket(ids){
   return added;
 }
 function removeFromBasket(ids){
-  const rm = new Set(ids); const prev = S.basket.slice();
-  S.basket = S.basket.filter(id => !rm.has(id)); saveBasket(); renderNav(); renderLessive(); renderDressing();
-  return prev;
+  const rm = new Set(ids);
+  const pb = S.basket.slice(), pk = (S.bulk || []).slice();
+  S.basket = S.basket.filter(id => !rm.has(id));
+  S.bulk = (S.bulk || []).filter(e => !rm.has('bulk:' + e.id));
+  saveBasket(); saveBulk(); renderNav(); renderLessive(); renderDressing(); renderTenue();
+  return () => { S.basket = pb; S.bulk = pk; saveBasket(); saveBulk(); render(); };
 }
 
 /* =========================================================
@@ -1687,7 +1831,7 @@ function closeSheet(){
   const sh = $('#sheet');
   sh.classList.remove('open');
   if (sheetState) {
-    [sheetState.img, sheetState.labelImg].forEach(x => { if (x && x.preview) URL.revokeObjectURL(x.preview); });
+    [sheetState.img, sheetState.labelImg, sheetState.newImg].forEach(x => { if (x && x.preview) URL.revokeObjectURL(x.preview); });
     if (sheetState.ctl) try { sheetState.ctl.abort(); } catch(e) {}
   }
   sheetState = null;
@@ -1958,7 +2102,7 @@ function bindAdd(root, st){
     save.disabled = true; save.textContent = 'Ajout…';
     try {
       const meta = {cat:st.cat, name:nameIn.value.trim(), w:st.img.w, h:st.img.h, transparent:st.img.transparent,
-        color:st.color || null, tags:curTags(st).slice(), style:null, warmth:st.warmth, motif:st.motif || 'uni', care:st.care || null};
+        color:st.color || null, tags:curTags(st).slice(), style:null, warmth:st.warmth, motif:st.motif || 'uni', care:st.care || null, norm:1};
       const id = await S.store.addItem(meta, st.img.blob, st.labelImg ? st.labelImg.blob : null);
       if (st.slot) { setSlot(st.slot, id, 1); closeSheet(); toast('Ajouté à la tenue'); }
       else { save.textContent = label; resetForNext(); toast('Pièce ajoutée. Colle la suivante.'); }
@@ -1992,7 +2136,13 @@ function openItem(id){
   const inB = S.basket.includes(id);
   openSheet(`
     <div class="sh-head"><h2>${esc(itemLabel(it))}</h2>${closeBtn}</div>
-    <div class="big dots"><img src="${esc(src(it))}" alt="" class="${it.transparent === false ? 'opaque' : ''}"></div>
+    <div class="big dots" data-bigwrap>${imgTag(it)}</div>
+    <div class="under"><button type="button" class="ghost" data-rep>${it.broken ? 'Remettre une photo' : 'Changer la photo'}</button></div>
+    <div data-repbox ${it.broken ? '' : 'hidden'}>
+      <div class="drop" data-drop2 style="margin-top:12px"><img class="pv" data-prev2 alt="" hidden>
+        <div class="paste" data-paste2 contenteditable="true" inputmode="none" role="textbox" aria-label="Zone de collage de la nouvelle photo" data-ph="Nouvelle photo : appui long ici, puis « Coller »"></div></div>
+      <div class="row2"><button type="button" class="btn sm" data-clip2>Coller</button><label class="btn sm file">Importer<input type="file" accept="image/*" data-file2></label></div>
+    </div>
     <div class="row2">
       <button type="button" class="btn primary" data-wear>Mettre dans la tenue</button>
       ${isTextile(it) ? `<button type="button" class="btn" data-bask>${ic('basket', 18)}${inB ? 'Retirer du panier' : 'Au panier'}</button>` : '<span></span>'}
@@ -2005,9 +2155,32 @@ function openItem(id){
     ${isTextile(it) ? `<details class="sec" data-csec ${it.care ? '' : 'open'}><summary><b>Étiquette d’entretien</b><span data-csum></span></summary><div class="inner">${careBlockHTML()}</div></details>` : ''}
     <button type="button" class="btn danger wide" data-del style="margin-top:14px">Supprimer cette pièce</button>
     <div class="foot"><button type="button" class="btn primary wide" data-save>Enregistrer les modifications</button></div>`, root => {
-    mountDetails(root, st);
+    const repaintDet = mountDetails(root, st);
     mountTags(root, st);
     if (isTextile(it)) mountCare(root, st, {existingLabel: labelSrc(it) || null});
+    const repbox = $('[data-repbox]', root), drop2 = $('[data-drop2]', root), paste2 = $('[data-paste2]', root);
+    const takeNew = async blob => {
+      if (!blob) return;
+      drop2.classList.add('busy');
+      try {
+        const r = await processImage(blob);
+        if (st.newImg && st.newImg.preview) URL.revokeObjectURL(st.newImg.preview);
+        st.newImg = r;
+        $('[data-bigwrap]', root).innerHTML = `<img src="${r.preview}" alt="" class="${r.transparent ? '' : 'opaque'}">`;
+        if (r.color && !st.touched.has('color')) { st.color = r.color; repaintDet(); }
+        repbox.hidden = true;
+        toast('Nouvelle photo prête : touche « Enregistrer les modifications »');
+      } catch(e) { toast('Image illisible. Essaie une autre photo.'); }
+      finally { drop2.classList.remove('busy'); paste2.innerHTML = ''; paste2.blur(); }
+    };
+    st.take = takeNew;
+    bindPaste(paste2, takeNew);
+    $('[data-rep]', root).onclick = () => { repbox.hidden = false; paste2.focus(); };
+    $('[data-clip2]', root).onclick = async () => {
+      try { const b = await readClipboard(); if (b) takeNew(b); else toast('Aucune image dans le presse-papier.'); }
+      catch(e) { paste2.focus(); toast('Collage direct bloqué ici : appui long dans le cadre, puis « Coller ».'); }
+    };
+    $('[data-file2]', root).onchange = e => { const f = e.target.files && e.target.files[0]; if (f) takeNew(f); e.target.value = ''; };
     $('.cats', root).addEventListener('click', e => {
       const c = e.target.closest('[data-cat]'); if (!c) return;
       st.cat = c.dataset.cat; $$('[data-cat]', root).forEach(b => b.classList.toggle('on', b === c));
@@ -2017,7 +2190,8 @@ function openItem(id){
       const b = ev.currentTarget; b.disabled = true;
       const patch = {cat:st.cat, name:$('[data-name]', root).value.trim(), color:st.color || null, tags:curTags(st).slice(), style:null, warmth:st.warmth, motif:st.motif || 'uni'};
       if (isTextile(it)) patch.care = st.care || null;
-      try { await S.store.updateItem(id, patch, st.labelImg ? st.labelImg.blob : null); closeSheet(); toast('Modifications enregistrées'); }
+      if (st.newImg) Object.assign(patch, {w:st.newImg.w, h:st.newImg.h, transparent:st.newImg.transparent, norm:1});
+      try { await S.store.updateItem(id, patch, st.labelImg ? st.labelImg.blob : null, st.newImg ? st.newImg.blob : null); closeSheet(); toast('Modifications enregistrées'); }
       catch(err) { b.disabled = false; toast(errMsg(err)); }
     };
     $('[data-wear]', root).onclick = () => {
@@ -2051,11 +2225,12 @@ function openBasketPicker(){
   const inB = new Set(S.basket);
   openSheet(`
     <div class="sh-head"><h2>Au panier</h2>${closeBtn}</div>
-    ${tex.length ? `<p class="how" style="margin-top:0">Touche les pièces sales. Les accessoires et chaussures n’apparaissent pas ici.</p>
+    ${tex.length ? `<p class="how" style="margin-top:0">Touche les pièces sales. Les accessoires et chaussures n’apparaissent pas ici. Pour les sous-vêtements, serviettes ou draps : <button type="button" class="rules" data-bulkopen style="color:var(--accent)">linge en vrac</button>.</p>
       <div class="grid">${tex.filter(it => !inB.has(it.id)).map(it => tileHTML(it, 'data-sel')).join('') || '<p class="how">Tout ton linge est déjà dans le panier.</p>'}</div>` : '<p class="how">Aucun vêtement lavable dans le dressing pour l’instant.</p>'}
     <div class="foot"><button type="button" class="btn primary wide" data-ok disabled>Ajouter au panier</button></div>`, root => {
     const ok = $('[data-ok]', root);
     root.addEventListener('click', e => {
+      if (e.target.closest('[data-bulkopen]')) { openBulk(); return; }
       const t = e.target.closest('[data-sel]'); if (!t) return;
       const id = t.dataset.sel;
       if (sel.has(id)) sel.delete(id); else sel.add(id);
@@ -2244,7 +2419,7 @@ async function buildBackup(onProgress, alive){
   }
   const data = {app:'penderie', version:1, exportedAt:new Date().toISOString(), items,
     outfits:S.outfits.map(o => ({id:o.id, name:o.name || '', slots:o.slots || {}, createdAt:o.createdAt || 0})),
-    basket:S.basket, current:S.current, locks:S.locks, ctx:S.ctx, customTags:S.customTags || [], profile:S.profile || null};
+    basket:S.basket, current:S.current, locks:S.locks, ctx:S.ctx, customTags:S.customTags || [], profile:S.profile || null, bulk:S.bulk || []};
   files.unshift({name:'penderie.json', data:new TextEncoder().encode(JSON.stringify(data))});
   return {blob:makeZip(files), missing, count:list.length};
 }
@@ -2289,6 +2464,7 @@ async function runImport(z, data, ui){
         oAdded++;
       }
       if (data.profile && typeof data.profile === 'object' && !prof().done) { S.profile = Object.assign({}, data.profile, {done:true}); lsSet('penderie.profile', S.profile); }
+      if (Array.isArray(data.bulk) && !(S.bulk || []).length) { S.bulk = data.bulk.filter(e => e && BULK[e.kind] && LG_LBL[e.lg] && e.n > 0); saveBulk(); }
       if (Array.isArray(data.customTags)) { const set = new Set(S.customTags || []); data.customTags.forEach(t => { if (typeof t === 'string' && t.length <= 24) set.add(t); }); S.customTags = Array.from(set); lsSet('penderie.tags', S.customTags); }
       if (Array.isArray(data.basket)) { const set = new Set(S.basket); data.basket.forEach(x => { if (map[x]) set.add(map[x]); }); S.basket = Array.from(set); saveBasket(); }
       if (!filledCount(S.current) && data.current && typeof data.current === 'object') {
@@ -2296,6 +2472,7 @@ async function runImport(z, data, ui){
       }
     }
     await S.store.reload(); render();
+    setTimeout(normalizeAll, 500);
     const stopped = done < list.length;
     return stopped
       ? `Import arrêté à ${done}/${list.length}. Relance-le : les pièces déjà importées seront ignorées.`
@@ -2456,6 +2633,33 @@ function openSettings(){
   });
 }
 
+function openBulk(){
+  const kinds = bulkKinds();
+  const st = {kind:kinds[0], lg:'fonce', n:3};
+  const cap1 = t => t.charAt(0).toUpperCase() + t.slice(1);
+  openSheet(`<div class="sh-head"><h2>Linge en vrac</h2>${closeBtn}</div>
+    <p class="how" style="margin-top:0">Pour le linge sans photo : sous-vêtements, chaussettes, serviettes, draps… Il est rangé dans la bonne machine selon sa couleur, sans apparaître dans tes tenues.</p>
+    <div data-bbody></div>
+    <div class="foot"><button type="button" class="btn primary wide" data-badd>Ajouter au panier</button></div>`, root => {
+    const paint = () => { $('[data-bbody]', root).innerHTML = `
+      <div class="field"><span>Type</span><div class="czc">${kinds.map(k => `<button type="button" class="chip sm ${st.kind === k ? 'on' : ''}" data-bkind="${k}">${esc(BULK[k].label)}</button>`).join('')}</div></div>
+      <div class="field"><span>Couleur</span><div class="czc">${Object.keys(LG_LBL).map(g => `<button type="button" class="chip sm ${st.lg === g ? 'on' : ''}" data-bgrp="${g}">${cap1(LG_LBL[g])}</button>`).join('')}</div></div>
+      <div class="field"><span>Quantité</span><div class="stepper"><button type="button" class="icon" data-bn="-1" aria-label="Moins">−</button><b aria-live="polite">${st.n}</b><button type="button" class="icon" data-bn="1" aria-label="Plus">+</button></div></div>`; };
+    paint();
+    root.addEventListener('click', e => {
+      const k = e.target.closest('[data-bkind]'); if (k) { st.kind = k.dataset.bkind; paint(); return; }
+      const g = e.target.closest('[data-bgrp]'); if (g) { st.lg = g.dataset.bgrp; paint(); return; }
+      const b = e.target.closest('[data-bn]'); if (b) { st.n = Math.max(1, Math.min(60, st.n + Number(b.dataset.bn))); paint(); }
+    });
+    $('[data-badd]', root).onclick = () => {
+      const ex = (S.bulk || []).find(x => x.kind === st.kind && x.lg === st.lg);
+      if (ex) ex.n += st.n; else S.bulk = (S.bulk || []).concat([{id:uid(), kind:st.kind, lg:st.lg, n:st.n}]);
+      saveBulk(); closeSheet(); render();
+      toast(`${st.n} × ${BULK[st.kind].label.toLowerCase()} au panier`);
+    };
+  });
+}
+
 /* =========================================================
    GLOBAL EVENTS
    ========================================================= */
@@ -2491,13 +2695,14 @@ document.addEventListener('click', e => {
       renderTenue();
       toast(n ? `${pl(n, 'pièce ajoutée', 'pièces ajoutées')} au linge sale` : 'Déjà au linge sale');
     }
-    else if (a === 'basket-rm') { const prev = removeFromBasket([act.dataset.id]); toast('Retiré du panier', 'Annuler', () => { S.basket = prev; saveBasket(); render(); }); }
-    else if (a === 'basket-clear') { const prev = removeFromBasket(S.basket.slice()); toast('Panier vidé', 'Annuler', () => { S.basket = prev; saveBasket(); render(); }); }
+    else if (a === 'basket-rm') { const undo = removeFromBasket([act.dataset.id]); toast('Retiré du panier', 'Annuler', undo); }
+    else if (a === 'basket-clear') { const undo = removeFromBasket(S.basket.concat((S.bulk || []).map(e => 'bulk:' + e.id))); toast('Panier vidé', 'Annuler', undo); }
+    else if (a === 'bulk-add') openBulk();
     else if (a === 'load-done' && S.plan) {
       const L = S.plan.loads[Number(act.dataset.load)];
-      if (L) { const prev = removeFromBasket(L.items.map(i => i.id)); toast('Machine terminée', 'Annuler', () => { S.basket = prev; saveBasket(); render(); }); }
+      if (L) { const undo = removeFromBasket(L.items.map(i => i.id)); toast('Machine terminée', 'Annuler', undo); }
     }
-    else if (a === 'hand-done' && S.plan) { const prev = removeFromBasket(S.plan.hand.map(i => i.id)); toast('Lavage à la main terminé', 'Annuler', () => { S.basket = prev; saveBasket(); render(); }); }
+    else if (a === 'hand-done' && S.plan) { const undo = removeFromBasket(S.plan.hand.map(i => i.id)); toast('Lavage à la main terminé', 'Annuler', undo); }
     return;
   }
   const f = t.closest('[data-filter]');
@@ -2507,6 +2712,21 @@ document.addEventListener('click', e => {
   const o = t.closest('[data-outfit]');
   if (o) openOutfit(o.dataset.outfit);
 });
+
+const imgRetry = new Set();
+document.addEventListener('error', async e => {
+  const t = e.target;
+  if (!t || t.tagName !== 'IMG' || !t.dataset || !t.dataset.iid) return;
+  const id = t.dataset.iid;
+  if (!imgRetry.has(id) && S.store && S.store.repair) {
+    imgRetry.add(id);
+    if (await S.store.repair(id)) { render(); return; }
+  }
+  const it = getItem(id);
+  if (it && S.mode === 'local') it.broken = true;
+  const ph = document.createElement('span'); ph.className = 'noimg'; ph.innerHTML = ic('x', 16) + '<em>Photo à remplacer</em>';
+  if (t.isConnected) t.replaceWith(ph);
+}, true);
 
 (function bindComposer(){
   const vt = $('#v-tenue');
@@ -2591,9 +2811,10 @@ async function init(){
   S.ready = true;
   render();
   if (!prof().done) openOnboarding();
+  setTimeout(normalizeAll, 1500);
   aiP.then(() => { if (S.ai && sheetState) { /* next sheet will show AI options */ } });
 }
-window.__penderie = {S, openOnboarding, hiddenCats, caps, evaluate, generate, buildLoads, render, makeZip, readZip, buildBackup, runImport, rerollSlot, tagsOf};
+window.__penderie = {S, contentBox, bulkItems, openBulk, normalizeAll, openOnboarding, hiddenCats, caps, evaluate, generate, buildLoads, render, makeZip, readZip, buildBackup, runImport, rerollSlot, tagsOf};
 init();
 })();
 </script>
